@@ -31,18 +31,18 @@ public class AuthController : Controller
             return BadRequest(new Response<string>
             {
                 Success = false,
-                Message = "Invalid data",
+                Message = "Invalid data.",
                 Data = null
             });
         }
 
         var result = await _userService.RegisterUserAsync(registerReq);
-        if (!result.Success)
+        if (!result)
         {
             return BadRequest(new Response<string>
             {
                 Success = false,
-                Message = result.Message,
+                Message = "Username is already taken.",
                 Data = null
             });
         }
@@ -50,7 +50,7 @@ public class AuthController : Controller
         return Ok(new Response<string>
         {
             Success = true,
-            Message = result.Message,
+            Message = "User registered successfully.",
             Data = null
         });
     }
@@ -64,7 +64,7 @@ public class AuthController : Controller
             return Unauthorized(new Response<string>
             {
                 Success = false,
-                Message = "Invalid credentials",
+                Message = "Invalid credentials.",
                 Data = null
             });
         }
@@ -94,7 +94,7 @@ public class AuthController : Controller
             return Unauthorized(new Response<string>
             {
                 Success = false,
-                Message = "Invalid refresh token",
+                Message = "Invalid refresh token.",
                 Data = null
             });
         }

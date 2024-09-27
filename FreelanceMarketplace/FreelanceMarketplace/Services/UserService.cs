@@ -1,12 +1,9 @@
 ﻿using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Models.DTOs.Req;
-using FreelanceMarketplace.Models.DTOs.Res;
 using FreelanceMarketplace.Services.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace FreelanceMarketplace.Services
 {
@@ -21,16 +18,12 @@ namespace FreelanceMarketplace.Services
             _passwordHasher = new PasswordHasher<Users>();
         }
 
-        public async Task<Response> RegisterUserAsync(RegisterReq registerReq)
+        public async Task<bool> RegisterUserAsync(RegisterReq registerReq)
         {
             var existingUser = await _context.Users.SingleOrDefaultAsync(u => u.Username == registerReq.Username);
             if (existingUser != null)
             {
-                return new Response
-                {
-                    Success = false,
-                    Message = "Username is already taken."
-                };
+                return false;
             }
 
             var user = new Users
@@ -40,15 +33,9 @@ namespace FreelanceMarketplace.Services
             };
 
             user.PasswordHash = _passwordHasher.HashPassword(user, registerReq.Password);
-
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
-
-            return new Response
-            {
-                Success = true,
-                Message = "User registered successfully."
-            };
+            return true;
         }
 
         public Users Authenticate(string username, string password)
@@ -62,18 +49,6 @@ namespace FreelanceMarketplace.Services
                 return user;
 
             return null;
-        }
-
-        public void RegisterUser(string username, string password)
-        {
-            var user = new Users
-            {
-                Username = username,
-                PasswordHash = CreatePasswordHash(password)
-            };
-
-            _context.Users.Add(user);
-            _context.SaveChanges();
         }
 
         public void SaveRefreshToken(int userId, string refreshToken)
@@ -101,10 +76,9 @@ namespace FreelanceMarketplace.Services
 #pragma warning restore CS8603 // Possible null reference return.
         }
 
-        public RefreshTokens? GetRefreshTokenByToken(string token)
+        public RefreshTokens GetRefreshTokenByToken(string token)
         {
-            return _context.RefreshTokens
-                .SingleOrDefault(rt => rt.Token == token);
+            return _context.RefreshTokens.SingleOrDefault(rt => rt.Token == token);
         }
 
         public void MarkRefreshTokenAsUsed(RefreshTokens refreshToken)
@@ -114,20 +88,9 @@ namespace FreelanceMarketplace.Services
             _context.SaveChanges();
         }
 
-        public string CreatePasswordHash(string password)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(bytes);
-            }
-        }
-
         public Users GetUserById(int userId)
         {
-#pragma warning disable CS8603 // Possible null reference return.
             return _context.Users.Find(userId);
-#pragma warning restore CS8603 // Possible null reference return.
         }
 
         public Users GetUserByUsername(string username)
