@@ -14,5 +14,6 @@ namespace FreelanceMarketplace.Services.Interface
         void MarkRefreshTokenAsUsed(RefreshTokens refreshToken);
         Users GetUserById(int userId);
         Users GetUserByUsername(string username);
+        List<Users> GetUsers();
     }
 }

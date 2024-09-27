@@ -97,5 +97,9 @@ namespace FreelanceMarketplace.Services
         {
             return _context.Users.SingleOrDefault(u => u.Username == username);
         }
+        public List<Users> GetUsers()
+        {
+            return _context.Users.ToList();
+        }
     }
 }

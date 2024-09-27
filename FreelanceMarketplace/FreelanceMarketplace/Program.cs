@@ -7,6 +7,8 @@ using System.Text;
 using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Middlewares;
 using FreelanceMarketplace.Hubs;
+using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +33,9 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+        ClockSkew = TimeSpan.Zero,
+        RoleClaimType = ClaimTypes.Role
     };
 
     // Add this section to handle WebSocket authentication
@@ -50,6 +54,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Configure CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
@@ -61,12 +66,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-    options.AddPolicy("FreelancerOnly", policy => policy.RequireRole("Freelancer"));
-    options.AddPolicy("ClientOnly", policy => policy.RequireRole("Client"));
-});
+// Configure authorization policies
+//builder.Services.AddAuthorization(options =>
+//{
+//    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+//    options.AddPolicy("FreelancerOnly", policy => policy.RequireRole("Freelancer"));
+//    options.AddPolicy("ClientOnly", policy => policy.RequireRole("Client"));
+//});
 
 // Register services
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -79,7 +85,34 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Freelance Marketplace", Version = "v1" }));
+
+builder.Services.AddSwaggerGen(c =>
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    }));
+builder.Services.AddSwaggerGen(c =>
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    }));
 
 var app = builder.Build();
 
@@ -100,8 +133,7 @@ app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-//app.UseMiddleware<RoleMiddleware>();
+app.UseMiddleware<RoleMiddleware>();
 
 // Use UseEndpoints to map hub and controllers
 app.UseEndpoints(endpoints =>
