@@ -107,6 +107,7 @@ app.UseAuthorization();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<ChatHub>("/chathub");
+    endpoints.MapHub<VideoCallHub>("/videocallhub");
     endpoints.MapControllers();
 });
 
