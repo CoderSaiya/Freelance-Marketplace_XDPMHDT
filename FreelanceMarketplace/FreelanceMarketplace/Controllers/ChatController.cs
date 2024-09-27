@@ -1,25 +1,28 @@
 ﻿using FreelanceMarketplace.Hubs;
+using FreelanceMarketplace.Models.DTOs.Res;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
-namespace FreelanceMarketplace.Controllers
+[ApiController]
+[Route("api/[controller]")]
+public class ChatController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ChatController : ControllerBase
+    private readonly IHubContext<ChatHub> _chatHub;
+
+    public ChatController(IHubContext<ChatHub> chatHub)
     {
-        private readonly IHubContext<ChatHub> _chatHub;
+        _chatHub = chatHub;
+    }
 
-        public ChatController(IHubContext<ChatHub> chatHub)
+    [HttpPost("send")]
+    public async Task<IActionResult> SendMessage(string user, string message)
+    {
+        await _chatHub.Clients.All.SendAsync("ReceiveMessage", user, message);
+        return Ok(new Response<string>
         {
-            _chatHub = chatHub;
-        }
-
-        [HttpPost("send")]
-        public async Task<IActionResult> SendMessage(string user, string message)
-        {
-            await _chatHub.Clients.All.SendAsync("ReceiveMessage", user, message);
-            return Ok(new { Status = "Message Sent" });
-        }
+            Success = true,
+            Message = "Message sent",
+            Data = null
+        });
     }
 }

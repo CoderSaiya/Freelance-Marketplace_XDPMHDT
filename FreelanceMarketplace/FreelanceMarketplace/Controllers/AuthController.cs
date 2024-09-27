@@ -1,14 +1,13 @@
 ﻿using FreelanceMarketplace.Data;
-using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Models.DTOs.Req;
-using FreelanceMarketplace.Services;
+using FreelanceMarketplace.Models.DTOs.Res;
+using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Services.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 [ApiController]
-[Route("api/admin/[controller]")]
+[Route("api/[controller]")]
 public class AuthController : Controller
 {
     private readonly IAuthService _authService;
@@ -29,43 +28,82 @@ public class AuthController : Controller
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(new Response<string>
+            {
+                Success = false,
+                Message = "Invalid data",
+                Data = null
+            });
         }
 
         var result = await _userService.RegisterUserAsync(registerReq);
         if (!result.Success)
         {
-            return BadRequest(result.Message);
+            return BadRequest(new Response<string>
+            {
+                Success = false,
+                Message = result.Message,
+                Data = null
+            });
         }
 
-        return Ok(result.Message);
+        return Ok(new Response<string>
+        {
+            Success = true,
+            Message = result.Message,
+            Data = null
+        });
     }
 
     [HttpPost("login")]
-    public JsonResult Login([FromBody] LoginReq request)
+    public IActionResult Login([FromBody] LoginReq request)
     {
         string accessToken = _authService.Login(request.Username, request.Password);
         if (accessToken == null)
-            return new JsonResult(Unauthorized());
+        {
+            return Unauthorized(new Response<string>
+            {
+                Success = false,
+                Message = "Invalid credentials",
+                Data = null
+            });
+        }
 
         Users user = _userService.GetUserByUsername(request.Username);
         string refreshToken = _authService.GenerateRefreshToken();
         _userService.SaveRefreshToken(user.Id, refreshToken);
 
-        return new JsonResult(Ok(new
+        return Ok(new Response<object>
         {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken
-        }));
+            Success = true,
+            Message = "Login successful",
+            Data = new
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            }
+        });
     }
 
     [HttpPost("refresh-token")]
-    public JsonResult RefreshToken([FromBody] TokenDto request)
+    public IActionResult RefreshToken([FromBody] TokenDto request)
     {
         var newAccessToken = _authService.RefreshToken(request.RefreshToken);
         if (newAccessToken == null)
-            return new JsonResult(Unauthorized());
+        {
+            return Unauthorized(new Response<string>
+            {
+                Success = false,
+                Message = "Invalid refresh token",
+                Data = null
+            });
+        }
 
-        return new JsonResult(Ok(new { AccessToken = newAccessToken }));
+        return Ok(new Response<string>
+        {
+            Success = true,
+            Message = "Token refreshed",
+            Data = newAccessToken
+        });
     }
 }
