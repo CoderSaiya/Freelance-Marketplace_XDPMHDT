@@ -6,10 +6,14 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Middlewares;
+using FreelanceMarketplace.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Config authentication with JWT Bearer
+// Add SignalR service
+builder.Services.AddSignalR();
+
+// Configure authentication with JWT Bearer
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -29,6 +33,32 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
+
+    // Add this section to handle WebSocket authentication
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chathub"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+    };
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://127.0.0.1:5500") // replace with your frontend port
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials();
+    });
 });
 
 builder.Services.AddAuthorization(options =>
@@ -44,7 +74,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 // Configure Entity Framework
 builder.Services.AddDbContext<AuthDbContext>(options =>
-    options.UseSqlServer(connectionString: "Data Source=DESKTOP-1FAVEMH\\SQLEXPRESS;Initial Catalog=FreelanceMarketplace;Integrated Security=True;trusted_connection=true;encrypt=false;")); /* sua ten database trong Catalog */
+    options.UseSqlServer(connectionString: "Data Source=DESKTOP-1FAVEMH\\SQLEXPRESS;Initial Catalog=FreelanceMarketplace;Integrated Security=True;trusted_connection=true;encrypt=false;"));
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -61,8 +91,23 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Add UseRouting before UseAuthentication and UseAuthorization
+app.UseRouting();
+
+// Place UseCors before UseAuthentication and UseAuthorization
+app.UseCors();
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 //app.UseMiddleware<RoleMiddleware>();
-app.MapControllers();
+
+// Use UseEndpoints to map hub and controllers
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<ChatHub>("/chathub");
+    endpoints.MapControllers();
+});
+
 app.Run();

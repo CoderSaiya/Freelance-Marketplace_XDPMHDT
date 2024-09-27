@@ -9,6 +9,7 @@ namespace FreelanceMarketplace.Data
 
         public DbSet<Users> Users { get; set; }
         public DbSet<RefreshTokens> RefreshTokens { get; set; }
+        public DbSet<ChatMessage> ChatMessages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<RefreshTokens>()
@@ -24,6 +25,11 @@ namespace FreelanceMarketplace.Data
             {
                 entity.HasIndex(e => e.Username).IsUnique();
                 entity.Property(e => e.Role).IsRequired().HasMaxLength(10);
+            });
+
+            modelBuilder.Entity<ChatMessage>(entity =>
+            {
+                entity.Property(e => e.Message).IsRequired();
             });
         }
     }
