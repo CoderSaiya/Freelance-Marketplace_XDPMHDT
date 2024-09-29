@@ -77,6 +77,7 @@ builder.Services.AddCors(options =>
 // Register services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Configure Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
