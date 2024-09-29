@@ -16,7 +16,11 @@ namespace FreelanceMarketplace.Models
         [Required]
         [MaxLength(250)]
         public string? PasswordHash { get; set; }
+        [Required]
+        public string? Email { get; set; }
         public string? Role { get; set; } = "Client";
+        public bool IsEmailConfirmed { get; set; } = false;
+        public string? EmailConfirmationToken { get; set; }
         public ICollection<RefreshTokens> RefreshTokens { get; set; } = new List<RefreshTokens>();
         public ICollection<Contracts> FreelancerContracts { get; set; } = new List<Contracts>();
         public ICollection<Contracts> ClientContracts { get; set; } = new List<Contracts>();

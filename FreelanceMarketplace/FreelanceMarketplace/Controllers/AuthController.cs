@@ -5,6 +5,7 @@ using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Services.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -12,10 +13,10 @@ public class AuthController : Controller
 {
     private readonly IAuthService _authService;
     private readonly IUserService _userService;
-    private readonly AuthDbContext _context;
+    private readonly AppDbContext _context;
     private readonly PasswordHasher<Users> _passwordHasher;
 
-    public AuthController(IAuthService authService, IUserService userService, AuthDbContext context)
+    public AuthController(IAuthService authService, IUserService userService, AppDbContext context)
     {
         _authService = authService;
         _userService = userService;
@@ -51,6 +52,28 @@ public class AuthController : Controller
         {
             Success = true,
             Message = "User registered successfully.",
+            Data = null
+        });
+    }
+
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail(int userId, string token)
+    {
+        var result = await _userService.ConfirmEmailAsync(userId, token);
+        if (!result)
+        {
+            return BadRequest(new Response<string>
+            {
+                Success = false,
+                Message = "Invalid confirmation link or token.",
+                Data = null
+            });
+        }
+
+        return Ok(new Response<string>
+        {
+            Success = true,
+            Message = "Email confirmed successfully.",
             Data = null
         });
     }
