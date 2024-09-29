@@ -36,8 +36,6 @@ namespace FreelanceMarketplace.Models
 
         [ForeignKey("CategoryId")]
         public Category? Category { get; set; }
-
-
-
+        public Contracts? Contract { get; set; }
     }
 }
