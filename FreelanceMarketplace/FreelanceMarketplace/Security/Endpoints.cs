@@ -6,7 +6,8 @@
         {
             "/api/auth/login",
             "/api/auth/register",
-            
+            "/api/auth/confirm-email",
+
         };
 
         public static readonly string[] AdminEndpoints =

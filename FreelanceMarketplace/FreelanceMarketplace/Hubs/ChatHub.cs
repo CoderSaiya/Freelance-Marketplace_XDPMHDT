@@ -9,8 +9,8 @@ namespace FreelanceMarketplace.Hubs
     public class ChatHub:Hub
     {
         private readonly IUserService _userService;
-        private readonly AuthDbContext _context;
-        public ChatHub(IUserService userService, AuthDbContext context)
+        private readonly AppDbContext _context;
+        public ChatHub(IUserService userService, AppDbContext context)
         {
             _userService = userService;
             _context = context;

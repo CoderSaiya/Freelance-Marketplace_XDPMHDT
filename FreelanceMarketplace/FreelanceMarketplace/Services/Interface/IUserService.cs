@@ -7,6 +7,7 @@ namespace FreelanceMarketplace.Services.Interface
     public interface IUserService
     {
         Task<bool> RegisterUserAsync(RegisterReq registerReq);
+        Task<bool> ConfirmEmailAsync(int userId, string token);
         Users Authenticate(string username, string password);
         void SaveRefreshToken(int userId, string refreshToken);
         RefreshTokens GetRefreshToken(int userId);
