@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
 namespace FreelanceMarketplace.Models
@@ -6,24 +7,21 @@ namespace FreelanceMarketplace.Models
     public class Apply
     {
         [Key]
-        public int Id { get; set; }
+        public int ApplyId { get; set; }
+
+        [Required]
+        public int UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public Users? User { get; set; }
 
         [Required]
         public int ProjectId { get; set; }
-        [Required]
-        public int FreelancerId { get; set; }  
-        [Required]
-        [MaxLength(500)]
-        public string CoverLetter { get; set; }  
 
-        [Required]
-        public DateTime ApplyDate { get; set; }  
-
-        public bool IsAccepted { get; set; }  
-
-        public DateTime? DecisionDate { get; set; }  
-
-        
-        public string Remarks { get; set; }  
+        [ForeignKey("ProjectId")]
+        public Project? Project { get; set; }
+        public int Duration { get; set; }
+        public string Status { get; set; } = "Pending";
+        public DateTime CreateAt { get; set; } = DateTime.Now;
     }
 }

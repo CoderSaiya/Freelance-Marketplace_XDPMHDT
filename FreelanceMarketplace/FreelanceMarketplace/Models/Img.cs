@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System;
 
 
@@ -11,22 +12,25 @@ namespace FreelanceMarketplace.Models
 
         [Required]
         [MaxLength(255)]
-        public string ImageName { get; set; }  
+        public string? ImageName { get; set; }  
 
         [Required]
         [MaxLength(2048)]
-        public string ImageUrl { get; set; }  
+        public string? ImageUrl { get; set; }  
 
         [MaxLength(255)]
-        public string MimeType { get; set; }  
+        public string? MimeType { get; set; }
 
         [Required]
-        public DateTime UploadedDate { get; set; }  
+        public DateTime UploadedDate { get; set; } = DateTime.UtcNow;
 
-        public long FileSize { get; set; }  
-
-        
-        public int? ProductId { get; set; }  
-        public string UploadedBy { get; set; }  
+        public long FileSize { get; set; }
+        public int ProjectId { get; set; }
+        [ForeignKey("ProjectId")]
+        public Project? Project { get; set; }
+        [Required]
+        public int UploadedByUserId { get; set; }
+        [ForeignKey("UploadedByUserId")]
+        public Users? UploadedByUser { get; set; }
     }
 }

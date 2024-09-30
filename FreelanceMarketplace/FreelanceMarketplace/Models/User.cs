@@ -26,5 +26,7 @@ namespace FreelanceMarketplace.Models
         public ICollection<Contracts> ClientContracts { get; set; } = new List<Contracts>();
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
         public UserProfile? UserProfile { get; set; }
+        public ICollection<Apply> Applies { get; set; } = new List<Apply>();
+        public ICollection<Img> UploadedImages { get; set; } = new List<Img>();
     }
 }

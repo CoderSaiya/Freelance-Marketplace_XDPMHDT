@@ -14,6 +14,7 @@ namespace FreelanceMarketplace.Data
         public DbSet<Contracts> Contracts { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<Img> Images { get; set; }
         public DbSet<RefreshTokens> RefreshTokens { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -97,6 +98,22 @@ namespace FreelanceMarketplace.Data
             .WithOne(c => c.Payment)
             .HasForeignKey<Payment>(p => p.ContractId)
             .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Img>()
+            .HasOne(i => i.UploadedByUser)
+            .WithMany(u => u.UploadedImages)
+            .HasForeignKey(i => i.UploadedByUserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Apply>()
+            .HasOne(a => a.User)
+            .WithMany(u => u.Applies)
+            .HasForeignKey(a => a.UserId);
+
+            modelBuilder.Entity<Apply>()
+            .HasOne(a => a.Project)
+            .WithMany(p => p.Applies)
+            .HasForeignKey(a => a.ProjectId);
         }
     }
 }
