@@ -12,10 +12,13 @@ namespace FreelanceMarketplace.Data
         public DbSet<Project> Projects { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Contracts> Contracts { get; set; }
+        public DbSet<Payment> Payments { get; set; }
+        public DbSet<Review> Reviews { get; set; }
         public DbSet<RefreshTokens> RefreshTokens { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //Cau hinh contribute (column)
             modelBuilder.Entity<RefreshTokens>()
                 .HasKey(rt => rt.Id);
 
@@ -41,10 +44,17 @@ namespace FreelanceMarketplace.Data
                 entity.HasIndex(e => e.CategoryName).IsUnique();
             });
 
-            modelBuilder.Entity<Project>(entity =>
-            {
+            //cau hinh rang buoc quan he
+            modelBuilder.Entity<UserProfile>()
+            .HasOne(up => up.User)
+            .WithOne(u => u.UserProfile)
+            .HasForeignKey<UserProfile>(up => up.UserId);
 
-            });
+            modelBuilder.Entity<Project>()
+            .HasOne(p => p.Category)
+            .WithMany(c => c.Projects)
+            .HasForeignKey(p => p.CategoryId)
+            .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Contracts>()
             .HasOne(c => c.Freelancer)
@@ -64,6 +74,29 @@ namespace FreelanceMarketplace.Data
                 entity.Property(e => e.EndDate).IsRequired();
                 entity.Property(e => e.Status).IsRequired();
             });
+
+            modelBuilder.Entity<Project>()
+                .HasOne(p => p.Category)
+                .WithMany(c => c.Projects)
+                .HasForeignKey(p => p.CategoryId);
+
+            modelBuilder.Entity<Review>()
+            .HasOne(r => r.User)
+            .WithMany(u => u.Reviews)
+            .HasForeignKey(r => r.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Review>()
+            .HasOne(r => r.Contract)
+            .WithMany(c => c.Reviews)
+            .HasForeignKey(r => r.ContractId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Payment>()
+            .HasOne(p => p.Contract)
+            .WithOne(c => c.Payment)
+            .HasForeignKey<Payment>(p => p.ContractId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
