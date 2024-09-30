@@ -24,5 +24,7 @@ namespace FreelanceMarketplace.Models
         public ICollection<RefreshTokens> RefreshTokens { get; set; } = new List<RefreshTokens>();
         public ICollection<Contracts> FreelancerContracts { get; set; } = new List<Contracts>();
         public ICollection<Contracts> ClientContracts { get; set; } = new List<Contracts>();
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
+        public UserProfile? UserProfile { get; set; }
     }
 }
