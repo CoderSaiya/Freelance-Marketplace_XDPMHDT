@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "freelancemarketplace-437412",
+  "private_key_id": "59156052cce2ca91f6cb9f640900abfccb91ab0f",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQC5Qq5+o7zJfuj/\nMKJSj0PCqwmLzW5rr5BCd/agWx6KfEX1ykdDitvMkdKaUqX14UeKGj2V2MRFKXDJ\n3RqhoZvjmxNL8EEjGknrrRhHvr+rjde35GKqHXwAV0IgLboH+WPJ18DwK+4DGjfm\n+8Bo4WGvt1DOmd+SYBLVKdAe6t3VopOf/x7LP2ryuhGWSoGEUTRN600v7YoogvIu\ndQ8z/JabcLNvjS11X4GpXW6ugSlwhpaCcjqMYd8sPQJotKId5DD26W75k+IX9xAO\nWGaNFiCJiNYZQCKqjWloL8fzk2DY2WWjAXLXvYrvooWF8Xmlv2QTL10K1I/40Csb\nFcyX9qO7AgMBAAECggEAPHiXnJ61sM/MHgAx++DnrVNG+mtD78KOxCOETTNw9KM7\n8s7kFBfvRwcSR21S3r96KooGMDNhXXH5burNFpU53UFxOwhhOqQKHPOTSVfqGIVk\nNJJH4l9dan8RBo/meVPeTrQuNjcgqcKVHMBwPcvTpxefONDhOVZCz3GmjXD8mA65\n1cawbIjrbXlWS7wqGxMggCUpS8sYCPxHAOhxk7uwAD7Sur31gK5aqYur2cwqeiBj\ndRfOJi28pAMU0cCbqCWaOPNcVlfMAhZQSUPm3A1kyxJW6Up5K8tE13r91CpmP/GA\nJLzF4TA4vculvhrTdWRba5N0ELI3WEfbjnyJeUBlgQKBgQD4m1YwUWnQH+s9UKaI\nhaJsDwQOEit230EPCaVVvvsWJD3FnL/DIVqW8TnfWQbnD7rMdiQ3wXoN/ITT5qY4\naIkgL8mgQiyYOgJHGPdY3ML/PhbmzWym0HDvjErI0vugTGOlnHDgnDvWJLWSo0MK\n17WXQZ3CbOUtEkWgYac4XLLfjwKBgQC+xRWdQKnagfL4+WeWrq4Ru3wZk3Y0vsU8\n+oCdvTleDI/zEfr7rD4IHJYwGyx4TF6tpPc8ETm76XO4T6JC7Q82tPaT0WT2dTFD\nH6UGac/E5zgWBrAIIIU0UjojhHGGN4titBOafX3zC5dRW02HT5KAnO1S9Mnz6Ww+\nQCHk9spjFQKBgCMvALyn2PzOd6Fe16K8nucCHQXMxn/1SqTRLaf79lcE3AUqkO0R\nvFteWl1koRh0XnBvS+LkK9zs3vOKUf3rtXRrrvJSSzNkCkx7mQ3neGVdKSqS6gyV\ntVYBmdfgHCJsjTGz+TmggstkuJm/J07Shm2YqLYKaUi+rEHtcBgG7n27AoGAPw4p\nrMaY3e6h/wWA5d9rDdVomZOSOLDtxNAP/xNyiNGiKvfAe7tc7ZV1VwVEV6b2jHLA\nfYw8Bw6M/1jjCzgMFUsPTaCivIvT8pndFBeZYz4B3dXsDWOiY77iFKdMVs65NbDL\n4f6kyNcF9xA0ugrlI7m6//aFYie/bXwJOAMStlkCgYAp7BJ7GUKxkPvPOQ/biffP\nVZLakTKwricEu7aFPG07EqAkEHzzMMN8m7r380LqudfAcrBXVZiXcXI7mVqe+IcM\n2+Kph6O363AYp/ziJ0rvo95/c2eL1nnIlPHeV0f+buqi7H2Aw0dmdii78XSLxHUF\nN62I3/F3ZEMUyQg3YdUTXg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "freelancemarketplace@freelancemarketplace-437412.iam.gserviceaccount.com",
+  "client_id": "114417853593306577778",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/freelancemarketplace%40freelancemarketplace-437412.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -78,6 +78,8 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IImgService, ImgService>();
+builder.Services.AddScoped<GoogleDriveService>();
 
 // Configure Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
