@@ -80,6 +80,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IImgService, ImgService>();
 builder.Services.AddScoped<GoogleDriveService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IProjectService, ProjectService>();
 
 // Configure Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
