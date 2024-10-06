@@ -17,7 +17,7 @@ namespace FreelanceMarketplace.Data
         public DbSet<Img> Images { get; set; }
         public DbSet<RefreshTokens> RefreshTokens { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
-	public DbSet<Apply> Applies { get; set; } 
+        public DbSet<Apply> Applies { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Cau hinh contribute (column)

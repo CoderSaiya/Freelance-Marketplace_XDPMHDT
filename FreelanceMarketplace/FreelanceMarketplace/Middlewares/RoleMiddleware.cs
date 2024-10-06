@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Security.Claims;
+using FreelanceMarketplace.Services.Interface;
 using FreelanceMarketplace.Security;
 
 namespace FreelanceMarketplace.Middlewares
@@ -30,27 +31,12 @@ namespace FreelanceMarketplace.Middlewares
             if (!context.User.Identity.IsAuthenticated)
             {
                 _logger.LogWarning($"Unauthorized access attempt to: {path}");
-
-                _logger.LogInformation("User Claims:");
-                foreach (var claim in context.User.Claims)
-                {
-                    _logger.LogInformation($"Claim type: {claim.Type}, Claim value: {claim.Value}");
-                }
-
-                if (context.User.IsInRole("Admin"))
-                {
-                    _logger.LogInformation("User is in role Admin");
-                }
-                else
-                {
-                    _logger.LogWarning("User is NOT in role Admin");
-                }
-
                 context.Response.StatusCode = 401;
                 await context.Response.WriteAsync("Unauthorized");
                 return;
             }
 
+            // Check if the token is valid and not expired
             if (!context.User.Identity.IsAuthenticated || context.User.FindFirst("exp") == null)
             {
                 _logger.LogWarning("Token expired or invalid");
@@ -59,24 +45,35 @@ namespace FreelanceMarketplace.Middlewares
                 return;
             }
 
-            if (Endpoints.AdminEndpoints.Any(e => path.StartsWith(e)) && !context.User.IsInRole("Admin"))
+            // Use HttpContext.RequestServices to create a scope
+            using (var scope = context.RequestServices.CreateScope())
             {
-                _logger.LogWarning($"Forbidden access attempt to admin endpoint: {path}");
-                context.Response.StatusCode = 403;
-                await context.Response.WriteAsync("Forbidden");
-                return;
-            }
+                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
 
-            if (Endpoints.FreelancerEndpoints.Any(e => path.StartsWith(e.ToLower())) && !context.User.IsInRole("Freelancer"))
-            {
-                context.Response.StatusCode = 403;
-                return;
-            }
+                // Check for admin role
+                if (Endpoints.AdminEndpoints.Any(e => path.StartsWith(e)) && !context.User.IsInRole("Admin"))
+                {
+                    _logger.LogWarning($"Forbidden access attempt to admin endpoint: {path}");
+                    context.Response.StatusCode = 403;
+                    await context.Response.WriteAsync("Forbidden");
+                    return;
+                }
 
-            if (Endpoints.ClientEndpoints.Any(e => path.StartsWith(e.ToLower())) && !context.User.IsInRole("Client"))
-            {
-                context.Response.StatusCode = 403;
-                return;
+                // Check for freelancer role
+                if (Endpoints.FreelancerEndpoints.Any(e => path.StartsWith(e.ToLower())) && !context.User.IsInRole("Freelancer"))
+                {
+                    context.Response.StatusCode = 403;
+                    await context.Response.WriteAsync("Forbidden");
+                    return;
+                }
+
+                // Check for client role
+                if (Endpoints.ClientEndpoints.Any(e => path.StartsWith(e.ToLower())) && !context.User.IsInRole("Client"))
+                {
+                    context.Response.StatusCode = 403;
+                    await context.Response.WriteAsync("Forbidden");
+                    return;
+                }
             }
 
             await _next(context);

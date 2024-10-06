@@ -4,7 +4,6 @@ using FreelanceMarketplace.Models.DTOs.Req;
 using FreelanceMarketplace.Services.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace FreelanceMarketplace.Services
 {
@@ -130,6 +129,12 @@ namespace FreelanceMarketplace.Services
         {
             return _context.Users.SingleOrDefault(u => u.Username == username);
         }
+
+        public async Task<Users> GetUserByUsernameAsync(string username)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        }
+
         public List<Users> GetUsers()
         {
             return _context.Users.ToList();

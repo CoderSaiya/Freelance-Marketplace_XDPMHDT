@@ -9,6 +9,15 @@ using FreelanceMarketplace.Middlewares;
 using FreelanceMarketplace.Hubs;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
+using FreelanceMarketplace.GraphQL.Schemas.Mutations;
+using FreelanceMarketplace.GraphQL.Schemas.Queries;
+using FreelanceMarketplace.GraphQL.Types;
+using FreelanceMarketplace.GraphQL.Schemas;
+using GraphQL;
+using GraphQL.Server;
+using GraphQL.Types;
+using FreelanceMarketplace.Services.Implementations;
+using FreelanceMarketplace.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,12 +76,12 @@ builder.Services.AddCors(options =>
 });
 
 // Configure authorization policies
-//builder.Services.AddAuthorization(options =>
-//{
-//    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-//    options.AddPolicy("FreelancerOnly", policy => policy.RequireRole("Freelancer"));
-//    options.AddPolicy("ClientOnly", policy => policy.RequireRole("Client"));
-//});
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("FreelancerOnly", policy => policy.RequireRole("Freelancer"));
+    options.AddPolicy("ClientOnly", policy => policy.RequireRole("Client"));
+});
 
 // Register services
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -86,7 +95,18 @@ builder.Services.AddScoped<IApplyService, ApplyService>();
 
 // Configure Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connectionString: "Data Source=DESKTOP-1FAVEMH\\SQLEXPRESS;Initial Catalog=FreelanceMarketplace;Integrated Security=True;trusted_connection=true;encrypt=false;"));
+    options.UseSqlServer(
+        connectionString: "Data Source=DESKTOP-1FAVEMH\\SQLEXPRESS;Initial Catalog=FreelanceMarketplace;Integrated Security=True;trusted_connection=true;encrypt=false;",
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        }),
+    contextLifetime: ServiceLifetime.Scoped,
+    optionsLifetime: ServiceLifetime.Singleton
+);
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -120,6 +140,26 @@ builder.Services.AddSwaggerGen(c =>
         }
     }));
 
+// Register GraphQL types with scoped lifetime
+builder.Services.AddScoped<ISchema, MainSchema>();
+
+builder.Services.AddScoped<UserQuery>();
+
+builder.Services.AddScoped<UserMutation>();
+
+builder.Services.AddScoped<UserType>();
+builder.Services.AddScoped<RefreshTokenType>();
+builder.Services.AddScoped<UserProfileType>();
+builder.Services.AddScoped<ProjectType>();
+
+// Adjust the GraphQL configuration to use AddSelfActivatingSchema
+builder.Services.AddGraphQL(b => b
+    .AddSelfActivatingSchema<MainSchema>()
+    .AddSystemTextJson()
+    .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = builder.Environment.IsDevelopment())
+    .AddGraphTypes(typeof(MainSchema).Assembly)
+);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
@@ -127,6 +167,7 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseGraphQLPlayground(); // GraphQL Playground UI
 }
 
 app.UseHttpsRedirection();
@@ -148,5 +189,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapHub<VideoCallHub>("/videocallhub");
     endpoints.MapControllers();
 });
+
+app.UseGraphQL<ISchema>("/graphql"); // GraphQL endpoint
 
 app.Run();
