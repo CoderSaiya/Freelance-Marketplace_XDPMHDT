@@ -1,9 +1,6 @@
 ﻿using GraphQL.Types;
 using GraphQL;
 using FreelanceMarketplace.Services.Interface;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 using FreelanceMarketplace.GraphQL.Types;
 
 namespace FreelanceMarketplace.GraphQL.Schemas.Queries
@@ -22,7 +19,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                     }
                 });
 
-            Field<UserType>("user")
+            Field<UserType>("userByUsername")
                 .Arguments(new QueryArguments(new QueryArgument<StringGraphType> { Name = "username" }))
                 .ResolveAsync(async context =>
                 {
@@ -30,8 +27,21 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                        // Assuming GetUserByUsername is async. If it's not, remove the await and async keywords.
                         return await userService.GetUserByUsernameAsync(username);
+                    }
+                });
+
+            Field<UserType>("userById")
+                .Arguments(new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "userId" }
+                ))
+                .Resolve(context =>
+                {
+                    int userId = context.GetArgument<int>("userId");
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+                        return userService.GetUserById(userId);
                     }
                 });
         }
