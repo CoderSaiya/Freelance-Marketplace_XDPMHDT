@@ -1,54 +1,73 @@
 ﻿using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Models.DTOs.Req;
-using FreelanceMarketplace.Models.DTOs.Res;
 using FreelanceMarketplace.Services.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace FreelanceMarketplace.Services
 {
     public class UserService : IUserService
     {
-        private readonly AuthDbContext _context;
+        private readonly AppDbContext _context;
         private readonly PasswordHasher<Users> _passwordHasher;
-
-        public UserService(AuthDbContext context)
+        private readonly IEmailService _emailService;
+        public UserService(AppDbContext context, IEmailService emailService)
         {
             _context = context;
             _passwordHasher = new PasswordHasher<Users>();
+            _emailService = emailService;
         }
 
-        public async Task<Response> RegisterUserAsync(RegisterReq registerReq)
+        public async Task<bool> RegisterUserAsync(RegisterReq registerReq)
         {
             var existingUser = await _context.Users.SingleOrDefaultAsync(u => u.Username == registerReq.Username);
             if (existingUser != null)
             {
-                return new Response
-                {
-                    Success = false,
-                    Message = "Username is already taken."
-                };
+                return false;
             }
 
             var user = new Users
             {
                 Username = registerReq.Username,
-                Role = registerReq.Role
+                Email = registerReq.Email,
+                Role = registerReq.Role,
+                IsEmailConfirmed = false,
+                EmailConfirmationToken = Guid.NewGuid().ToString(),
             };
 
-            user.PasswordHash = _passwordHasher.HashPassword(user, registerReq.Password);
+            Console.WriteLine("User Email: " + user.Email);
 
+            user.PasswordHash = _passwordHasher.HashPassword(user, registerReq.Password);
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            return new Response
+            var confirmationLink = $"https://localhost:7115/api/Auth/confirm-email?userId={user.Id}&token={user.EmailConfirmationToken}";
+
+            var emailBody = $@"
+            <h2>Confirm your registration email</h2>
+            <p>Hi, {user.Username}</p>
+            <p>Please click the link below to confirm your account:</p>
+            <a href='{confirmationLink}'>Confirm email</a>";
+
+            await _emailService.SendEmailAsync(user.Email, "Xác nhận đăng ký tài khoản", emailBody);
+
+            return true;
+        }
+
+        public async Task<bool> ConfirmEmailAsync(int userId, string token)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Id == userId && u.EmailConfirmationToken == token);
+            if (user == null)
             {
-                Success = true,
-                Message = "User registered successfully."
-            };
+                return false;
+            }
+
+            user.IsEmailConfirmed = true;
+            user.EmailConfirmationToken = null;
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
         public Users Authenticate(string username, string password)
@@ -62,18 +81,6 @@ namespace FreelanceMarketplace.Services
                 return user;
 
             return null;
-        }
-
-        public void RegisterUser(string username, string password)
-        {
-            var user = new Users
-            {
-                Username = username,
-                PasswordHash = CreatePasswordHash(password)
-            };
-
-            _context.Users.Add(user);
-            _context.SaveChanges();
         }
 
         public void SaveRefreshToken(int userId, string refreshToken)
@@ -101,10 +108,9 @@ namespace FreelanceMarketplace.Services
 #pragma warning restore CS8603 // Possible null reference return.
         }
 
-        public RefreshTokens? GetRefreshTokenByToken(string token)
+        public RefreshTokens GetRefreshTokenByToken(string token)
         {
-            return _context.RefreshTokens
-                .SingleOrDefault(rt => rt.Token == token);
+            return _context.RefreshTokens.SingleOrDefault(rt => rt.Token == token);
         }
 
         public void MarkRefreshTokenAsUsed(RefreshTokens refreshToken)
@@ -114,25 +120,34 @@ namespace FreelanceMarketplace.Services
             _context.SaveChanges();
         }
 
-        public string CreatePasswordHash(string password)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(bytes);
-            }
-        }
-
         public Users GetUserById(int userId)
         {
-#pragma warning disable CS8603 // Possible null reference return.
             return _context.Users.Find(userId);
-#pragma warning restore CS8603 // Possible null reference return.
         }
 
         public Users GetUserByUsername(string username)
         {
             return _context.Users.SingleOrDefault(u => u.Username == username);
+        }
+
+        public async Task<Users> GetUserByUsernameAsync(string username)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        }
+
+        public List<Users> GetUsers()
+        {
+            return _context.Users.ToList();
+        }
+
+        public bool DeleteUserById(int userId)
+        {
+            var user = _context.Users.Find(userId);
+            if (user == null) return false;
+
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+            return true;
         }
     }
 }

@@ -6,14 +6,17 @@ namespace FreelanceMarketplace.Services.Interface
 {
     public interface IUserService
     {
-        Task<Response> RegisterUserAsync(RegisterReq registerReq);
+        Task<bool> RegisterUserAsync(RegisterReq registerReq);
+        Task<bool> ConfirmEmailAsync(int userId, string token);
         Users Authenticate(string username, string password);
-        void RegisterUser(string username, string password);
         void SaveRefreshToken(int userId, string refreshToken);
         RefreshTokens GetRefreshToken(int userId);
-        public RefreshTokens? GetRefreshTokenByToken(string token);
+        RefreshTokens GetRefreshTokenByToken(string token);
         void MarkRefreshTokenAsUsed(RefreshTokens refreshToken);
-        public Users GetUserById(int userId);
-        public Users GetUserByUsername(string username);
+        Users GetUserById(int userId);
+        Users GetUserByUsername(string username);
+        Task<Users> GetUserByUsernameAsync(string username);
+        List<Users> GetUsers();
+        bool DeleteUserById(int userId);
     }
 }

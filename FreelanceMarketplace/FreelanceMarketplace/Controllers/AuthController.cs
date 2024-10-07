@@ -1,22 +1,22 @@
 ﻿using FreelanceMarketplace.Data;
-using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Models.DTOs.Req;
-using FreelanceMarketplace.Services;
+using FreelanceMarketplace.Models.DTOs.Res;
+using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Services.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System;
 
 [ApiController]
-[Route("api/admin/[controller]")]
+[Route("api/[controller]")]
 public class AuthController : Controller
 {
     private readonly IAuthService _authService;
     private readonly IUserService _userService;
-    private readonly AuthDbContext _context;
+    private readonly AppDbContext _context;
     private readonly PasswordHasher<Users> _passwordHasher;
 
-    public AuthController(IAuthService authService, IUserService userService, AuthDbContext context)
+    public AuthController(IAuthService authService, IUserService userService, AppDbContext context)
     {
         _authService = authService;
         _userService = userService;
@@ -29,43 +29,104 @@ public class AuthController : Controller
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState);
+            return BadRequest(new Response<string>
+            {
+                Success = false,
+                Message = "Invalid data.",
+                Data = null
+            });
         }
 
         var result = await _userService.RegisterUserAsync(registerReq);
-        if (!result.Success)
+        if (!result)
         {
-            return BadRequest(result.Message);
+            return BadRequest(new Response<string>
+            {
+                Success = false,
+                Message = "Username is already taken.",
+                Data = null
+            });
         }
 
-        return Ok(result.Message);
+        return Ok(new Response<string>
+        {
+            Success = true,
+            Message = "User registered successfully.",
+            Data = null
+        });
+    }
+
+    [HttpGet("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail(int userId, string token)
+    {
+        var result = await _userService.ConfirmEmailAsync(userId, token);
+        if (!result)
+        {
+            return BadRequest(new Response<string>
+            {
+                Success = false,
+                Message = "Invalid confirmation link or token.",
+                Data = null
+            });
+        }
+
+        return Ok(new Response<string>
+        {
+            Success = true,
+            Message = "Email confirmed successfully.",
+            Data = null
+        });
     }
 
     [HttpPost("login")]
-    public JsonResult Login([FromBody] LoginReq request)
+    public IActionResult Login([FromBody] LoginReq request)
     {
         string accessToken = _authService.Login(request.Username, request.Password);
         if (accessToken == null)
-            return new JsonResult(Unauthorized());
+        {
+            return Unauthorized(new Response<string>
+            {
+                Success = false,
+                Message = "Invalid credentials.",
+                Data = null
+            });
+        }
 
         Users user = _userService.GetUserByUsername(request.Username);
         string refreshToken = _authService.GenerateRefreshToken();
         _userService.SaveRefreshToken(user.Id, refreshToken);
 
-        return new JsonResult(Ok(new
+        return Ok(new Response<object>
         {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken
-        }));
+            Success = true,
+            Message = "Login successful",
+            Data = new
+            {
+                AccessToken = accessToken,
+                RefreshToken = refreshToken
+            }
+        });
     }
 
     [HttpPost("refresh-token")]
-    public JsonResult RefreshToken([FromBody] TokenDto request)
+    public IActionResult RefreshToken([FromBody] TokenDto request)
     {
         var newAccessToken = _authService.RefreshToken(request.RefreshToken);
         if (newAccessToken == null)
-            return new JsonResult(Unauthorized());
+        {
+            return Unauthorized(new Response<string>
+            {
+                Success = false,
+                Message = "Invalid refresh token.",
+                Data = null
+            });
+        }
 
-        return new JsonResult(Ok(new { AccessToken = newAccessToken }));
+        return Ok(new Response<string>
+        {
+            Success = true,
+            Message = "Token refreshed",
+            Data = newAccessToken
+        });
     }
 }
