@@ -139,5 +139,15 @@ namespace FreelanceMarketplace.Services
         {
             return _context.Users.ToList();
         }
+
+        public bool DeleteUserById(int userId)
+        {
+            var user = _context.Users.Find(userId);
+            if (user == null) return false;
+
+            _context.Users.Remove(user);
+            _context.SaveChanges();
+            return true;
+        }
     }
 }

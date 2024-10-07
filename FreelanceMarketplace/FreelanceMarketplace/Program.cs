@@ -92,6 +92,7 @@ builder.Services.AddScoped<GoogleDriveService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IApplyService, ApplyService>();
+builder.Services.AddScoped<IContractService, ContractService>();
 
 // Configure Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -144,13 +145,17 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<ISchema, MainSchema>();
 
 builder.Services.AddScoped<UserQuery>();
+builder.Services.AddScoped<ContractQuery>();
 
 builder.Services.AddScoped<UserMutation>();
+builder.Services.AddScoped<ContractMutation>();
 
 builder.Services.AddScoped<UserType>();
 builder.Services.AddScoped<RefreshTokenType>();
 builder.Services.AddScoped<UserProfileType>();
 builder.Services.AddScoped<ProjectType>();
+builder.Services.AddScoped<ContractType>();
+builder.Services.AddScoped<ContractInputType>();
 
 // Adjust the GraphQL configuration to use AddSelfActivatingSchema
 builder.Services.AddGraphQL(b => b

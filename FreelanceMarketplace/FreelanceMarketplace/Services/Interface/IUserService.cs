@@ -17,5 +17,6 @@ namespace FreelanceMarketplace.Services.Interface
         Users GetUserByUsername(string username);
         Task<Users> GetUserByUsernameAsync(string username);
         List<Users> GetUsers();
+        bool DeleteUserById(int userId);
     }
 }
