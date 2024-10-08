@@ -7,7 +7,7 @@ namespace FreelanceMarketplace.Services.Interface
         Task<List<Category>> GetAllCategoriesAsync();
         Task<Category?> GetCategoryByIdAsync(int categoryId);
         Task<Category> CreateCategoryAsync(Category category);
-        Task UpdateCategoryAsync(Category category);
-        Task DeleteCategoryAsync(int categoryId);
+        Task<Category> UpdateCategoryAsync(int categoryId, Category Category);
+        Task<bool> DeleteCategoryAsync(int categoryId);
     }
 }

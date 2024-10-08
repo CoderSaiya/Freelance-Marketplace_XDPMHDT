@@ -7,7 +7,7 @@ namespace FreelanceMarketplace.Services.Interface
         Task<List<Project>> GetAllProjectsAsync();
         Task<Project?> GetProjectByIdAsync(int projectId);
         Task<Project> CreateProjectAsync(Project project);
-        Task UpdateProjectAsync(Project project);
-        Task DeleteProjectAsync(int projectId);
+        Task<Project> UpdateProjectAsync(int projectId, Project updatedProject);
+        Task<bool> DeleteProjectAsync(int projectId);
     }
 }

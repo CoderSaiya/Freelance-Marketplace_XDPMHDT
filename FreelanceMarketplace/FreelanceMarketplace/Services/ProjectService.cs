@@ -14,7 +14,6 @@ namespace FreelanceMarketplace.Services
             _context = context;
         }
 
-        // Get all projects
         public async Task<List<Project>> GetAllProjectsAsync()
         {
             try
@@ -68,32 +67,33 @@ namespace FreelanceMarketplace.Services
             }
         }
 
-        public async Task UpdateProjectAsync(Project project)
+        public async Task<Project> UpdateProjectAsync(int projectId, Project Project)
         {
             try
             {
-                var existingProject = await _context.Projects.FindAsync(project.ProjectId);
+                var existingProject = await _context.Projects.FindAsync(projectId);
                 if (existingProject == null)
                     throw new KeyNotFoundException("Project not found");
 
-                existingProject.ProjectName = project.ProjectName;
-                existingProject.ProjectDescription = project.ProjectDescription;
-                existingProject.Budget = project.Budget;
-                existingProject.Deadline = project.Deadline;
-                existingProject.SkillRequire = project.SkillRequire;
-                existingProject.Status = project.Status;
-                existingProject.CategoryId = project.CategoryId;
+                // Cập nhật thông tin dự án
+                existingProject.ProjectName = Project.ProjectName;
+                existingProject.ProjectDescription = Project.ProjectDescription;
+                existingProject.Budget = Project.Budget;
+                existingProject.Deadline = Project.Deadline;
+                existingProject.SkillRequire = Project.SkillRequire;
+                existingProject.Status = Project.Status;
+                existingProject.CategoryId = Project.CategoryId;
 
                 _context.Projects.Update(existingProject);
                 await _context.SaveChangesAsync();
+                return existingProject; 
             }
             catch (Exception ex)
             {
                 throw new Exception("Error updating project", ex);
             }
         }
-
-        public async Task DeleteProjectAsync(int projectId)
+        public async Task<bool> DeleteProjectAsync(int projectId) 
         {
             try
             {
@@ -103,6 +103,7 @@ namespace FreelanceMarketplace.Services
 
                 _context.Projects.Remove(project);
                 await _context.SaveChangesAsync();
+                return true; 
             }
             catch (Exception ex)
             {

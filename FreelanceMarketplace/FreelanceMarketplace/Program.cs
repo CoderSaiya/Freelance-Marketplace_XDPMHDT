@@ -97,7 +97,7 @@ builder.Services.AddScoped<IContractService, ContractService>();
 // Configure Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
-        connectionString: "Data Source=DESKTOP-1FAVEMH\\SQLEXPRESS;Initial Catalog=FreelanceMarketplace;Integrated Security=True;trusted_connection=true;encrypt=false;",
+        connectionString: "Data Source=DESKTOP-DE2OGA9\\HUY;Initial Catalog=FreelanceMarketplace;Integrated Security=True;trusted_connection=true;encrypt=false;",
         sqlServerOptionsAction: sqlOptions =>
         {
             sqlOptions.EnableRetryOnFailure(
@@ -146,9 +146,13 @@ builder.Services.AddScoped<ISchema, MainSchema>();
 
 builder.Services.AddScoped<UserQuery>();
 builder.Services.AddScoped<ContractQuery>();
+builder.Services.AddScoped<CategoryQuery>();
+builder.Services.AddScoped<ProjectQuery>();
 
 builder.Services.AddScoped<UserMutation>();
 builder.Services.AddScoped<ContractMutation>();
+builder.Services.AddScoped<CategoryMutation>();
+builder.Services.AddScoped<ProjectMutation>();
 
 builder.Services.AddScoped<UserType>();
 builder.Services.AddScoped<RefreshTokenType>();
@@ -156,6 +160,11 @@ builder.Services.AddScoped<UserProfileType>();
 builder.Services.AddScoped<ProjectType>();
 builder.Services.AddScoped<ContractType>();
 builder.Services.AddScoped<ContractInputType>();
+builder.Services.AddScoped<CategoryType>();
+builder.Services.AddScoped<CategoryInputType>();
+builder.Services.AddScoped<ProjectType>();
+builder.Services.AddScoped<ProjectInputType>();
+
 
 // Adjust the GraphQL configuration to use AddSelfActivatingSchema
 builder.Services.AddGraphQL(b => b
