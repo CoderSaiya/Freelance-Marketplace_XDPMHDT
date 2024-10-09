@@ -153,11 +153,15 @@ builder.Services.AddScoped<UserQuery>();
 builder.Services.AddScoped<ContractQuery>();
 builder.Services.AddScoped<CategoryQuery>();
 builder.Services.AddScoped<ProjectQuery>();
+builder.Services.AddScoped<UserProfileQuery>();
+builder.Services.AddScoped<NotificationQuery>();
 
 builder.Services.AddScoped<UserMutation>();
 builder.Services.AddScoped<ContractMutation>();
 builder.Services.AddScoped<CategoryMutation>();
 builder.Services.AddScoped<ProjectMutation>();
+builder.Services.AddScoped<UserProfileMutation>();
+builder.Services.AddScoped<NotificationMutation>();
 
 builder.Services.AddScoped<UserType>();
 builder.Services.AddScoped<RefreshTokenType>();
@@ -169,6 +173,8 @@ builder.Services.AddScoped<CategoryType>();
 builder.Services.AddScoped<CategoryInputType>();
 builder.Services.AddScoped<ProjectType>();
 builder.Services.AddScoped<ProjectInputType>();
+builder.Services.AddScoped<UserProfileType>();
+builder.Services.AddScoped<NotificationType>();
 
 builder.Services.AddScoped<PaymentType>();
 builder.Services.AddScoped<PaymentInputType>();

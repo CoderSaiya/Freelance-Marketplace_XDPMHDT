@@ -11,15 +11,20 @@ namespace FreelanceMarketplace.GraphQL.Schemas
         {
             Query = new CombinedQuery(
             serviceProvider.GetRequiredService<UserQuery>(),
+             serviceProvider.GetRequiredService<UserProfileQuery>(),
+            serviceProvider.GetRequiredService<NotificationQuery>(),
             serviceProvider.GetRequiredService<ContractQuery>(),
             serviceProvider.GetRequiredService<CategoryQuery>(),
              serviceProvider.GetRequiredService<ProjectQuery>(),
               serviceProvider.GetRequiredService<ReviewQuery>(),
             serviceProvider.GetRequiredService<PaymentQuery>()
+           
             );
 
             Mutation = new CombinedMutation(
             serviceProvider.GetRequiredService<UserMutation>(),
+             serviceProvider.GetRequiredService<UserProfileMutation>(),
+            serviceProvider.GetRequiredService<NotificationMutation>(),
             serviceProvider.GetRequiredService<ContractMutation>(),
             serviceProvider.GetRequiredService<CategoryMutation>(),
              serviceProvider.GetRequiredService<ProjectMutation>(),
@@ -30,9 +35,19 @@ namespace FreelanceMarketplace.GraphQL.Schemas
 
         public class CombinedQuery : ObjectGraphType
         {
-            public CombinedQuery(UserQuery userQuery, ContractQuery contractQuery, CategoryQuery categoryQuery, ProjectQuery projectQuery, ReviewQuery reviewQuery, PaymentQuery paymentQuery)
+            public CombinedQuery(UserQuery userQuery, UserProfileQuery userProfileQuery, NotificationQuery notificationQuery,  ContractQuery contractQuery, CategoryQuery categoryQuery, ProjectQuery projectQuery, ReviewQuery reviewQuery, PaymentQuery paymentQuery)
             {
                 foreach (var field in userQuery.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in userProfileQuery.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in notificationQuery.Fields)
                 {
                     AddField(field);
                 }
@@ -66,9 +81,19 @@ namespace FreelanceMarketplace.GraphQL.Schemas
 
         public class CombinedMutation : ObjectGraphType
         {
-            public CombinedMutation(UserMutation userMutation, ContractMutation contractMutation, CategoryMutation categoryMutation, ProjectMutation projectMutation, ReviewMutation reviewMutation, PaymentMutation paymentMutation)
+            public CombinedMutation(UserMutation userMutation, UserProfileMutation userProfileMutation, NotificationMutation notificationMutaion, ContractMutation contractMutation, CategoryMutation categoryMutation, ProjectMutation projectMutation, ReviewMutation reviewMutation, PaymentMutation paymentMutation)
             {
                 foreach (var field in userMutation.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in userProfileMutation.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in notificationMutaion.Fields)
                 {
                     AddField(field);
                 }
