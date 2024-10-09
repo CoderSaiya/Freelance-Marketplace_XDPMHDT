@@ -29,7 +29,7 @@ namespace FreelanceMarketplace.Services
             }
         }
 
-        public async Task DetetePaymentAsync(int paymentId)
+        public async Task<bool> DetetePaymentAsync(int paymentId)
         {
             try
             {
@@ -40,6 +40,7 @@ namespace FreelanceMarketplace.Services
                 }
                 _context.Payments.Remove(payment);
                 await _context.SaveChangesAsync();
+                return true;
             }
             catch (Exception ex)
             {
@@ -81,7 +82,7 @@ namespace FreelanceMarketplace.Services
 
         }
 
-        public async Task UpdatePaymentAsync(Payment payment)
+        public async Task<Payment?> UpdatePaymentAsync(int paymentId,Payment payment)
         {
             try
             {
@@ -96,6 +97,7 @@ namespace FreelanceMarketplace.Services
 
                 _context.Payments.Update(existingPayment);
                 await _context.SaveChangesAsync();
+                return existingPayment;
             }
             catch (Exception ex)
             {

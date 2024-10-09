@@ -65,7 +65,7 @@ namespace FreelanceMarketplace.Services
             }
         }
 
-        public async Task UpdateReviewAsync(Review review)
+        public async Task<Review?> UpdateReviewAsync(int reviewId, Review review)
         {
             try
             {
@@ -82,6 +82,8 @@ namespace FreelanceMarketplace.Services
                 
                 _context.Reviews.Update(existingReview);
                 await _context.SaveChangesAsync();
+
+                return existingReview;
             }
             catch(Exception ex)
             {
@@ -89,7 +91,7 @@ namespace FreelanceMarketplace.Services
             }
         }
 
-        public async Task  DeleteReviewAsync(int reviewId)
+        public async Task<bool>  DeleteReviewAsync(int reviewId)
         {
             try
             {
@@ -100,6 +102,7 @@ namespace FreelanceMarketplace.Services
                 }
                     _context.Reviews.Remove(review);
                 await _context.SaveChangesAsync();
+                return true;
             }
             catch (Exception ex)
             {

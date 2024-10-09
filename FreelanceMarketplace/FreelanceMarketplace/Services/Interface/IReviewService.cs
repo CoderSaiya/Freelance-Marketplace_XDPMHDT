@@ -10,9 +10,9 @@ namespace FreelanceMarketplace.Services.Interface
 
         Task <Review> CreateReviewAsync(Review review);
 
-        Task UpdateReviewAsync(Review review); 
+        Task <Review?> UpdateReviewAsync(int reviewId, Review review); 
 
-        Task DeleteReviewAsync(int reviewId);
+        Task<bool> DeleteReviewAsync(int reviewId);
         
 
     }
