@@ -192,6 +192,10 @@ builder.Services.AddGraphQL(b => b
     .AddSystemTextJson()
     .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = builder.Environment.IsDevelopment())
     .AddGraphTypes(typeof(MainSchema).Assembly)
+    .AddUserContextBuilder(ctx => new Dictionary<string, object?>
+    {
+        { "User", ctx.User }
+    })
 );
 
 var app = builder.Build();
