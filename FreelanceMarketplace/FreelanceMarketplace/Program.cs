@@ -94,6 +94,10 @@ builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IApplyService, ApplyService>();
 builder.Services.AddScoped<IContractService, ContractService>();
 
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+
+
 // Configure Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
@@ -164,6 +168,12 @@ builder.Services.AddScoped<CategoryType>();
 builder.Services.AddScoped<CategoryInputType>();
 builder.Services.AddScoped<ProjectType>();
 builder.Services.AddScoped<ProjectInputType>();
+
+builder.Services.AddScoped<PaymentType>();
+builder.Services.AddScoped<PaymentInputType>();
+
+builder.Services.AddScoped<ReviewType>();
+builder.Services.AddScoped<ReviewInputType>();
 
 
 // Adjust the GraphQL configuration to use AddSelfActivatingSchema
