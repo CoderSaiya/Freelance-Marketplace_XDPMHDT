@@ -155,6 +155,7 @@ builder.Services.AddScoped<CategoryQuery>();
 builder.Services.AddScoped<ProjectQuery>();
 builder.Services.AddScoped<UserProfileQuery>();
 builder.Services.AddScoped<NotificationQuery>();
+builder.Services.AddScoped<ApplyQuery>();
 
 builder.Services.AddScoped<UserMutation>();
 builder.Services.AddScoped<ContractMutation>();
@@ -162,6 +163,7 @@ builder.Services.AddScoped<CategoryMutation>();
 builder.Services.AddScoped<ProjectMutation>();
 builder.Services.AddScoped<UserProfileMutation>();
 builder.Services.AddScoped<NotificationMutation>();
+builder.Services.AddScoped<ApplyMutation>();
 
 builder.Services.AddScoped<UserType>();
 builder.Services.AddScoped<RefreshTokenType>();
@@ -175,6 +177,7 @@ builder.Services.AddScoped<ProjectType>();
 builder.Services.AddScoped<ProjectInputType>();
 builder.Services.AddScoped<UserProfileType>();
 builder.Services.AddScoped<NotificationType>();
+builder.Services.AddScoped<ApplyType>();
 
 builder.Services.AddScoped<PaymentType>();
 builder.Services.AddScoped<PaymentInputType>();
@@ -189,10 +192,6 @@ builder.Services.AddGraphQL(b => b
     .AddSystemTextJson()
     .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = builder.Environment.IsDevelopment())
     .AddGraphTypes(typeof(MainSchema).Assembly)
-    .AddUserContextBuilder(ctx => new Dictionary<string, object?>
-    {
-        { "User", ctx.User }
-    })
 );
 
 var app = builder.Build();
