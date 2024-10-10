@@ -11,18 +11,15 @@ namespace FreelanceMarketplace.GraphQL.Authorization
         {
             var authorizeAttribute = new AuthorizeRolesAttribute(roles);
             var originalResolver = field.Resolver;
-
-            field.Resolver = new FuncFieldResolver<object>(context =>
+            field.Resolver = new FuncFieldResolver<object>(async context =>
             {
                 if (!authorizeAttribute.Authorize(context))
                 {
                     context.Errors.Add(new ExecutionError("You do not have permission to access this resource."));
                     return null;
                 }
-
-                return originalResolver.ResolveAsync(context);
+                return await originalResolver.ResolveAsync(context);
             });
-
             return field;
         }
     }
