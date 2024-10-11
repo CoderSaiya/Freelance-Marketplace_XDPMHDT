@@ -2,6 +2,8 @@
 using GraphQL;
 using FreelanceMarketplace.Services.Interface;
 using FreelanceMarketplace.GraphQL.Types;
+using FreelanceMarketplace.GraphQL.Authorization;
+using GraphQL.Resolvers;
 
 namespace FreelanceMarketplace.GraphQL.Schemas.Queries
 {
@@ -9,19 +11,26 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
     {
         public UserQuery(IServiceProvider serviceProvider)
         {
-            Field<ListGraphType<UserType>>("users")
-                .Resolve(context =>
+            AddField(new FieldType
+            {
+                Name = "users",
+                Type = typeof(ListGraphType<UserType>),
+                Resolver = new FuncFieldResolver<object>(context =>
                 {
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                        return userService.GetUsers();
+                        return userService.GetUsers().ToList();
                     }
-                });
+                })
+            }.AuthorizeWith("Admin"));
 
-            Field<UserType>("userByUsername")
-                .Arguments(new QueryArguments(new QueryArgument<StringGraphType> { Name = "username" }))
-                .ResolveAsync(async context =>
+            AddField(new FieldType
+            {
+                Name = "userByUsername",
+                Type = typeof(UserType),
+                Arguments = new QueryArguments(new QueryArgument<StringGraphType> { Name = "username" }),
+                Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     string username = context.GetArgument<string>("username");
                     using (var scope = serviceProvider.CreateScope())
@@ -29,13 +38,15 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                         var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
                         return await userService.GetUserByUsernameAsync(username);
                     }
-                });
+                })
+            }.AuthorizeWith("Admin"));
 
-            Field<UserType>("userById")
-                .Arguments(new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "userId" }
-                ))
-                .Resolve(context =>
+            AddField(new FieldType
+            {
+                Name = "userById",
+                Type = typeof(UserType),
+                Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "userId" }),
+                Resolver = new FuncFieldResolver<object>(context =>
                 {
                     int userId = context.GetArgument<int>("userId");
                     using (var scope = serviceProvider.CreateScope())
@@ -43,7 +54,8 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                         var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
                         return userService.GetUserById(userId);
                     }
-                });
+                })
+            }.AuthorizeWith("Admin"));
         }
     }
 }
