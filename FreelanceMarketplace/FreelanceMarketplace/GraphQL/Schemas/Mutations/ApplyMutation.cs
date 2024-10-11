@@ -3,6 +3,8 @@ using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Services.Interfaces;
 using GraphQL;
 using GraphQL.Types;
+using GraphQL.Resolvers;
+using FreelanceMarketplace.GraphQL.Authorization;
 
 namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
 {
@@ -10,32 +12,50 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
     {
         public ApplyMutation(IApplyService applyService)
         {
-            Field<ApplyType>("createApply")
-                .Argument<NonNullGraphType<ApplyInputType>>("apply")
-                .ResolveAsync(async context =>
+            AddField(new FieldType
+            {
+                Name = "createApply",
+                Type = typeof(ApplyType),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<ApplyInputType>> { Name = "apply" }
+                ),
+                Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     var input = context.GetArgument<Apply>("apply");
                     return await applyService.CreateApplyAsync(input);
-                });
+                })
+            }.AuthorizeWith("Freelancer"));
 
-            Field<ApplyType>("updateApply")
-                .Argument<NonNullGraphType<IntGraphType>>("applyId")
-                .Argument<NonNullGraphType<ApplyInputType>>("apply")
-                .ResolveAsync(async context =>
+            AddField(new FieldType
+            {
+                Name = "updateApply",
+                Type = typeof(ApplyType),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "applyId" },
+                    new QueryArgument<NonNullGraphType<ApplyInputType>> { Name = "apply" }
+                ),
+                Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     var applyId = context.GetArgument<int>("applyId");
                     var input = context.GetArgument<Apply>("apply");
-                    input.ApplyId = applyId; 
+                    input.ApplyId = applyId;
                     return await applyService.UpdateApplyAsync(input);
-                });
+                })
+            }.AuthorizeWith("Freelancer"));
 
-            Field<BooleanGraphType>("deleteApply")
-                .Argument<NonNullGraphType<IntGraphType>>("applyId")
-                .ResolveAsync(async context =>
+            AddField(new FieldType
+            {
+                Name = "deleteApply",
+                Type = typeof(BooleanGraphType),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "applyId" }
+                ),
+                Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     var applyId = context.GetArgument<int>("applyId");
                     return await applyService.DeleteApplyAsync(applyId);
-                });
+                })
+            }.AuthorizeWith("Admin"));
         }
     }
 }
