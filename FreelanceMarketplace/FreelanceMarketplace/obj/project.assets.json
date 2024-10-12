@@ -214,6 +214,22 @@
           }
         }
       },
+      "Microsoft.AspNetCore.Authentication.Google/6.0.33": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/Microsoft.AspNetCore.Authentication.Google.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Microsoft.AspNetCore.Authentication.Google.dll": {
+            "related": ".xml"
+          }
+        },
+        "frameworkReferences": [
+          "Microsoft.AspNetCore.App"
+        ]
+      },
       "Microsoft.AspNetCore.Authentication.JwtBearer/6.0.33": {
         "type": "package",
         "dependencies": {
@@ -1627,6 +1643,21 @@
         "lib/netstandard2.1/MailKit.xml",
         "mailkit.4.8.0.nupkg.sha512",
         "mailkit.nuspec"
+      ]
+    },
+    "Microsoft.AspNetCore.Authentication.Google/6.0.33": {
+      "sha512": "Q22DpXokkjOhGWH7x7j6uj/Ss4AHrk2w2IY8nIXZEswKWglPtZqWrGTXCbCQpz4bVjSpsHFufyB5U6GZ29BHFQ==",
+      "type": "package",
+      "path": "microsoft.aspnetcore.authentication.google/6.0.33",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/net6.0/Microsoft.AspNetCore.Authentication.Google.dll",
+        "lib/net6.0/Microsoft.AspNetCore.Authentication.Google.xml",
+        "microsoft.aspnetcore.authentication.google.6.0.33.nupkg.sha512",
+        "microsoft.aspnetcore.authentication.google.nuspec"
       ]
     },
     "Microsoft.AspNetCore.Authentication.JwtBearer/6.0.33": {
@@ -3327,6 +3358,7 @@
       "GraphQL.Server.Transports.AspNetCore >= 8.0.3",
       "GraphQL.Server.Ui.Playground >= 8.0.3",
       "MailKit >= 4.8.0",
+      "Microsoft.AspNetCore.Authentication.Google >= 6.0.33",
       "Microsoft.AspNetCore.Authentication.JwtBearer >= 6.0.33",
       "Microsoft.AspNetCore.Identity.EntityFrameworkCore >= 6.0.33",
       "Microsoft.EntityFrameworkCore >= 6.0.33",
@@ -3400,6 +3432,10 @@
           "MailKit": {
             "target": "Package",
             "version": "[4.8.0, )"
+          },
+          "Microsoft.AspNetCore.Authentication.Google": {
+            "target": "Package",
+            "version": "[6.0.33, )"
           },
           "Microsoft.AspNetCore.Authentication.JwtBearer": {
             "target": "Package",

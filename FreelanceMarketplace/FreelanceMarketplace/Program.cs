@@ -18,6 +18,7 @@ using GraphQL.Server;
 using GraphQL.Types;
 using FreelanceMarketplace.Services.Implementations;
 using FreelanceMarketplace.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,7 @@ builder.Services.AddSignalR();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
@@ -61,7 +63,15 @@ builder.Services.AddAuthentication(options =>
             return Task.CompletedTask;
         }
     };
+})
+.AddCookie()
+.AddGoogle(options =>
+{
+    options.ClientId = "838128278169-ug2l134id0g6krlkhiklt8u606iln46u.apps.googleusercontent.com";
+    options.ClientSecret = "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";
 });
+
+builder.Services.AddControllersWithViews();
 
 // Configure CORS policy
 builder.Services.AddCors(options =>
@@ -98,11 +108,10 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
 
-
 // Configure Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
-        connectionString: "Data Source=DESKTOP-DE2OGA9\\HUY;Initial Catalog=FreelanceMarketplace;Integrated Security=True;trusted_connection=true;encrypt=false;",
+        connectionString: "Data Source=DESKTOP-1FAVEMH\\SQLEXPRESS;Initial Catalog=FreelanceMarketplace;Integrated Security=True;trusted_connection=true;encrypt=false;",
         sqlServerOptionsAction: sqlOptions =>
         {
             sqlOptions.EnableRetryOnFailure(
@@ -184,7 +193,6 @@ builder.Services.AddScoped<PaymentInputType>();
 
 builder.Services.AddScoped<ReviewType>();
 builder.Services.AddScoped<ReviewInputType>();
-
 
 // Adjust the GraphQL configuration to use AddSelfActivatingSchema
 builder.Services.AddGraphQL(b => b

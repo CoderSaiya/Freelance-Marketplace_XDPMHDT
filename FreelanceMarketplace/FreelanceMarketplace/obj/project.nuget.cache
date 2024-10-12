@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "itSCqi9Ecd9zOD74UTF2ujJz0q6Ne1awBF0YsR/R+m+vXNy6WksAMANt7lI9cVHyLsWRr/QwSsjYmp3QjRhTAA==",
+  "dgSpecHash": "OVDtUkigJ0CGPy2byB2IIzWuuSjZbrvKtlu1ewS+SCegWj59bZKu8qPFj1m5Y5Nf3Qlul7hQ5Um1U8+EsBOAFg==",
   "success": true,
   "projectFilePath": "C:\\Users\\admin\\Documents\\WorkSpace\\ProjectNET\\git\\BE_XDPMHDT\\FreelanceMarketplace\\FreelanceMarketplace\\FreelanceMarketplace.csproj",
   "expectedPackageFiles": [
@@ -18,6 +18,7 @@
     "C:\\Users\\admin\\.nuget\\packages\\graphql.systemtextjson\\8.0.2\\graphql.systemtextjson.8.0.2.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\mailkit\\4.8.0\\mailkit.4.8.0.nupkg.sha512",
+    "C:\\Users\\admin\\.nuget\\packages\\microsoft.aspnetcore.authentication.google\\6.0.33\\microsoft.aspnetcore.authentication.google.6.0.33.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\6.0.33\\microsoft.aspnetcore.authentication.jwtbearer.6.0.33.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\microsoft.aspnetcore.cryptography.internal\\6.0.33\\microsoft.aspnetcore.cryptography.internal.6.0.33.nupkg.sha512",
     "C:\\Users\\admin\\.nuget\\packages\\microsoft.aspnetcore.cryptography.keyderivation\\6.0.33\\microsoft.aspnetcore.cryptography.keyderivation.6.0.33.nupkg.sha512",

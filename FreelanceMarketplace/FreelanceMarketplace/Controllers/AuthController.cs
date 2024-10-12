@@ -5,7 +5,7 @@ using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Services.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System;
+using Microsoft.AspNetCore.Authentication;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -128,5 +128,49 @@ public class AuthController : Controller
             Message = "Token refreshed",
             Data = newAccessToken
         });
+    }
+
+    [HttpGet("signin-google")]
+    public IActionResult SignInWithGoogle()
+    {
+        var redirectUrl = Url.Action("GoogleResponse", "GoogleLogin");
+        var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+        return Challenge(properties, "Google");
+    }
+
+    [HttpGet("google-response")]
+    public async Task<IActionResult> GoogleResponse()
+    {
+        var result = await HttpContext.AuthenticateAsync("Google");
+        if (result.Succeeded)
+        {
+            // success
+            var claims = result.Principal.Identities.First().Claims;
+            _authService.GenerateAccessToken(claims);
+        }
+
+        return Redirect("/");
+    }
+
+    [HttpGet("signin-facebook")]
+    public IActionResult SignInWithFacebook()
+    {
+        var redirectUrl = Url.Action("FacebookResponse", "FacebookLogin");
+        var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+        return Challenge(properties, "Facebook");
+    }
+
+    [HttpGet("facebook-response")]
+    public async Task<IActionResult> FacebookResponse()
+    {
+        var result = await HttpContext.AuthenticateAsync("Facebook");
+        if (result.Succeeded)
+        {
+            // success
+            var claims = result.Principal.Identities.First().Claims;
+            _authService.GenerateAccessToken(claims);
+        }
+
+        return Redirect("/");
     }
 }
