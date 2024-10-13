@@ -64,6 +64,10 @@
               "target": "Package",
               "version": "[4.8.0, )"
             },
+            "Microsoft.AspNetCore.Authentication.Google": {
+              "target": "Package",
+              "version": "[6.0.33, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[6.0.33, )"

@@ -1,7 +1,9 @@
 ﻿using FreelanceMarketplace.GraphQL.Types;
 using FreelanceMarketplace.Services.Interface;
 using GraphQL;
+using GraphQL.Resolvers;
 using GraphQL.Types;
+using FreelanceMarketplace.GraphQL.Authorization;
 
 namespace FreelanceMarketplace.GraphQL.Schemas.Queries
 {
@@ -9,23 +11,33 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
     {
         public ContractQuery(IServiceProvider serviceProvider)
         {
-            Field<ListGraphType<ContractType>>("contracts")
-                .ResolveAsync(async context =>
+            AddField(new FieldType
+            {
+                Name = "contracts",
+                Type = typeof(ListGraphType<ContractType>),
+                Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     using var scope = serviceProvider.CreateScope();
                     var contractService = scope.ServiceProvider.GetRequiredService<IContractService>();
                     return await contractService.GetAllContractsAsync();
-                });
+                })
+            }.AuthorizeWith("Admin"));
 
-            Field<ContractType>("contractById")
-                .Arguments(new QueryArguments(new QueryArgument<IntGraphType> { Name = "contractId" }))
-                .ResolveAsync(async context =>
+            AddField(new FieldType
+            {
+                Name = "contractById",
+                Type = typeof(ContractType),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "contractId" }
+                ),
+                Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     int contractId = context.GetArgument<int>("contractId");
                     using var scope = serviceProvider.CreateScope();
                     var contractService = scope.ServiceProvider.GetRequiredService<IContractService>();
                     return await contractService.GetContractByIdAsync(contractId);
-                });
+                })
+            }.AuthorizeWith("Admin", "Client", "Freelancer"));
         }
     }
 }

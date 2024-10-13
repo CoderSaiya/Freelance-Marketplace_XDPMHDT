@@ -61,19 +61,20 @@ namespace FreelanceMarketplace.Services
             }
         }
 
-        public async Task UpdateCategoryAsync(Category category)
+        public async Task<Category> UpdateCategoryAsync(int categoryId, Category Category) 
         {
             try
             {
-                var existingCategory = await _context.Categories.FindAsync(category.CategoryId);
+                var existingCategory = await _context.Categories.FindAsync(categoryId);
                 if (existingCategory == null)
                     throw new KeyNotFoundException("Category not found");
 
-                existingCategory.CategoryName = category.CategoryName;
-                existingCategory.CategoryDescription = category.CategoryDescription;
+                existingCategory.CategoryName = Category.CategoryName;
+                existingCategory.CategoryDescription = Category.CategoryDescription;
 
-                _context.Categories.Update(existingCategory);
-                await _context.SaveChangesAsync();
+                _context.Categories.Update(existingCategory); 
+                await _context.SaveChangesAsync(); 
+                return existingCategory; 
             }
             catch (Exception ex)
             {
@@ -81,16 +82,17 @@ namespace FreelanceMarketplace.Services
             }
         }
 
-        public async Task DeleteCategoryAsync(int categoryId)
+        public async Task<bool> DeleteCategoryAsync(int categoryId) 
         {
             try
             {
-                var category = await _context.Categories.FindAsync(categoryId);
+                var category = await _context.Categories.FindAsync(categoryId); 
                 if (category == null)
                     throw new KeyNotFoundException("Category not found");
 
-                _context.Categories.Remove(category);
-                await _context.SaveChangesAsync();
+                _context.Categories.Remove(category); 
+                await _context.SaveChangesAsync(); 
+                return true; 
             }
             catch (Exception ex)
             {

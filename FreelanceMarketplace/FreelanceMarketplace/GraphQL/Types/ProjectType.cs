@@ -15,7 +15,7 @@ namespace FreelanceMarketplace.GraphQL.Types
             Field(x => x.SkillRequire);
             Field(x => x.Status);
             Field(x => x.CreateAt);
-            //Field<CategoryType>("category");
+            Field<CategoryType>("category");
             //Field<ListGraphType<ApplyType>>("applies");
             //Field<ListGraphType<ImgType>>("images");
         }

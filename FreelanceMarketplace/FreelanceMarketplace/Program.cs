@@ -18,6 +18,7 @@ using GraphQL.Server;
 using GraphQL.Types;
 using FreelanceMarketplace.Services.Implementations;
 using FreelanceMarketplace.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,7 @@ builder.Services.AddSignalR();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
@@ -61,7 +63,15 @@ builder.Services.AddAuthentication(options =>
             return Task.CompletedTask;
         }
     };
+})
+.AddCookie()
+.AddGoogle(options =>
+{
+    options.ClientId = "838128278169-ug2l134id0g6krlkhiklt8u606iln46u.apps.googleusercontent.com";
+    options.ClientSecret = "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";
 });
+
+builder.Services.AddControllersWithViews();
 
 // Configure CORS policy
 builder.Services.AddCors(options =>
@@ -93,6 +103,10 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProjectService, ProjectService>();
 builder.Services.AddScoped<IApplyService, ApplyService>();
 builder.Services.AddScoped<IContractService, ContractService>();
+builder.Services.AddScoped<IUserProfileService, UserProfileService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 // Configure Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -146,9 +160,19 @@ builder.Services.AddScoped<ISchema, MainSchema>();
 
 builder.Services.AddScoped<UserQuery>();
 builder.Services.AddScoped<ContractQuery>();
+builder.Services.AddScoped<CategoryQuery>();
+builder.Services.AddScoped<ProjectQuery>();
+builder.Services.AddScoped<UserProfileQuery>();
+builder.Services.AddScoped<NotificationQuery>();
+builder.Services.AddScoped<ApplyQuery>();
 
 builder.Services.AddScoped<UserMutation>();
 builder.Services.AddScoped<ContractMutation>();
+builder.Services.AddScoped<CategoryMutation>();
+builder.Services.AddScoped<ProjectMutation>();
+builder.Services.AddScoped<UserProfileMutation>();
+builder.Services.AddScoped<NotificationMutation>();
+builder.Services.AddScoped<ApplyMutation>();
 
 builder.Services.AddScoped<UserType>();
 builder.Services.AddScoped<RefreshTokenType>();
@@ -156,6 +180,19 @@ builder.Services.AddScoped<UserProfileType>();
 builder.Services.AddScoped<ProjectType>();
 builder.Services.AddScoped<ContractType>();
 builder.Services.AddScoped<ContractInputType>();
+builder.Services.AddScoped<CategoryType>();
+builder.Services.AddScoped<CategoryInputType>();
+builder.Services.AddScoped<ProjectType>();
+builder.Services.AddScoped<ProjectInputType>();
+builder.Services.AddScoped<UserProfileType>();
+builder.Services.AddScoped<NotificationType>();
+builder.Services.AddScoped<ApplyType>();
+
+builder.Services.AddScoped<PaymentType>();
+builder.Services.AddScoped<PaymentInputType>();
+
+builder.Services.AddScoped<ReviewType>();
+builder.Services.AddScoped<ReviewInputType>();
 
 // Adjust the GraphQL configuration to use AddSelfActivatingSchema
 builder.Services.AddGraphQL(b => b
@@ -163,6 +200,10 @@ builder.Services.AddGraphQL(b => b
     .AddSystemTextJson()
     .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = builder.Environment.IsDevelopment())
     .AddGraphTypes(typeof(MainSchema).Assembly)
+    .AddUserContextBuilder(ctx => new Dictionary<string, object?>
+    {
+        { "User", ctx.User }
+    })
 );
 
 var app = builder.Build();

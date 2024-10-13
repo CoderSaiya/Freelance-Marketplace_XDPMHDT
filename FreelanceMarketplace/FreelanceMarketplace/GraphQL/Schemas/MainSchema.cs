@@ -11,20 +11,45 @@ namespace FreelanceMarketplace.GraphQL.Schemas
         {
             Query = new CombinedQuery(
             serviceProvider.GetRequiredService<UserQuery>(),
-            serviceProvider.GetRequiredService<ContractQuery>()
+             serviceProvider.GetRequiredService<UserProfileQuery>(),
+            serviceProvider.GetRequiredService<NotificationQuery>(),
+            serviceProvider.GetRequiredService<ContractQuery>(),
+            serviceProvider.GetRequiredService<CategoryQuery>(),
+             serviceProvider.GetRequiredService<ProjectQuery>(),
+              serviceProvider.GetRequiredService<ReviewQuery>(),
+            serviceProvider.GetRequiredService<PaymentQuery>(),
+             serviceProvider.GetRequiredService<ApplyQuery>()
+
             );
 
             Mutation = new CombinedMutation(
             serviceProvider.GetRequiredService<UserMutation>(),
-            serviceProvider.GetRequiredService<ContractMutation>()
+             serviceProvider.GetRequiredService<UserProfileMutation>(),
+            serviceProvider.GetRequiredService<NotificationMutation>(),
+            serviceProvider.GetRequiredService<ContractMutation>(),
+            serviceProvider.GetRequiredService<CategoryMutation>(),
+             serviceProvider.GetRequiredService<ProjectMutation>(),
+             serviceProvider.GetRequiredService<ReviewMutation>(),
+            serviceProvider.GetRequiredService<PaymentMutation>(),
+            serviceProvider.GetRequiredService<ApplyMutation>()
             );
         }
 
         public class CombinedQuery : ObjectGraphType
         {
-            public CombinedQuery(UserQuery userQuery, ContractQuery contractQuery)
+            public CombinedQuery(UserQuery userQuery, UserProfileQuery userProfileQuery, NotificationQuery notificationQuery,  ContractQuery contractQuery, CategoryQuery categoryQuery, ProjectQuery projectQuery, ReviewQuery reviewQuery, PaymentQuery paymentQuery, ApplyQuery applyQuery)
             {
                 foreach (var field in userQuery.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in userProfileQuery.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in notificationQuery.Fields)
                 {
                     AddField(field);
                 }
@@ -33,19 +58,77 @@ namespace FreelanceMarketplace.GraphQL.Schemas
                 {
                     AddField(field);
                 }
+
+                foreach (var field in categoryQuery.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in projectQuery.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in reviewQuery.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in paymentQuery.Fields)
+                {
+                    AddField(field);
+                }
+                foreach (var field in applyQuery.Fields) 
+                {
+                    AddField(field);
+                }
             }
         }
 
         public class CombinedMutation : ObjectGraphType
         {
-            public CombinedMutation(UserMutation userMutation, ContractMutation contractMutation)
+            public CombinedMutation(UserMutation userMutation, UserProfileMutation userProfileMutation, NotificationMutation notificationMutaion, ContractMutation contractMutation, CategoryMutation categoryMutation, ProjectMutation projectMutation, ReviewMutation reviewMutation, PaymentMutation paymentMutation, ApplyMutation applyMutation)
             {
                 foreach (var field in userMutation.Fields)
                 {
                     AddField(field);
                 }
 
+                foreach (var field in userProfileMutation.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in notificationMutaion.Fields)
+                {
+                    AddField(field);
+                }
+
                 foreach (var field in contractMutation.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in categoryMutation.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in projectMutation.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in reviewMutation.Fields)
+                {
+                    AddField(field);
+                }
+
+                foreach (var field in paymentMutation.Fields)
+                {
+                    AddField(field);
+                }
+                foreach (var field in applyMutation.Fields)  
                 {
                     AddField(field);
                 }

@@ -7,6 +7,9 @@
             "/api/auth/login",
             "/api/auth/register",
             "/api/auth/confirm-email",
+            "/api/img",
+            "/api/auth/refresh-token",
+            "/api/auth/signin-google"
 
         };
 

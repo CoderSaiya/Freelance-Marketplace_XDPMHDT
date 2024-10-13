@@ -3,6 +3,8 @@ using FreelanceMarketplace.Services.Interface;
 using GraphQL.Types;
 using GraphQL;
 using FreelanceMarketplace.Models;
+using GraphQL.Resolvers;
+using FreelanceMarketplace.GraphQL.Authorization;
 
 namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
 {
@@ -10,16 +12,20 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
     {
         public UserMutation(IServiceProvider serviceProvider)
         {
-            Field<BooleanGraphType>("deleteUser")
-                .Arguments(new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "userId" }
-                ))
-                .Resolve(context =>
+            AddField(new FieldType
+            {
+                Name = "deleteUser",
+                Type = typeof(BooleanGraphType),
+                Arguments = new QueryArguments(
+                new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "userId" }
+            ),
+                Resolver = new FuncFieldResolver<bool>(context =>
                 {
                     var userService = serviceProvider.GetRequiredService<IUserService>();
                     int userId = context.GetArgument<int>("userId");
                     return userService.DeleteUserById(userId);
-                });
+                })
+            }).AuthorizeWith("Admin");
         }
     }
 }

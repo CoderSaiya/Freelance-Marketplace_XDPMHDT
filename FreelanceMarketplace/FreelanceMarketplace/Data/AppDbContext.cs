@@ -9,6 +9,8 @@ namespace FreelanceMarketplace.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Users> Users { get; set; }
+        public DbSet<UserProfile> UserProfiles { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Contracts> Contracts { get; set; }
