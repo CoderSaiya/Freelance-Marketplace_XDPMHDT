@@ -1,4 +1,5 @@
 import Home from "../pages/Home";
+import Login from "../pages/Login";
 import { RouteType } from "../types";
 
 const publicRoute: RouteType[] = [
@@ -6,6 +7,15 @@ const publicRoute: RouteType[] = [
     path: "/",
     component: Home,
   },
+
+
+  {
+    path: "/login",
+    component: Login,
+    
+  }
+
+  
 //   {
 //     path: "/profile",
 //     component: ProfilePage,
