@@ -1,8 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
+import authReducer from '../features/authSlice';
 import { restfulApi } from '../apis/restfulApi';
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
+    auth: authReducer,
     [restfulApi.reducerPath]: restfulApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
