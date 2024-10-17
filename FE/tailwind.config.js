@@ -1,15 +1,17 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-    mode: 'jit',
-    purge: ['./src/**/*.{js,jsx,ts,tsx}', './index.html'],
-    theme: {
-      extend: {
-        transform: ['responsive', 'hover', 'focus'],
-        transitionProperty: {
-          'transform': 'transform',
-        },
+  content: ['./src/**/*.{js,jsx,ts,tsx}', './index.html'],
+  theme: {
+    extend: {
+      transitionProperty: {
+        'transform': 'transform',
       },
     },
-    plugins: [],
-  };
-  
+  },
+  variants: {
+    extend: {
+      transform: ['responsive', 'hover', 'focus'],
+    },
+  },
+  plugins: [],
+};
