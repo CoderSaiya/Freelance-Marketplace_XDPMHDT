@@ -81,8 +81,8 @@ public class AuthController : Controller
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginReq request)
     {
-        string accessToken = _authService.Login(request.Username, request.Password);
-        if (accessToken == null)
+        TokenDto token = _authService.Login(request.Username, request.Password);
+        if (token == null)
         {
             return Unauthorized(new Response<string>
             {
@@ -92,9 +92,9 @@ public class AuthController : Controller
             });
         }
 
-        Users user = _userService.GetUserByUsername(request.Username);
-        string refreshToken = _authService.GenerateRefreshToken();
-        _userService.SaveRefreshToken(user.Id, refreshToken);
+        //Users user = _userService.GetUserByUsername(request.Username);
+        //string refreshToken = _authService.GenerateRefreshToken();
+        //_userService.SaveRefreshToken(user.Id, refreshToken);
 
         return Ok(new Response<object>
         {
@@ -102,8 +102,8 @@ public class AuthController : Controller
             Message = "Login successful",
             Data = new
             {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
+                AccessToken = token.AccessToken,
+                RefreshToken = token.RefreshToken,
             }
         });
     }

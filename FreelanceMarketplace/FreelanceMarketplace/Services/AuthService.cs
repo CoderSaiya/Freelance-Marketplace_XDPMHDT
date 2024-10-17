@@ -6,6 +6,7 @@ using System.Text;
 
 namespace FreelanceMarketplace.Services
 {
+    using FreelanceMarketplace.Models.DTOs.Req;
     using FreelanceMarketplace.Services.Interface;
     using Microsoft.Extensions.Configuration;
     using Microsoft.IdentityModel.Tokens;
@@ -26,7 +27,7 @@ namespace FreelanceMarketplace.Services
             _userService = userService;
         }
 
-        public string Login(string username, string password)
+        public TokenDto Login(string username, string password)
         {
             var user = _userService.Authenticate(username, password);
             if (user == null) return null;
@@ -42,7 +43,7 @@ namespace FreelanceMarketplace.Services
             var refreshToken = GenerateRefreshToken();
             _userService.SaveRefreshToken(user.Id, refreshToken);
 
-            return accessToken;
+            return new TokenDto(accessToken, refreshToken);
         }
 
         public string RefreshToken(string token)
