@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useLoginUserMutation } from "../../apis/restfulApi";
 import { useNavigate } from "react-router-dom";
+import { notification } from "antd";
 
 const Form: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -41,8 +42,14 @@ const Form: React.FC = () => {
 
       localStorage.setItem('access_token', accessToken);
       localStorage.setItem('refresh', refreshToken);
+      notification.success({
+        message: 'Successfully login',
+      })
       navigate("/");
     } catch (error) {
+      notification.error({
+        message: 'Failed login',
+      })
       console.error("Login failed:", error);
     }
   };
