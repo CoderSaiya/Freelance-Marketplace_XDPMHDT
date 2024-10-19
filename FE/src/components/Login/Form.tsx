@@ -284,7 +284,7 @@ const Form: React.FC = () => {
           <img
             src="/img/login.png"
             alt="Decorative"
-            className="w-full h-full object-cover rounded-lg shadow-lg opacity-5"
+            className="w-full h-full object-cover rounded-lg shadow-lg "
           />
         </motion.div>
       </div>

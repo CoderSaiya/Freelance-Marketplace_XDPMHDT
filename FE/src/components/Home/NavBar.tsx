@@ -1,8 +1,42 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { BellOutlined } from "@ant-design/icons";
 
 const Navbar: React.FC = () => {
-  const isLogin = localStorage.getItem("access_token") === null;
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const isLogin = localStorage.getItem("access_token") === '';
+  const navigate = useNavigate();
+
+  const handleMouseEnter = () => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    setIsDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    const newTimeoutId = setTimeout(() => {
+      setIsDropdownOpen(false);
+    }, 200);
+    setTimeoutId(newTimeoutId);
+  };
+
+  const handleLogout = () => {
+    localStorage.setItem("access_token", "");
+    localStorage.setItem("refresh", "");
+
+    navigate("/login");
+  };
+
+  useEffect(() => {
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [timeoutId]);
+
   return (
     <nav className="bg-white shadow-md p-4 flex items-center justify-between">
       {/* Logo */}
@@ -31,17 +65,51 @@ const Navbar: React.FC = () => {
           </>
         ) : (
           <>
-            <button className="flex items-center">
-              <img
-                src="/img/logo.png"
-                alt="User Avatar"
-                className="w-12 h-12 rounded-full"
-              />
-            </button>
-            <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 font-medium">Log out</button>
+            <BellOutlined style={{ fontSize: 25 }} />
+            <div
+              className="relative"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              {/* User Avatar */}
+              <button className="flex items-center">
+                <img
+                  src="/img/logo.png"
+                  alt="User Avatar"
+                  className="w-12 h-12 rounded-full"
+                />
+              </button>
+
+              {/* Dropdown Menu */}
+              <div
+                className={`absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-50 transform transition-all duration-300 ${
+                  isDropdownOpen
+                    ? "opacity-100 scale-100 pointer-events-auto"
+                    : "opacity-0 scale-95 pointer-events-none"
+                }`}
+              >
+                <Link
+                  to="/profile"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Profile
+                </Link>
+                <Link
+                  to="/settings"
+                  className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                >
+                  Settings
+                </Link>
+                <button
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={handleLogout}
+                >
+                  Log out
+                </button>
+              </div>
+            </div>
           </>
         )}
-        ;
       </div>
     </nav>
   );
