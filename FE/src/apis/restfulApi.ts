@@ -2,6 +2,19 @@ import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError 
 import { Mutex } from 'async-mutex';
 import { setTokens, logout } from '../features/authSlice';
 
+interface GoogleSignInResponse {
+  url: string;
+}
+
+interface GoogleAuthResponse {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    name: string;
+  };
+}
+
 const BASE_URL = "https://localhost:7115";
 
 const mutex = new Mutex();
@@ -65,6 +78,23 @@ export const restfulApi = createApi({
         body: credentials,
       }),
     }),
+    // loginGoogle: builder.query<void, void>({
+    //   query: () => ({
+    //     url: 'Auth/signin-google',
+    //     method: 'GET',
+    //     mode: 'no-cors',
+    //   }),
+    // }),
+    // googleCallback: builder.query<void, string>({
+    //   query: (code) => `Auth/google-response?code=${code}`,
+    // }),
+    loginGoogle: builder.mutation<void,void>({
+      query: (googleResponseCode) => ({
+        url: 'Auth/google-response', // Endpoint to exchange Google token
+        method: 'POST',
+        body: { code: googleResponseCode }, // Include the Google response code in the body
+      }),
+    }),
     refreshToken: builder.mutation<{ accessToken: string }, void>({
       query: () => ({
         url: 'Auth/refresh-token',
@@ -74,4 +104,4 @@ export const restfulApi = createApi({
   }),
 });
 
-export const { useLoginUserMutation } = restfulApi;
+export const { useLoginUserMutation, useLoginGoogleMutation  } = restfulApi;

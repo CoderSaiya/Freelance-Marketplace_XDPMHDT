@@ -1,15 +1,42 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useLoginUserMutation } from "../../apis/restfulApi";
+import {
+  useLoginUserMutation,
+  useLoginGoogleMutation,
+} from "../../apis/restfulApi";
 import { useNavigate } from "react-router-dom";
 import { notification } from "antd";
+import { EyeOutlined } from "@ant-design/icons";
 
 const Form: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isShowPass, setIsShowPass] = useState(false);
   const [loginUser] = useLoginUserMutation();
+  const [loginGoogle, { data, error, isSuccess }] = useLoginGoogleMutation();
+
   const navigate = useNavigate();
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const code = urlParams.get('code');
+
+  // const { data, error, refetch } = useGoogleCallbackQuery(code ?? '', {
+  //   skip: !code,
+  // });
+
+  // useEffect(() => {
+  //   if (data && data.token) {
+  //     localStorage.setItem('access-token', data.token)
+  //     navigate('/');
+  //   }
+  // }, [data, dispatch, navigate]);
+
+  // useEffect(() => {
+  //   if (error) {
+  //     console.error('OAuth callback failed:', error);
+  //   }
+  // }, [error]);
 
   const toggleForm = () => {
     setIsLogin(!isLogin);
@@ -35,24 +62,74 @@ const Form: React.FC = () => {
 
       console.log("API Response:", response);
 
-      const { accessToken: accessToken, refreshToken: refreshToken } = response.data;
+      const { accessToken: accessToken, refreshToken: refreshToken } =
+        response.data;
       if (!accessToken || !refreshToken) {
         console.error("Tokens not found in response");
       }
 
-      localStorage.setItem('access_token', accessToken);
-      localStorage.setItem('refresh', refreshToken);
+      localStorage.setItem("access_token", accessToken);
+      localStorage.setItem("refresh", refreshToken);
       notification.success({
-        message: 'Successfully login',
-      })
+        message: "Successfully login",
+      });
       navigate("/");
     } catch (error) {
       notification.error({
-        message: 'Failed login',
-      })
+        message: "Failed login",
+      });
       console.error("Login failed:", error);
     }
   };
+
+  const handleLoginGoogle = () => {
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=838128278169-ug2l134id0g6krlkhiklt8u606iln46u.apps.googleusercontent.com&redirect_uri=http://localhost:5173/auth/callback&response_type=code&scope=openid email profile`;
+  
+    const width = 500;
+    const height = 600;
+    const left = window.screen.width / 2 - width / 2;
+    const top = window.screen.height / 2 - height / 2;
+  
+    // Mở cửa sổ nhỏ để đăng nhập Google
+    const googleWindow = window.open(
+      googleAuthUrl,
+      "Google Sign-In",
+      `width=${width},height=${height},top=${top},left=${left}`
+    );
+  
+    // Theo dõi khi cửa sổ pop-up đóng
+    const interval = setInterval(() => {
+      if (googleWindow && googleWindow.closed) {
+        clearInterval(interval);
+        // Kiểm tra nếu cửa sổ đăng nhập bị đóng
+        console.log("Google window closed");
+        // Xử lý sau khi đăng nhập thành công
+      }
+    }, 1000);
+  };
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+
+    if (code) {
+      // Call your loginGoogle mutation with the Google code
+      loginGoogle(code);
+    }
+  }, [loginGoogle]);
+
+  useEffect(() => {
+    if (isSuccess && data) {
+      const { accessToken, refreshToken } = data;
+
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      notification.success({
+        message: "Succcesfully login"
+      })
+      navigate('/');
+    }
+  }, [isSuccess, data, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white overflow-hidden">
@@ -126,13 +203,23 @@ const Form: React.FC = () => {
                 <label htmlFor="password" className="block text-gray-700">
                   Password
                 </label>
-                <input
-                  type="password"
-                  id="password"
-                  className="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter your password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <div className="relative flex items-center">
+                  <input
+                    type={isShowPass ? "text" : "password"}
+                    id="password"
+                    className="mt-1 w-full px-4 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter your password"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                    onClick={() => setIsShowPass(!isShowPass)}
+                  >
+                    <EyeOutlined />
+                  </button>
+                </div>
+
                 {isLogin && (
                   <div className="text-right">
                     <a
@@ -154,7 +241,7 @@ const Form: React.FC = () => {
               <button
                 type="button"
                 className="w-full flex items-center justify-center bg-gray-100 border border-gray-300 py-2 rounded-md mt-2 hover:bg-gray-200 transition"
-                onClick={toggleForm}
+                onClick={handleLoginGoogle}
               >
                 <img
                   src="/img/google.png"
