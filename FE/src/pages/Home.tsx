@@ -1,12 +1,17 @@
-import React from 'react';
+import React from "react";
+import Banner from "../components/Home/Banner";
+import Propose from "../components/Home/Propose";
+import Footer from "../components/Home/Footer";
 
-const Home: React.FC = () => {
 
-return (
-    <div>
-      <h1>Welcome to the Home Page</h1>
-    </div>
+const App: React.FC = () => {
+  return (
+    <>
+      <Banner/>
+      <Propose/>
+      <Footer/>
+    </>
   );
 };
 
-export default Home;
+export default App;
