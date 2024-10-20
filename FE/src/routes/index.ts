@@ -1,6 +1,7 @@
 import GoogleCallback from "../pages/auth/GoogleCallback";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
+import Upload from "../pages/Upload";
 import { RouteType } from "../types";
 
 const publicRoute: RouteType[] = [
@@ -63,6 +64,10 @@ const publicRoute: RouteType[] = [
 ];
 
 const privateRoute: RouteType[] = [
+  {
+    path: "/upload",
+    component: Upload,
+  },
 ];
 
 export { privateRoute, publicRoute };
