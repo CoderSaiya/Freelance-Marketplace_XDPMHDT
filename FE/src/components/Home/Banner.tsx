@@ -2,7 +2,7 @@ import { SearchOutlined } from "@ant-design/icons";
 
 const Banner = () => {
   return (
-    <div className="h-screen flex items-center justify-center">
+    <div className="h-screen flex items-center justify-center z-50">
       {/* Wrapper with rounded corners */}
       <div className="relative w-full h-full overflow-hidden shadow-lg">
         {/* Background Image */}
