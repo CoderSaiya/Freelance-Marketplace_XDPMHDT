@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import FormWithFloatingLabels from "../components/Upload/FormWithFloatingLabels";
 
 const Upload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -30,9 +31,10 @@ const Upload: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center w-full p-4">
-      {!file && (
-        <div className="border-dashed border-2 border-gray-300 p-6 rounded-lg hover:border-blue-500 focus:border-blue-500 transition-all">
+    <div className="flex flex-row justify-center w-full p-20">
+      {/* Image Upload Section */}
+      <div className="flex flex-col items-center border-dashed border-2 border-gray-300 p-6 rounded-lg hover:border-blue-500 focus:border-blue-500 transition-all mb-auto w-full max-w-md mr-4">
+        {!file && (
           <label className="flex flex-col items-center cursor-pointer">
             <svg
               className="w-12 h-12 mb-2 text-gray-400"
@@ -56,41 +58,58 @@ const Upload: React.FC = () => {
             </span>
             <input type="file" className="hidden" onChange={handleFileUpload} />
           </label>
-        </div>
-      )}
+        )}
 
-      {isUploading && (
-        <div className="w-full max-w-md">
-          <div className="flex justify-between text-xs mb-2">
-            <span>{file?.name}</span>
-            <span>{`${progress}%`}</span>
+        {/* Upload Progress Section */}
+        {isUploading && (
+          <div className="w-full mt-4 flex flex-col items-center">
+            <div className="flex justify-between text-xs mb-2 w-full">
+              <span>{file?.name}</span>
+              <span>{`${progress}%`}</span>
+            </div>
+            <div className="relative w-full h-2 bg-gray-300 rounded">
+              <div
+                className="absolute top-0 left-0 h-full bg-blue-600 rounded transition-all"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
           </div>
-          <div className="relative w-full h-2 bg-gray-300 rounded">
-            <div
-              className="absolute top-0 left-0 h-full bg-blue-600 rounded transition-all"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-        </div>
-      )}
+        )}
 
-      {!isUploading && file && progress === 100 && (
-        <div className="w-full max-w-md flex justify-between items-center mt-4">
-          <span>{file.name}</span>
-          <div className="flex space-x-4">
-            <button className="text-blue-600">Download</button>
-            <button
-              className="text-red-600"
-              onClick={() => {
-                setFile(null);
-                setProgress(0);
-              }}
-            >
-              Remove
-            </button>
+        {/* Upload Complete Section */}
+        {!isUploading && file && progress === 100 && (
+          <div className="w-full flex justify-between items-center mt-4">
+            <span>{file.name}</span>
+            <div className="flex space-x-4">
+              <button className="text-blue-600">Download</button>
+              <button
+                className="text-red-600"
+                onClick={() => {
+                  setFile(null);
+                  setProgress(0);
+                }}
+              >
+                Remove
+              </button>
+            </div>
           </div>
+        )}
+      </div>
+
+      {/* Form Section */}
+      <div className="w-full max-w-md">
+        <FormWithFloatingLabels />
+
+        {/* Button Group, aligned to the right */}
+        <div className="flex justify-end space-x-4 mt-4">
+          <button className="bg-gray-100 text-black px-4 py-2 rounded-md shadow">
+            Cancel
+          </button>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-md shadow">
+            Save
+          </button>
         </div>
-      )}
+      </div>
     </div>
   );
 };
