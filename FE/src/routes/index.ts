@@ -1,6 +1,7 @@
 import GoogleCallback from "../pages/auth/GoogleCallback";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
+import ProfilePage from "../pages/Profile";
 import Upload from "../pages/Upload";
 import { RouteType } from "../types";
 
@@ -20,13 +21,13 @@ const publicRoute: RouteType[] = [
   {
     path:"/auth/callback",
     component: GoogleCallback,
-  }
+  },
 
   
-//   {
-//     path: "/profile",
-//     component: ProfilePage,
-//   },
+  {
+    path: "/profile",
+    component: ProfilePage,
+  }
 //   {
 //     path: "/chat",
 //     component: ChatPage,
