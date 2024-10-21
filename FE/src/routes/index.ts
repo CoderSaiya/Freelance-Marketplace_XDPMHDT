@@ -24,10 +24,6 @@ const publicRoute: RouteType[] = [
   },
 
   
-  {
-    path: "/profile",
-    component: ProfilePage,
-  }
 //   {
 //     path: "/chat",
 //     component: ChatPage,
@@ -69,6 +65,11 @@ const privateRoute: RouteType[] = [
     path: "/upload",
     component: Upload,
   },
+
+  {
+    path: "/profile",
+    component: ProfilePage,
+  }
 ];
 
 export { privateRoute, publicRoute };
