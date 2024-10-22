@@ -32,6 +32,16 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                         return await projectService.GetProjectByIdAsync(projectId);
                     }
                 });
+
+            Field<ListGraphType<ProjectType>>("popularProjects")
+                .ResolveAsync(async context =>
+                {
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var projectService = scope.ServiceProvider.GetRequiredService<IProjectService>();
+                        return await projectService.GetPopularProjectsAsync();
+                    }
+                });
         }
     }
 }

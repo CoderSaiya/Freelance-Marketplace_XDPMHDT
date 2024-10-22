@@ -55,6 +55,24 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
                     return await projectService.DeleteProjectAsync(projectId);
                 })
             }.AuthorizeWith("Admin", "Client"));
+
+            AddField(new FieldType
+            {
+                Name = "checkProjectConflict",
+                Type = typeof(BooleanGraphType),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "userId" },
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "projectId" }
+                ),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    var userId = context.GetArgument<int>("userId");
+                    var projectId = context.GetArgument<int>("projectId");
+
+                    return await projectService.CheckScheduleConflictAsync(userId, projectId);
+                })
+            }.AuthorizeWith("Admin", "Client"));
+
         }
     }
 }

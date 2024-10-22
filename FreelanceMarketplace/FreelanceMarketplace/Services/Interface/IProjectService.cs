@@ -9,5 +9,9 @@ namespace FreelanceMarketplace.Services.Interface
         Task<Project> CreateProjectAsync(Project project);
         Task<Project> UpdateProjectAsync(int projectId, Project updatedProject);
         Task<bool> DeleteProjectAsync(int projectId);
+        Task<bool> CheckScheduleConflictAsync(int userId, int projectId);
+        Task<List<Project>> GetPopularProjectsAsync();
+
+
     }
 }

@@ -110,5 +110,64 @@ namespace FreelanceMarketplace.Services
                 throw new Exception("Error deleting project", ex);
             }
         }
+
+        public async Task<bool> CheckScheduleConflictAsync(int userId, int projectId)
+        {
+            try
+            {
+                var newProject = await _context.Projects.FindAsync(projectId);
+                if (newProject == null)
+                    throw new KeyNotFoundException("Project not found");
+
+                var activeProjects = await _context.Applies
+                    .Include(a => a.Project)
+                    .Where(a => a.UserId == userId && a.Status == "Accepted")
+                    .ToListAsync();
+
+                DateTime newProjectStart = DateTime.Now;
+                DateTime newProjectEnd = newProject.Deadline;
+
+                // Kiểm tra xung đột lịch
+                foreach (var apply in activeProjects)
+                {
+                    var projectStart = apply.CreateAt;
+                    var projectEnd = apply.CreateAt.AddDays(apply.Duration);
+
+                    if (newProjectStart < projectEnd && newProjectEnd > projectStart)
+                    {
+                        return true; 
+                    }
+                }
+                return false; 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error checking schedule conflicts", ex);
+            }
+        }
+
+        public async Task<List<Project>> GetPopularProjectsAsync()
+        {
+            try
+            {
+                var projects = await _context.Projects
+                    .Include(p => p.Applies) 
+                    .ToListAsync();
+
+                // Sắp xếp các dự án dựa trên số lượng apply giảm dần
+                var sortedProjects = projects
+                    .OrderByDescending(p => p.Applies.Count)
+                    .ToList();
+
+                return sortedProjects;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving popular projects", ex);
+            }
+        }
+
+
+
     }
 }

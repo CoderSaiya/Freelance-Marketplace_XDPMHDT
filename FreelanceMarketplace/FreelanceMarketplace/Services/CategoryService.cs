@@ -82,22 +82,59 @@ namespace FreelanceMarketplace.Services
             }
         }
 
-        public async Task<bool> DeleteCategoryAsync(int categoryId) 
+        public async Task<bool> DeleteCategoryAsync(int categoryId)
         {
             try
             {
-                var category = await _context.Categories.FindAsync(categoryId); 
+                var category = await _context.Categories
+                    .Include(c => c.Projects) 
+                    .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
+
                 if (category == null)
                     throw new KeyNotFoundException("Category not found");
 
-                _context.Categories.Remove(category); 
-                await _context.SaveChangesAsync(); 
-                return true; 
+                // Kiểm tra xem danh mục có dự án nào liên kết không
+                if (category.Projects.Any())
+                    throw new InvalidOperationException("Category cannot be deleted because it has associated projects.");
+
+                _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
+                return true;
             }
             catch (Exception ex)
             {
                 throw new Exception("Error deleting category", ex);
             }
         }
+
+        public async Task<List<Project>> GetProjectsSortedByCategoryPriorityAsync()
+        {
+            try
+            {
+                var categories = await _context.Categories
+                    .Include(c => c.Projects) 
+                    .ToListAsync();
+
+                // Sắp xếp các danh mục theo số lượng dự án từ cao xuống thấp
+                var sortedCategories = categories
+                    .OrderByDescending(c => c.Projects.Count) 
+                    .ToList();
+
+                var sortedProjects = new List<Project>();
+
+                // Lần lượt thêm các dự án theo thứ tự của danh mục đã sắp xếp
+                foreach (var category in sortedCategories)
+                {
+                    sortedProjects.AddRange(category.Projects);
+                }
+
+                return sortedProjects;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving projects sorted by category priority", ex);
+            }
+        }
+
     }
 }
