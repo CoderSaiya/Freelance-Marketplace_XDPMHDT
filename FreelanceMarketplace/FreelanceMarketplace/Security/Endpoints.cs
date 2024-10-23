@@ -9,7 +9,9 @@
             "/api/auth/confirm-email",
             "/api/img",
             "/api/auth/refresh-token",
-            "/api/auth/signin-google"
+            "/api/auth/signin-google",
+            "/api/auth/google-response",
+            "/graphql"
 
         };
 
