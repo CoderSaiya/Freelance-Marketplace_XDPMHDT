@@ -24,12 +24,6 @@ const publicRoute: RouteType[] = [
     component: GoogleCallback,
   },
 
-  
-  {
-    path: "/profile",
-    component: ProfilePage,
-  },
-
   {
     path: "/filter",
     component: FilterPage,
