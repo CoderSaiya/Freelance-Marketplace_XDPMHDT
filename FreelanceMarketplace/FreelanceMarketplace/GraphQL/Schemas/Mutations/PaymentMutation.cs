@@ -25,7 +25,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
                     var input = context.GetArgument<Payment>("payment");
                     return await paymentService.CreatePaymentAsync(input);
                 })
-            }.AuthorizeWith("Admin","Client"));
+            }.AuthorizeWith("Client", "Admin", "Freelancer"));
 
             AddField(new FieldType
             {
@@ -56,6 +56,20 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
                     return await paymentService.DetetePaymentAsync(paymentId);
                 })
             }.AuthorizeWith("Admin"));
+
+            AddField(new FieldType
+            {
+                Name = "refundPayment",
+                Type = typeof(PaymentType),
+                Arguments = new QueryArguments(
+                   new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "paymentId" }
+               ),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    var paymentId = context.GetArgument<int>("paymentId");
+                    return await paymentService.RefundPaymentAsync(paymentId);
+                })
+            }.AuthorizeWith("Client", "Admin", "Freelancer"));
         }
     }
 }
