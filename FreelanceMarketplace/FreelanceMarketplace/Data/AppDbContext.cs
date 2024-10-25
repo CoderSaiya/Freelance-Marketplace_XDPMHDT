@@ -20,6 +20,8 @@ namespace FreelanceMarketplace.Data
         public DbSet<RefreshTokens> RefreshTokens { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Apply> Applies { get; set; }
+
+        public DbSet<Wallet> Wallets { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Cau hinh contribute (column)
@@ -120,10 +122,10 @@ namespace FreelanceMarketplace.Data
 
 
             modelBuilder.Entity<Wallet>()
-         .HasOne(w => w.User)
-          .WithOne(w => w.Wallet)
-          .HasForeignKey<Wallet>(w => w.WalletId)
-          .OnDelete(DeleteBehavior.Cascade);
+             .HasOne(w => w.User)
+             .WithOne(w => w.Wallet)
+                .HasForeignKey<Wallet>(w => w.WalletId)
+             .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
