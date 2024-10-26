@@ -21,8 +21,22 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
                 ),
                 Resolver = new FuncFieldResolver<object>(async context =>
                 {
-                    var input = context.GetArgument<Project>("project");
-                    return await projectService.CreateProjectAsync(input);
+                    Console.WriteLine("abc");
+                    var projectInput = context.GetArgument<Dictionary<string, object>>("project");
+
+                    var project = new Project
+                    {
+                        ProjectName = projectInput["projectName"]?.ToString(),
+                        ProjectDescription = projectInput["projectDescription"]?.ToString(),
+                        Budget = Convert.ToDouble(projectInput["budget"]),
+                        Deadline = DateTime.Parse(projectInput["deadline"].ToString()),
+                        Status = projectInput["status"]?.ToString(),
+                        CategoryId = Convert.ToInt32(projectInput["categoryId"]),
+                        SkillRequire = projectInput.ContainsKey("skillRequire") ? projectInput["skillRequire"].ToString() : null
+                    };
+
+                    var createdProject = await projectService.CreateProjectAsync(project);
+                    return createdProject;
                 })
             }.AuthorizeWith("Admin", "Client"));
 
