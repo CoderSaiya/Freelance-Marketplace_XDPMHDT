@@ -7,4 +7,9 @@ export default defineConfig({
     port: 5173
   },
   plugins: [react()],
+  resolve: {
+    alias: {
+      'apollo-upload-client': 'apollo-upload-client/public/index.js',
+    },
+  },
 })

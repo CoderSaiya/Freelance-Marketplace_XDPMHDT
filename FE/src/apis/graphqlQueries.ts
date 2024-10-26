@@ -18,3 +18,22 @@ export const CREATE_CONTRACT = gql`
     }
   }
 `;
+
+export const GET_PROJECTS = gql`
+  query GetProjects {
+    projects {
+      projectId
+      projectName
+    }
+  }
+`;
+
+export const CREATE_PROJECT = gql`
+  mutation ($project: ProjectInput!, $imageFile: Upload) {
+    createProject(project: $project, imageFile: $imageFile) {
+      projectName
+      description
+      projectId
+    }
+  }
+`;

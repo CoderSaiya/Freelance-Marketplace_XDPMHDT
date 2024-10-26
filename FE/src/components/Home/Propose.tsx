@@ -1,7 +1,9 @@
 import React from "react";
+import { useQuery } from "@apollo/client";
 import ProjectCard from "./ProjectCard";
+import { GET_PROJECTS } from "../../apis/graphqlQueries";
 
-const Propose = () => {
+const Propose: React.FC = () => {
   const projects = [
     {
       image: "https://example.com/florence.jpg",
@@ -24,6 +26,11 @@ const Propose = () => {
       homesCount: 200,
     },
   ];
+  const { loading, error, data } = useQuery(GET_PROJECTS);
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  console.log(data);
   return (
     <div className="max-w-6xl mx-auto p-6">
       <h2 className="text-2xl font-semibold mb-6">

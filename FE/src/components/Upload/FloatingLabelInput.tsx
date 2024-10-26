@@ -3,10 +3,10 @@ import React from 'react';
 interface FloatingLabelInputProps {
   label: string;
   type?: string;
-  value: string;
+  value: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   name: string;
-  width?: string; // Optional width prop
+  width?: string;
 }
 
 const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({ label, type = 'text', value, onChange, name, width = 'w-full' }) => {

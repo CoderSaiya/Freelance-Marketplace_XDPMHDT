@@ -88,7 +88,7 @@ export const restfulApi = createApi({
     // googleCallback: builder.query<void, string>({
     //   query: (code) => `Auth/google-response?code=${code}`,
     // }),
-    loginGoogle: builder.mutation<void,void>({
+    loginGoogle: builder.mutation<void, void>({
       query: (googleResponseCode) => ({
         url: 'Auth/google-response', // Endpoint to exchange Google token
         method: 'POST',
@@ -101,7 +101,14 @@ export const restfulApi = createApi({
         method: 'POST',
       }),
     }),
+    uploadImg: builder.mutation<{ ImageUrl: string }, FormData>({
+      query: (formData) => ({
+        url: 'Img',
+        method: 'POST',
+        body: formData,
+      })
+    })
   }),
 });
 
-export const { useLoginUserMutation, useLoginGoogleMutation  } = restfulApi;
+export const { useLoginUserMutation, useLoginGoogleMutation, useUploadImgMutation } = restfulApi;

@@ -1,10 +1,27 @@
 import React, { useState } from "react";
 import FormWithFloatingLabels from "../components/Upload/FormWithFloatingLabels";
+import { useCreateProjectMutation } from "../store/graphqlApi";
+import { useUploadImgMutation } from "../apis/restfulApi";
+import { notification } from "antd";
 
 const Upload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [formValues, setFormValues] = useState({
+    projectName: "",
+    projectDescription: "",
+    budget: 0.0,
+    deadline: "",
+    skillRequired: "",
+    status: "",
+    categoryId: 0,
+  });
+
+  const [createProject] = useCreateProjectMutation();
+  const [uploadImg] = useUploadImgMutation();
+
+  const token = localStorage.getItem("access_token")?.toString();
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -25,10 +42,106 @@ const Upload: React.FC = () => {
           setIsUploading(false);
           return 100;
         }
-        return oldProgress + 10;
+        return oldProgress + 20;
       });
     }, 300);
   };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setFormValues((prevValues) => {
+      if (name === "budget" || name === "categoryId") {
+        return {
+          ...prevValues,
+          [name]: parseFloat(value),
+        };
+      }
+
+      return {
+        ...prevValues,
+        [name]: value,
+      };
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    console.log(file);
+    if (
+      !formValues.projectName ||
+      !formValues.budget ||
+      !formValues.deadline ||
+      !formValues.skillRequired ||
+      !formValues.status ||
+      !formValues.categoryId
+    ) {
+      notification.error({
+        message: "Please fill in all required fields.",
+      });
+      return;
+    }
+
+    const formattedData = {
+      projectName: formValues.projectName,
+      projectDescription: formValues.projectDescription || null,
+      budget: formValues.budget,
+      deadline: formValues.deadline,
+      skillRequired: formValues.skillRequired,
+      status: formValues.status,
+      categoryId: formValues.categoryId,
+    };
+
+    const formDataImg = new FormData();
+
+    try {
+      const createResponse = await createProject({
+        project: formattedData,
+      }).unwrap();
+
+      console.log("createResponse:", createResponse);
+
+      if (file) {
+        formDataImg.append("file", file);
+
+        const decoded = parseJwt(token);
+        const userId =
+          decoded[
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+          ];
+        console.log(createResponse.data.createProject.projectId);
+        console.log(userId);
+
+        if (createResponse.data.createProject.projectId !== null || createResponse.data.createProject.projectId !== undefined ) {
+          formDataImg.append("userId", userId);
+          formDataImg.append("projectId", createResponse.data.createProject.projectId.toString());
+          await uploadImg(formDataImg).unwrap();
+        } else {
+          console.error("projectId is missing in the response");
+        }
+      }
+
+      console.log("Project created:", createResponse);
+    } catch (error) {
+      console.error("Error creating project:", error);
+    }
+  };
+
+  function parseJwt(token: string) {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map(function (c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+
+    return JSON.parse(jsonPayload);
+  }
 
   return (
     <div className="flex flex-row justify-center w-full p-20">
@@ -98,14 +211,26 @@ const Upload: React.FC = () => {
 
       {/* Form Section */}
       <div className="w-full max-w-md">
-        <FormWithFloatingLabels />
-
+        <FormWithFloatingLabels
+          projectName={formValues.projectName}
+          projectDescription={formValues.projectDescription}
+          budget={formValues.budget.toString()}
+          deadline={formValues.deadline}
+          skillRequired={formValues.skillRequired}
+          status={formValues.status}
+          categoryId={formValues.categoryId}
+          onChange={handleInputChange}
+          onSubmit={handleSubmit}
+        />{" "}
         {/* Button Group, aligned to the right */}
         <div className="flex justify-end space-x-4 mt-4">
           <button className="bg-gray-100 text-black px-4 py-2 rounded-md shadow">
             Cancel
           </button>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md shadow">
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded-md shadow"
+            onClick={handleSubmit}
+          >
             Save
           </button>
         </div>

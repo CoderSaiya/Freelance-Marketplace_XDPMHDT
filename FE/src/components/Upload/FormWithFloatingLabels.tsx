@@ -1,72 +1,76 @@
-import React, { useState } from "react";
+import React from "react";
 import FloatingLabelInput from "./FloatingLabelInput";
 
-const FormWithFloatingLabels: React.FC = () => {
-  const [formValues, setFormValues] = useState({
-    projectName: "",
-    projectDescription: "",
-    budget: "",
-    deadline: "",
-    skillRequired: "",
-    status: "",
-    categoryId: "",
-  });
+interface FormProps {
+  projectName: string;
+  projectDescription: string;
+  budget: string;
+  deadline: string;
+  skillRequired: string;
+  status: string;
+  categoryId: number;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onSubmit: (e: React.FormEvent) => void;
+}
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      [name]: value,
-    }));
-  };
-
+const FormWithFloatingLabels: React.FC<FormProps> = ({
+  projectName,
+  projectDescription,
+  budget,
+  deadline,
+  skillRequired,
+  status,
+  categoryId,
+  onChange,
+  onSubmit,
+}) => {
   return (
-    <form className="p-6 space-y-4">
+    <form onSubmit={onSubmit} className="p-6 space-y-4">
       <FloatingLabelInput
         label="Project Name"
-        value={formValues.projectName}
-        onChange={handleInputChange}
+        value={projectName}
+        onChange={onChange}
         name="projectName"
       />
       <div className="flex gap-10">
         <FloatingLabelInput
           label="Budget"
           type="number"
-          value={formValues.budget}
-          onChange={handleInputChange}
+          value={budget}
+          onChange={onChange}
           name="budget"
         />
         <FloatingLabelInput
           label="Deadline"
           type="date"
-          value={formValues.deadline}
-          onChange={handleInputChange}
+          value={deadline}
+          onChange={onChange}
           name="deadline"
         />
       </div>
       <FloatingLabelInput
         label="Project Description"
-        value={formValues.projectDescription}
-        onChange={handleInputChange}
+        value={projectDescription}
+        onChange={onChange}
         name="projectDescription"
       />
-
       <FloatingLabelInput
         label="Skills Required"
-        value={formValues.skillRequired}
-        onChange={handleInputChange}
+        value={skillRequired}
+        onChange={onChange}
         name="skillRequired"
       />
       <FloatingLabelInput
         label="Status"
-        value={formValues.status}
-        onChange={handleInputChange}
+        value={status}
+        onChange={onChange}
         name="status"
       />
       <FloatingLabelInput
         label="Category ID"
-        value={formValues.categoryId}
-        onChange={handleInputChange}
+        type="number"
+        value={categoryId.toString()}
+        onChange={onChange}
         name="categoryId"
       />
     </form>
