@@ -5,6 +5,7 @@ import ProfilePage from "../pages/Profile";
 import FilterPage from "../pages/Filter";
 import Upload from "../pages/Upload";
 import { RouteType } from "../types";
+import Chat from "../pages/Chat";
 
 const publicRoute: RouteType[] = [
   {
@@ -73,6 +74,11 @@ const privateRoute: RouteType[] = [
   {
     path: "/profile",
     component: ProfilePage,
+  },
+
+  {
+    path: "/chat",
+    component: Chat,
   }
 ];
 
