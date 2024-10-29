@@ -39,21 +39,25 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
   if (result.error && result.error.status === 401) {
     if (!mutex.isLocked()) {
       const release = await mutex.acquire();
-
       try {
-        // Dispatch refreshToken mutation to get new token
-        const refreshResult = await api.dispatch(restfulApi.endpoints.refreshToken.initiate());
-        const newToken = refreshResult?.data?.accessToken;
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (refreshToken) {
+          const refreshResult = await api.dispatch(
+            restfulApi.endpoints.refreshToken.initiate({ accessToken: null, refreshToken })
+          );
 
-        if (newToken) {
-          // Update token in Redux store
-          api.dispatch(setTokens({ accessToken: newToken }));
+          const newAccessToken = refreshResult.data?.accessToken;
+          const newRefreshToken = refreshResult.data?.refreshToken;
 
-          // Retry the original query with the new access token
-          result = await baseQuery(args, api, extraOptions);
-        } else {
-          // If refresh fails, log out
-          api.dispatch(logout());
+          if (newAccessToken && newRefreshToken) {
+            api.dispatch(setTokens({ accessToken: newAccessToken, refreshToken: newRefreshToken }));
+            localStorage.setItem('access_token', newAccessToken);
+            localStorage.setItem('refresh_token', newRefreshToken);
+
+            result = await baseQuery(args, api, extraOptions);
+          } else {
+            api.dispatch(logout());
+          }
         }
       } finally {
         release();
@@ -63,7 +67,6 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
       result = await baseQuery(args, api, extraOptions);
     }
   }
-
   return result;
 };
 
@@ -96,10 +99,11 @@ export const restfulApi = createApi({
         body: { code: googleResponseCode }, // Include the Google response code in the body
       }),
     }),
-    refreshToken: builder.mutation<{ accessToken: string }, void>({
-      query: () => ({
+    refreshToken: builder.mutation<{ accessToken: string; refreshToken: string }, { accessToken: string | null; refreshToken: string | null }>({
+      query: (tokens) => ({
         url: 'Auth/refresh-token',
         method: 'POST',
+        body: tokens,
       }),
     }),
     uploadImg: builder.mutation<{ ImageUrl: string }, FormData>({
