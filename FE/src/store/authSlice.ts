@@ -1,50 +1,30 @@
-// import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-// import { login, refreshToken } from '../services/authService';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-// interface AuthState {
-//   user: any;
-//   token: string | null;
-//   loading: boolean;
-//   error: string | null;
-// }
+interface AuthState {
+  userId: number;
+  username: string;
+}
 
-// const initialState: AuthState = {
-//   user: null,
-//   token: null,
-//   loading: false,
-//   error: null,
-// };
+const initialState: AuthState = {
+  userId: 0,
+  username: "",
+};
 
-// // Action to refresh the token
-// export const refreshUserToken = createAsyncThunk('auth/refreshToken', async (_refreshToken: string) => {
-//   const response = await refreshToken(_refreshToken);
-//   return response.token;
-// });
+const authSlice = createSlice({
+  name: 'auth',
+  initialState,
+  reducers: {
+    setUser(state, action: PayloadAction<{ userId: number; username: string }>) {
+      state.userId = action.payload.userId;
+      state.username = action.payload.username;
+    },
+    clearUser(state) {
+      state.userId = 0;
+      state.username = "";
+    },
+  },
+});
 
-// // Action to login the user
-// export const loginUser = createAsyncThunk('auth/loginUser', async ({ username, password }: { username: string; password: string }) => {
-//   return await login(username, password);
-// });
+export const { setUser, clearUser } = authSlice.actions;
 
-// const authSlice = createSlice({
-//   name: 'auth',
-//   initialState,
-//   reducers: {
-//     logout: (state) => {
-//       state.user = null;
-//       state.token = null;
-//     },
-//   },
-//   extraReducers: (builder) => {
-//     builder.addCase(loginUser.fulfilled, (state, action: PayloadAction<{ user: any; token: string }>) => {
-//       state.user = action.payload.user;
-//       state.token = action.payload.token;
-//     });
-//     builder.addCase(refreshUserToken.fulfilled, (state, action: PayloadAction<string>) => {
-//       state.token = action.payload;
-//     });
-//   },
-// });
-
-// export const { logout } = authSlice.actions;
-// export default authSlice.reducer;
+export default authSlice.reducer;

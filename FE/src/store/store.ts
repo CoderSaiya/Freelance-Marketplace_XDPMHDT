@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from '../features/authSlice';
+import authReducer from './authSlice'
 import { restfulApi } from '../apis/restfulApi';
-import { graphqlApi } from './graphqlapi';
+import { graphqlApi } from '../apis/graphqlApi';
 
 export const store = configureStore({
   reducer: {

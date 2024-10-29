@@ -19,7 +19,7 @@ const Form: React.FC = () => {
   const navigate = useNavigate();
 
   const urlParams = new URLSearchParams(window.location.search);
-  const code = urlParams.get('code');
+  const code = urlParams.get("code");
 
   // const { data, error, refetch } = useGoogleCallbackQuery(code ?? '', {
   //   skip: !code,
@@ -68,8 +68,28 @@ const Form: React.FC = () => {
         console.error("Tokens not found in response");
       }
 
-      localStorage.setItem("access_token", accessToken);
-      localStorage.setItem("refresh", refreshToken);
+      if (accessToken) {
+        // const decodedToken: any = jwtDecode(accessToken);
+        // const userId =
+        //   decodedToken[
+        //     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+        //   ];
+        // const userName =
+        //   decodedToken[
+        //     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+        //   ];
+
+        // console.log(userId);
+
+        // dispatch(setUser({ userId: userId, username: userName }));
+
+        localStorage.setItem("access_token", accessToken);
+        localStorage.setItem("refresh", refreshToken);
+
+        // console.log("User ID:", userId);
+        // console.log("Username:", userName);
+      }
+
       notification.success({
         message: "Successfully login",
       });
@@ -84,19 +104,19 @@ const Form: React.FC = () => {
 
   const handleLoginGoogle = () => {
     const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=838128278169-ug2l134id0g6krlkhiklt8u606iln46u.apps.googleusercontent.com&redirect_uri=http://localhost:5173/auth/callback&response_type=code&scope=openid email profile`;
-  
+
     const width = 500;
     const height = 600;
     const left = window.screen.width / 2 - width / 2;
     const top = window.screen.height / 2 - height / 2;
-  
+
     // Mở cửa sổ nhỏ để đăng nhập Google
     const googleWindow = window.open(
       googleAuthUrl,
       "Google Sign-In",
       `width=${width},height=${height},top=${top},left=${left}`
     );
-  
+
     // Theo dõi khi cửa sổ pop-up đóng
     const interval = setInterval(() => {
       if (googleWindow && googleWindow.closed) {
@@ -110,7 +130,7 @@ const Form: React.FC = () => {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
+    const code = urlParams.get("code");
 
     if (code) {
       // Call your loginGoogle mutation with the Google code
@@ -122,12 +142,12 @@ const Form: React.FC = () => {
     if (isSuccess && data) {
       const { accessToken, refreshToken } = data;
 
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
       notification.success({
-        message: "Succcesfully login"
-      })
-      navigate('/');
+        message: "Succcesfully login",
+      });
+      navigate("/");
     }
   }, [isSuccess, data, navigate]);
 

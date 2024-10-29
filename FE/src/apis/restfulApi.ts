@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { Mutex } from 'async-mutex';
 import { setTokens, logout } from '../features/authSlice';
+import { ChatMessage } from '../types/ChatMessage';
 
 interface GoogleSignInResponse {
   url: string;
@@ -107,8 +108,25 @@ export const restfulApi = createApi({
         method: 'POST',
         body: formData,
       })
-    })
+    }),
+    sendAll: builder.mutation<void, { user: string; message: string }>({
+      query: ({ user, message }) => ({
+        url: 'Chat/sendAll',
+        method: 'POST',
+        body: { user, message },
+      }),
+    }),
+    getChatHistory: builder.query<ChatMessage[], { user1: string; user2: string }>({
+      query: ({ user1, user2 }) => `Chat/history?user1=${user1}&user2=${user2}`,
+    }),
+    sendMessage: builder.mutation<void, { sender: string; recipient: string; message: string }>({
+      query: ({ sender, recipient, message }) => ({
+        url: 'Chat/send',
+        method: 'POST',
+        body: { sender, recipient, message },
+      }),
+    }),
   }),
 });
 
-export const { useLoginUserMutation, useLoginGoogleMutation, useUploadImgMutation } = restfulApi;
+export const { useLoginUserMutation, useLoginGoogleMutation, useUploadImgMutation, useSendMessageMutation, useSendAllMutation, useGetChatHistoryQuery } = restfulApi;

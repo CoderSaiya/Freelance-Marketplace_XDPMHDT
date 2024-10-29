@@ -1,24 +1,29 @@
 import * as signalR from '@microsoft/signalr';
 
-const BASE_URL = import.meta.env.BASE_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const connection = new signalR.HubConnectionBuilder()
-  .withUrl(`${BASE_URL}/chatHub`)
+  .withUrl(`${BASE_URL}/chatHub`, {
+    accessTokenFactory: async () => {
+      return localStorage.getItem('access_token') || '';
+    }
+  })
   .configureLogging(signalR.LogLevel.Information)
   .build();
 
-export const startConnection = async () => {
+export const startSignalRConnection = async (onReceiveMessage: (user: string, message: string) => void) => {
+  connection.on('ReceiveMessage', onReceiveMessage);
+
   try {
     await connection.start();
-    console.log('Connected to SignalR!');
-  } catch (error) {
-    console.error('Connection failed: ', error);
-    setTimeout(startConnection, 5000);
+    console.log('SignalR connected');
+  } catch (err) {
+    console.error('SignalR connection failed: ', err);
   }
 };
 
-export const sendMessage = async (message: string) => {
-  await connection.invoke('SendMessage', message);
+export const sendSignalRMessage = (user: string, message: string) => {
+  connection.invoke('SendMessage', user, message).catch((err) => console.error(err.toString()));
 };
 
 export const onReceiveMessage = (callback: (message: string) => void) => {

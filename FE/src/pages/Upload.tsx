@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import FormWithFloatingLabels from "../components/Upload/FormWithFloatingLabels";
-import { useCreateProjectMutation } from "../store/graphqlApi";
+import { useCreateProjectMutation } from "../apis/graphqlApi";
 import { useUploadImgMutation } from "../apis/restfulApi";
 import { notification } from "antd";
 
