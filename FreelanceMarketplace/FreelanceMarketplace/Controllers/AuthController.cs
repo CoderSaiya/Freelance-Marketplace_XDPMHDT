@@ -6,6 +6,8 @@ using FreelanceMarketplace.Services.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using GraphQLParser;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -111,8 +113,8 @@ public class AuthController : Controller
     [HttpPost("refresh-token")]
     public IActionResult RefreshToken([FromBody] TokenDto request)
     {
-        var newAccessToken = _authService.RefreshToken(request.RefreshToken);
-        if (newAccessToken == null)
+        var tokenResponse = _authService.RefreshToken(request.RefreshToken);
+        if (tokenResponse == null)
         {
             return Unauthorized(new Response<string>
             {
@@ -122,11 +124,11 @@ public class AuthController : Controller
             });
         }
 
-        return Ok(new Response<string>
+        return Ok(new Response<TokenRes>
         {
             Success = true,
             Message = "Token refreshed",
-            Data = newAccessToken
+            Data = tokenResponse
         });
     }
 
@@ -138,18 +140,71 @@ public class AuthController : Controller
         return Challenge(properties, "Google");
     }
 
-    [HttpGet("google-response")]
+    //[HttpGet("google-response")]
+    //public async Task<IActionResult> GoogleResponse()
+    //{
+    //    var result = await HttpContext.AuthenticateAsync("Google");
+    //    if (result.Succeeded)
+    //    {
+    //        // success
+    //        var claims = result.Principal.Identities.First().Claims;
+    //        _authService.GenerateAccessToken(claims);
+    //    }
+
+    //    return Redirect("http://localhost:5173");
+    //}
+
+    [HttpPost("google-response")]
     public async Task<IActionResult> GoogleResponse()
     {
+        // Authenticate the user via Google
         var result = await HttpContext.AuthenticateAsync("Google");
+        Console.WriteLine(result);
+
         if (result.Succeeded)
         {
-            // success
-            var claims = result.Principal.Identities.First().Claims;
-            _authService.GenerateAccessToken(claims);
-        }
+            // Extract claims from Google authentication result
+            var claims = result.Principal.Identities.First().Claims.ToList();
 
-        return Redirect("/");
+            // Check if user exists or create a new user in your database
+            var googleEmail = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            var user = _userService.GetOrCreateUserFromGoogleToken(googleEmail);
+
+            if (user != null)
+            {
+                // Add custom claims (e.g., user ID and role)
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+                claims.Add(new Claim(ClaimTypes.Role, user.Role));
+
+                var accessToken = _authService.GenerateAccessToken(claims);
+
+                var refreshToken = _authService.GenerateRefreshToken();
+
+                _userService.SaveRefreshToken(user.Id, refreshToken);
+
+                Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddDays(7)
+                });
+
+                return Ok(new Response<object>
+                {
+                    Success = true,
+                    Message = "Login successful",
+                    Data = new
+                    {
+                        AccessToken = accessToken,
+                        RefreshToken = refreshToken
+                    }
+                });
+            }
+        }
+        var errorDetails = result.Failure?.Message;
+        Console.WriteLine(errorDetails);
+        return Unauthorized($"Google authentication failed. {errorDetails}");
     }
 
     [HttpGet("signin-facebook")]
@@ -166,7 +221,7 @@ public class AuthController : Controller
         var result = await HttpContext.AuthenticateAsync("Facebook");
         if (result.Succeeded)
         {
-            // success
+            // Xử lý người dùng sau khi đăng nhập thành công
             var claims = result.Principal.Identities.First().Claims;
             _authService.GenerateAccessToken(claims);
         }
