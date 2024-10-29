@@ -3,13 +3,16 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using FreelanceMarketplace.Models.DTOs.Res;
 
 namespace FreelanceMarketplace.Services
 {
     using FreelanceMarketplace.Models.DTOs.Req;
     using FreelanceMarketplace.Services.Interface;
+    using Google.Apis.Auth.OAuth2.Responses;
     using Microsoft.Extensions.Configuration;
     using Microsoft.IdentityModel.Tokens;
+    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.IdentityModel.Tokens.Jwt;
@@ -46,7 +49,7 @@ namespace FreelanceMarketplace.Services
             return new TokenDto(accessToken, refreshToken);
         }
 
-        public string RefreshToken(string token)
+        public TokenRes RefreshToken(string token)
         {
             var refreshToken = _userService.GetRefreshTokenByToken(token);
             if (refreshToken == null || refreshToken.ExpiryDate < DateTime.UtcNow || refreshToken.IsUsed || refreshToken.IsRevoked)
@@ -70,7 +73,7 @@ namespace FreelanceMarketplace.Services
             // save new token
             _userService.SaveRefreshToken(user.Id, newRefreshToken);
 
-            return newAccessToken;
+            return new TokenRes(newAccessToken, newRefreshToken);
         }
 
         public string GenerateAccessToken(IEnumerable<Claim> claims)
@@ -96,6 +99,53 @@ namespace FreelanceMarketplace.Services
                 rng.GetBytes(randomNumber);
                 return Convert.ToBase64String(randomNumber);
             }
+        }
+
+        public ClaimsPrincipal ValidateToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]);
+
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = true,
+                ValidIssuer = _config["Jwt:Issuer"],
+                ValidateAudience = true,
+                ValidAudience = _config["Jwt:Audience"],
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken validatedToken);
+                return principal;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<TokenResponse> ExchangeCodeForTokensAsync(string code)
+        {
+            var httpClient = new HttpClient();
+            var tokenRequest = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("code", code),
+                new KeyValuePair<string, string>("client_id", "838128278169-ug2l134id0g6krlkhiklt8u606iln46u.apps.googleusercontent.com"),
+                new KeyValuePair<string, string>("client_secret", "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"),
+                new KeyValuePair<string, string>("redirect_uri", "https://localhost:7115/api/Auth/google-callback"),
+                new KeyValuePair<string, string>("grant_type", "authorization_code"),
+            });
+
+            var response = await httpClient.PostAsync("https://oauth2.googleapis.com/token", tokenRequest);
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            var tokenResponse = JsonConvert.DeserializeObject<TokenResponse>(responseString);
+            return tokenResponse;
         }
     }
 }

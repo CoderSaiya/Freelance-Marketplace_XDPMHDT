@@ -18,5 +18,6 @@ namespace FreelanceMarketplace.Services.Interface
         Task<Users> GetUserByUsernameAsync(string username);
         List<Users> GetUsers();
         bool DeleteUserById(int userId);
+        Users GetOrCreateUserFromGoogleToken(string googleEmail);
     }
 }
