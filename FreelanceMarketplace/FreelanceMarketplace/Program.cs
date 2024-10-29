@@ -14,12 +14,10 @@ using FreelanceMarketplace.GraphQL.Schemas.Queries;
 using FreelanceMarketplace.GraphQL.Types;
 using FreelanceMarketplace.GraphQL.Schemas;
 using GraphQL;
-using GraphQL.Server;
 using GraphQL.Types;
 using FreelanceMarketplace.Services.Implementations;
 using FreelanceMarketplace.Services.Interfaces;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -114,7 +112,7 @@ builder.Services.AddScoped<IReviewService, ReviewService>();
 // Configure Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
-        connectionString: "Data Source=ADMIN\\SQLEXPRESS;Initial Catalog=FreelanceMarketplace;Integrated Security=True;trusted_connection=true;encrypt=false;",
+        connectionString: "Data Source=DESKTOP-1FAVEMH\\SQLEXPRESS;Initial Catalog=FreelanceMarketplace;Integrated Security=True;trusted_connection=true;encrypt=false;",
         sqlServerOptionsAction: sqlOptions =>
         {
             sqlOptions.EnableRetryOnFailure(
@@ -201,6 +199,10 @@ builder.Services.AddScoped<ReviewInputType>();
 builder.Services.AddGraphQL(b => b
     .AddSelfActivatingSchema<MainSchema>()
     .AddSystemTextJson()
+    .AddErrorInfoProvider(opt =>
+    {
+        opt.ExposeExceptionDetails = builder.Environment.IsDevelopment();
+    })
     .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = builder.Environment.IsDevelopment())
     .AddGraphTypes(typeof(MainSchema).Assembly)
     .AddUserContextBuilder(ctx => new Dictionary<string, object?>

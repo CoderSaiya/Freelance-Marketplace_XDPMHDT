@@ -21,6 +21,7 @@ namespace FreelanceMarketplace.Middlewares
             var path = context.Request.Path.Value.ToLower();
             _logger.LogInformation($"Processing request for path: {path}");
 
+            Console.WriteLine(Endpoints.PublicEndpoints.Any(e => path.StartsWith(e)));
             if (Endpoints.PublicEndpoints.Any(e => path.StartsWith(e)))
             {
                 _logger.LogInformation($"Allowing access to public endpoint: {path}");
@@ -36,42 +37,60 @@ namespace FreelanceMarketplace.Middlewares
                 return;
             }
 
-            // Check if the token is valid and not expired
-            if (!context.User.Identity.IsAuthenticated || context.User.FindFirst("exp") == null)
-            {
-                _logger.LogWarning("Token expired or invalid");
-                context.Response.StatusCode = 401;
-                await context.Response.WriteAsync("Unauthorized");
-                return;
-            }
-
-            // Use HttpContext.RequestServices to create a scope
             using (var scope = context.RequestServices.CreateScope())
             {
-                var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-
-                // Check for admin role
-                if (Endpoints.AdminEndpoints.Any(e => path.StartsWith(e)) && !context.User.IsInRole("Admin"))
+                var expClaim = context.User.FindFirst("exp");
+                if (expClaim != null && long.TryParse(expClaim.Value, out var expSeconds))
                 {
-                    _logger.LogWarning($"Forbidden access attempt to admin endpoint: {path}");
-                    context.Response.StatusCode = 403;
-                    await context.Response.WriteAsync("Forbidden");
-                    return;
+                    var tokenExpiryDate = DateTimeOffset.FromUnixTimeSeconds(expSeconds).UtcDateTime;
+                    if (tokenExpiryDate < DateTime.UtcNow)
+                    {
+                        var authService = context.RequestServices.GetRequiredService<IAuthService>();
+                        var refreshToken = context.Request.Headers["X-Refresh-Token"].ToString();
+
+                        if (string.IsNullOrEmpty(refreshToken))
+                        {
+                            _logger.LogWarning("Refresh token is missing in request headers.");
+                            context.Response.StatusCode = 401;
+                            await context.Response.WriteAsync("Unauthorized - Refresh token required");
+                            return;
+                        }
+
+                        var newAccessToken = authService.RefreshToken(refreshToken);
+
+                        if (newAccessToken == null)
+                        {
+                            _logger.LogWarning("Failed to refresh access token - Invalid or expired refresh token.");
+                            context.Response.StatusCode = 401;
+                            await context.Response.WriteAsync("Unauthorized - Invalid refresh token");
+                            return;
+                        }
+
+                        context.Response.Headers["X-New-Access-Token"] = newAccessToken;
+                        _logger.LogInformation("Access token refreshed successfully.");
+                    }
                 }
 
-                // Check for freelancer role
-                if (Endpoints.FreelancerEndpoints.Any(e => path.StartsWith(e.ToLower())) && !context.User.IsInRole("Freelancer"))
-                {
-                    context.Response.StatusCode = 403;
-                    await context.Response.WriteAsync("Forbidden");
-                    return;
-                }
+                bool isAdminEndpoint = Endpoints.AdminEndpoints.Any(e => path.StartsWith(e));
+                bool isFreelancerEndpoint = Endpoints.FreelancerEndpoints.Any(e => path.StartsWith(e));
+                bool isClientEndpoint = Endpoints.ClientEndpoints.Any(e => path.StartsWith(e));
 
-                // Check for client role
-                if (Endpoints.ClientEndpoints.Any(e => path.StartsWith(e.ToLower())) && !context.User.IsInRole("Client"))
+                bool hasAccess = false;
+
+                if (isAdminEndpoint && context.User.IsInRole("Admin"))
+                    hasAccess = true;
+
+                if (isFreelancerEndpoint && context.User.IsInRole("Freelancer"))
+                    hasAccess = true;
+
+                if (isClientEndpoint && context.User.IsInRole("Client"))
+                    hasAccess = true;
+
+                if (!hasAccess)
                 {
-                    context.Response.StatusCode = 403;
-                    await context.Response.WriteAsync("Forbidden");
+                    _logger.LogWarning($"Forbidden access attempt to role-specific endpoint: {path}");
+                    context.Response.StatusCode = 403; // Forbidden
+                    await context.Response.WriteAsync("Forbidden - Insufficient role permissions");
                     return;
                 }
             }
