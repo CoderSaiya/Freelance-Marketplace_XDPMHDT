@@ -24,3 +24,23 @@ export interface ProjectInput {
     status: string;
     categoryId: string;
 }
+
+
+export interface ProjectImageResponse {
+    data: {
+        projects: ProjectWithImage[]
+    }
+}
+
+export interface ProjectWithImage {
+    projectId: number;
+    projectName: string;
+    projectDescription: string;
+    budget: number;
+    deadline: Date;
+    skillRequire: string;
+    status: string;
+    createAt: Date;
+    category: CategoryType;
+    imageUrls: string[];
+}

@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { Mutex } from 'async-mutex';
 import { setTokens, logout } from '../features/authSlice';
-import { ProjectResponseType } from '../types/ProjectType';
+import { ProjectImageResponse, ProjectResponseType, ProjectWithImage } from '../types/ProjectType';
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const mutex = new Mutex();
@@ -87,6 +87,33 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    getProject: builder.query<ProjectImageResponse, void>({
+      query: () => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query {
+              projects {
+                projectId
+                projectName
+                projectDescription
+                budget
+                deadline
+                skillRequire
+                status
+                createAt
+                category {
+                  categoryId
+                  categoryName
+                }
+                imageUrls
+              }
+            }
+          `,
+        },
+      }),
+    }),
     refreshToken: builder.mutation<{ accessToken: string; refreshToken: string }, { accessToken: string | null; refreshToken: string | null }>({
       query: (tokens) => ({
         url: 'api/Auth/refresh-token',
@@ -97,4 +124,4 @@ export const graphqlApi = createApi({
   }),
 });
 
-export const { useCreateProjectMutation } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery } = graphqlApi;
