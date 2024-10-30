@@ -74,6 +74,12 @@ namespace FreelanceMarketplace.Data
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.Cascade);
 
+            modelBuilder.Entity<Project>()
+                .HasMany(p => p.Images)
+                .WithOne(i => i.Project)
+                .HasForeignKey(i => i.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<Contracts>()
             .HasOne(c => c.Freelancer)
             .WithMany(u => u.FreelancerContracts)

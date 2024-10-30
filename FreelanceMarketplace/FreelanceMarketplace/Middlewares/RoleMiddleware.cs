@@ -66,7 +66,7 @@ namespace FreelanceMarketplace.Middlewares
                             return;
                         }
 
-                        context.Response.Headers["X-New-Access-Token"] = newAccessToken;
+                        context.Response.Headers["X-New-Access-Token"] = newAccessToken.AccessToken;
                         _logger.LogInformation("Access token refreshed successfully.");
                     }
                 }

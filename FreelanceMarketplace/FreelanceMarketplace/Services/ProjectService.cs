@@ -167,7 +167,84 @@ namespace FreelanceMarketplace.Services
             }
         }
 
+        public async Task<List<Project>> GetProjectsWithPagingAndSortingAsync(int page = 1, int pageSize = 10, string sortBy = "ProjectName", bool isAscending = true)
+        {
+            try
+            {
+                var query = _context.Projects
+                    .Include(p => p.Category)
+                    .Include(p => p.Applies)
+                    .Include(p => p.Contract)
+                    .Include(p => p.Images)
+                    .AsQueryable();
 
+                // Apply sorting
+                query = sortBy switch
+                {
+                    "Budget" => isAscending ? query.OrderBy(p => p.Budget) : query.OrderByDescending(p => p.Budget),
+                    "Deadline" => isAscending ? query.OrderBy(p => p.Deadline) : query.OrderByDescending(p => p.Deadline),
+                    "Status" => isAscending ? query.OrderBy(p => p.Status) : query.OrderByDescending(p => p.Status),
+                    _ => isAscending ? query.OrderBy(p => p.ProjectName) : query.OrderByDescending(p => p.ProjectName)
+                };
+
+                // Apply paging
+                return await query
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving projects with paging and sorting", ex);
+            }
+        }
+
+        public async Task<List<Project>> GetProjectsWithPagingAsync(int page = 1, int pageSize = 10)
+        {
+            try
+            {
+                return await _context.Projects
+                    .Include(p => p.Category)
+                    .Include(p => p.Applies)
+                    .Include(p => p.Contract)
+                    .Include(p => p.Images)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving projects with paging", ex);
+            }
+        }
+
+        public async Task<List<Project>> GetProjectsWithSortingAsync(string sortBy = "ProjectName", bool isAscending = true)
+        {
+            try
+            {
+                var query = _context.Projects
+                    .Include(p => p.Category)
+                    .Include(p => p.Applies)
+                    .Include(p => p.Contract)
+                    .Include(p => p.Images)
+                    .AsQueryable();
+
+                // Apply sorting based on the sortBy parameter
+                query = sortBy switch
+                {
+                    "Budget" => isAscending ? query.OrderBy(p => p.Budget) : query.OrderByDescending(p => p.Budget),
+                    "Deadline" => isAscending ? query.OrderBy(p => p.Deadline) : query.OrderByDescending(p => p.Deadline),
+                    "Status" => isAscending ? query.OrderBy(p => p.Status) : query.OrderByDescending(p => p.Status),
+                    _ => isAscending ? query.OrderBy(p => p.ProjectName) : query.OrderByDescending(p => p.ProjectName)
+                };
+
+                return await query.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving projects with sorting", ex);
+            }
+        }
 
     }
 }

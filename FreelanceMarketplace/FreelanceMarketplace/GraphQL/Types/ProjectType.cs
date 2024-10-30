@@ -1,5 +1,6 @@
 ﻿using FreelanceMarketplace.Models;
 using GraphQL.Types;
+using System.Management;
 
 namespace FreelanceMarketplace.GraphQL.Types
 {
@@ -15,9 +16,11 @@ namespace FreelanceMarketplace.GraphQL.Types
             Field(x => x.SkillRequire);
             Field(x => x.Status);
             Field(x => x.CreateAt);
+
             Field<CategoryType>("category");
             Field<ListGraphType<ApplyType>>("applies");
-            //Field<ListGraphType<ImgType>>("images");
+            Field<ListGraphType<StringGraphType>>("imageUrls")
+            .Resolve(context => context.Source.Images.Select(i => i.ImageUrl));
         }
     }
 }
