@@ -236,6 +236,7 @@ app.UseMiddleware<RoleMiddleware>();
 // Use UseEndpoints to map hub and controllers
 app.UseEndpoints(endpoints =>
 {
+    endpoints.MapHub<NotificationHub>("/notificationHub"); 
     endpoints.MapHub<ChatHub>("/chathub");
     endpoints.MapHub<VideoCallHub>("/videocallhub");
     endpoints.MapControllers();

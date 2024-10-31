@@ -11,18 +11,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
     {
         public UserProfileQuery(IUserProfileService userProfileService)
         {
-            /*
-            Field<UserProfileType>("userProfile")
-                .Arguments(new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "id" }))
-                .ResolveAsync(async context =>
-                {
-                    var id = context.GetArgument<int>("id");
-                    return await userProfileService.GetUserProfileByIdAsync(id);
-                });
-
-            Field<ListGraphType<UserProfileType>>("allUserProfiles")
-                .ResolveAsync(async context => await userProfileService.GetAllUserProfilesAsync());
-            */
+            // Single user profile - Public information, no authorization needed
             AddField(new FieldType
             {
                 Name = "userProfile",
@@ -33,7 +22,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                     var id = context.GetArgument<int>("id");
                     return await userProfileService.GetUserProfileByIdAsync(id);
                 })
-            }.AuthorizeWith("User"));
+            }); // No AuthorizeWith since profiles are public
 
             AddField(new FieldType
             {

@@ -168,3 +168,14 @@ E:\xdhdt\ban push\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug
 E:\xdhdt\ban push\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\FreelanceMarketplace.pdb
 E:\xdhdt\ban push\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\FreelanceMarketplace.genruntimeconfig.cache
 E:\xdhdt\ban push\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\ref\FreelanceMarketplace.dll
+D:\UTH-IT\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\FreelanceMarketplace.csproj.AssemblyReference.cache
+D:\UTH-IT\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\FreelanceMarketplace.GeneratedMSBuildEditorConfig.editorconfig
+D:\UTH-IT\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\FreelanceMarketplace.AssemblyInfoInputs.cache
+D:\UTH-IT\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\FreelanceMarketplace.AssemblyInfo.cs
+D:\UTH-IT\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\FreelanceMarketplace.csproj.CoreCompileInputs.cache
+D:\UTH-IT\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\FreelanceMarketplace.MvcApplicationPartsAssemblyInfo.cs
+D:\UTH-IT\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\FreelanceMarketplace.MvcApplicationPartsAssemblyInfo.cache
+D:\UTH-IT\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\FreelanceMarketplace.sourcelink.json
+D:\UTH-IT\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\FreelanceMarketplace.dll
+D:\UTH-IT\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\refint\FreelanceMarketplace.dll
+D:\UTH-IT\BE_XDPMHDT\FreelanceMarketplace\FreelanceMarketplace\obj\Debug\net6.0\FreelanceMarketplace.pdb
