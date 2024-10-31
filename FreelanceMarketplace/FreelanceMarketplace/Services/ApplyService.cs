@@ -29,26 +29,26 @@ namespace FreelanceMarketplace.Services.Implementations
                 var project = await _context.Projects.FindAsync(apply.ProjectId);
                 if (project == null || project.Status != "Open")
                 {
-                    throw new InvalidOperationException("Dự án không mở để apply.");
+                    throw new InvalidOperationException("The project is not open for applications.");
                 }
 
                 var applyCount = await _context.Applies
                     .CountAsync(a => a.ProjectId == apply.ProjectId);
                 if (applyCount >= MaxAppliesPerProject)
                 {
-                    throw new InvalidOperationException("Đã đạt số lượng apply tối đa cho dự án này.");
+                    throw new InvalidOperationException("The maximum number of applications for this project has been reached.");
                 }
 
                 await _context.Applies.AddAsync(apply);
                 await _context.SaveChangesAsync();
 
-                await SendNotificationAsync(apply.UserId, "Apply của bạn đã được gửi thành công.");
+                await SendNotificationAsync(apply.UserId, "Your application has been submitted successfully.");
 
                 return apply;
             }
             catch (Exception ex)
             {
-                throw new Exception("Error creating apply", ex);
+                throw new Exception("Error creating application", ex);
             }
         }
 
@@ -60,11 +60,11 @@ namespace FreelanceMarketplace.Services.Implementations
                     .Include(a => a.User)
                     .Include(a => a.Project)
                     .SingleOrDefaultAsync(a => a.ApplyId == applyId)
-                    ?? throw new Exception($"Apply với ID {applyId} không tìm thấy");
+                    ?? throw new Exception($"Application with ID {applyId} not found");
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error retrieving apply with ID {applyId}", ex);
+                throw new Exception($"Error retrieving application with ID {applyId}", ex);
             }
         }
 
@@ -79,7 +79,7 @@ namespace FreelanceMarketplace.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error retrieving applies for project with ID {projectId}", ex);
+                throw new Exception($"Error retrieving applications for project with ID {projectId}", ex);
             }
         }
 
@@ -89,21 +89,21 @@ namespace FreelanceMarketplace.Services.Implementations
             {
                 var existingApply = await _context.Applies.FindAsync(apply.ApplyId);
                 if (existingApply == null)
-                    throw new KeyNotFoundException("Apply not found");
+                    throw new KeyNotFoundException("Application not found");
 
                 _context.Entry(existingApply).CurrentValues.SetValues(apply);
                 await _context.SaveChangesAsync();
 
                 var message = apply.Status == "Accepted"
-                    ? "Apply của bạn đã được chấp nhận."
-                    : "Apply của bạn đã bị từ chối.";
+                    ? "Your application has been accepted."
+                    : "Your application has been rejected.";
                 await SendNotificationAsync(apply.UserId, message);
 
                 return existingApply;
             }
             catch (Exception ex)
             {
-                throw new Exception("Error updating apply", ex);
+                throw new Exception("Error updating application", ex);
             }
         }
 
@@ -120,7 +120,7 @@ namespace FreelanceMarketplace.Services.Implementations
             }
             catch (Exception ex)
             {
-                throw new Exception("Error deleting apply", ex);
+                throw new Exception("Error deleting application", ex);
             }
         }
 
