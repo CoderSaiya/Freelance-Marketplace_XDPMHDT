@@ -149,5 +149,26 @@ namespace FreelanceMarketplace.Services
             _context.SaveChanges();
             return true;
         }
+
+        public Users GetOrCreateUserFromGoogleToken(string googleEmail)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Email == googleEmail);
+
+            if (user == null)
+            {
+                user = new Users
+                {
+                    Email = googleEmail,
+                    Username = googleEmail,
+                    IsEmailConfirmed = true,
+                    Role = "Client"
+                };
+
+                _context.Users.Add(user);
+                _context.SaveChanges();
+            }
+
+            return user;
+        }
     }
 }

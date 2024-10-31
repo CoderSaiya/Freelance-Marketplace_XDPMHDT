@@ -9,7 +9,10 @@ namespace FreelanceMarketplace.Services.Interface
         Task<Payment> CreatePaymentAsync(Payment payment);
         Task<Payment?> UpdatePaymentAsync(int paymentId, Payment payment);
 
-        Task <bool> DetetePaymentAsync(int paymentId);
+        Task<bool> DetetePaymentAsync(int paymentId);
+
+        Task<Payment?> RefundPaymentAsync(int paymentId);
+
 
     }
 }

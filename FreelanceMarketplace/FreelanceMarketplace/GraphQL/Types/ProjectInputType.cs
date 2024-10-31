@@ -9,11 +9,12 @@ namespace FreelanceMarketplace.GraphQL.Types
             Name = "ProjectInput";
 
             Field<NonNullGraphType<StringGraphType>>("projectName");
-            Field<NonNullGraphType<StringGraphType>>("projectDescription");
-            Field<NonNullGraphType<FloatGraphType>>("budget");
-            Field<NonNullGraphType<DateTimeGraphType>>("deadline");
-            Field<StringGraphType>("skillRequire");
+            Field<StringGraphType>("projectDescription");
+            Field<NonNullGraphType<DecimalGraphType>>("budget");
+            Field<NonNullGraphType<DateGraphType>>("deadline");
+            Field<NonNullGraphType<StringGraphType>>("skillRequired");
             Field<NonNullGraphType<StringGraphType>>("status");
+            Field<NonNullGraphType<IntGraphType>>("categoryId");
         }
     }
 }

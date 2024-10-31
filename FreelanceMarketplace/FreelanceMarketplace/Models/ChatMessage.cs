@@ -8,9 +8,13 @@ namespace FreelanceMarketplace.Models
         [Key]
         public int Id { get; set; }
         [Required]
-        public int UserId { get; set; }
-        [ForeignKey("UserId")]
-        public Users? User { get; set; }
+        public int? SenderId { get; set; }
+        [Required]
+        public int? RecipientId { get; set; }
+        [ForeignKey("SenderId")]
+        public Users? Sender { get; set; }
+        [ForeignKey("RecipientId")]
+        public Users? Recipient { get; set; }
         public string? Message { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }

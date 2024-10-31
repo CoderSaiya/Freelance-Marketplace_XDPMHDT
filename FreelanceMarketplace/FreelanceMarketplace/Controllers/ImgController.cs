@@ -43,7 +43,7 @@ namespace FreelanceMarketplace.Controllers
 
         [HttpPost]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadProductImage(IFormFile file, int userId, int projectId)
+        public async Task<IActionResult> UploadProductImage(IFormFile file, [FromForm] int userId, [FromForm] int projectId)
         {
             if (file == null || file.Length == 0)
             {
@@ -59,7 +59,7 @@ namespace FreelanceMarketplace.Controllers
             }
 
             Task<Img> image = _imgService.CreateImageAsync(file, projectId, userId, imageUrl);
-            if(image == null)
+            if (image == null)
             {
                 return StatusCode(401, "Faied to stored image");
             }

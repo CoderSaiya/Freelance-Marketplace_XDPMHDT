@@ -1,35 +1,41 @@
 ﻿using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Models;
-using FreelanceMarketplace.Services;
 using FreelanceMarketplace.Services.Interface;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace FreelanceMarketplace.Hubs
 {
-    public class ChatHub:Hub
+    public class ChatHub : Hub
     {
         private readonly IUserService _userService;
         private readonly AppDbContext _context;
-        private readonly INotificationService _notificationService;
-
-        public ChatHub(IUserService userService, AppDbContext context, INotificationService notificationService)
+        public ChatHub(IUserService userService, AppDbContext context)
         {
             _userService = userService;
             _context = context;
-            _notificationService = notificationService;
         }
-        public async Task SendMessage(string user, string message)
+        public async Task SendMessage(string sender, string recipient, string message)
         {
-            var chatMessage = new ChatMessage { UserId = _userService.GetUserByUsername(user).Id, Message = message };
+            var senderId = _userService.GetUserByUsername(sender)?.Id;
+            var recipientId = _userService.GetUserByUsername(recipient)?.Id;
+            if (senderId == null || recipientId == null) return;
+
+            var chatMessage = new ChatMessage
+            {
+                SenderId = senderId,
+                RecipientId = recipientId,
+                Message = message,
+                Timestamp = DateTime.UtcNow
+            };
+
             _context.ChatMessages.Add(chatMessage);
             await _context.SaveChangesAsync();
 
-            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            // Send message to only involved users
+            await Clients.User(senderId.ToString()).SendAsync("ReceiveMessage", sender, message);
+            await Clients.User(recipientId.ToString()).SendAsync("ReceiveMessage", sender, message);
         }
-        public async Task SendNotification(string userId, string message)
-        {
-            await Clients.User(userId).SendAsync("ReceiveNotification", message);
-        }
+
     }
 }

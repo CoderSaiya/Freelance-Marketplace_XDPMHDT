@@ -11,23 +11,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
     {
         public NotificationQuery(INotificationService notificationService)
         {
-            /*
-            Field<NotificationType>("notification")
-                .Arguments(new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "id" }))
-                .ResolveAsync(async context =>
-                {
-                    var id = context.GetArgument<int>("id");
-                    return await notificationService.GetNotificationByIdAsync(id);
-                });
-
-            Field<ListGraphType<NotificationType>>("notificationsByUser")
-                .Arguments(new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "userId" }))
-                .ResolveAsync(async context =>
-                {
-                    var userId = context.GetArgument<int>("userId");
-                    return await notificationService.GetNotificationsByUserIdAsync(userId);
-                });
-            */
+            // Single notification - Only the owner (Client/Freelancer) or Admin should see it
             AddField(new FieldType
             {
                 Name = "notification",
@@ -38,8 +22,9 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                     var id = context.GetArgument<int>("id");
                     return await notificationService.GetNotificationByIdAsync(id);
                 })
-            }.AuthorizeWith("User"));
+            }.AuthorizeWith("Admin", "Freelancer", "Client")); // Allow all authenticated users since ownership check should be done in service
 
+            // Notifications by user - Only the owner (Client/Freelancer) or Admin should see them
             AddField(new FieldType
             {
                 Name = "notificationsByUser",
@@ -50,7 +35,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                     var userId = context.GetArgument<int>("userId");
                     return await notificationService.GetNotificationsByUserIdAsync(userId);
                 })
-            }.AuthorizeWith("User"));
+            }.AuthorizeWith("Admin", "Freelancer", "Client")); // Allow all authenticated users since ownership check should be done in service
         }
     }
 }

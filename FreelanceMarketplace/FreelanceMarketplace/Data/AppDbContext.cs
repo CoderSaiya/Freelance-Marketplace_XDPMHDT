@@ -20,6 +20,8 @@ namespace FreelanceMarketplace.Data
         public DbSet<RefreshTokens> RefreshTokens { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Apply> Applies { get; set; }
+
+        public DbSet<Wallet> Wallets { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             //Cau hinh contribute (column)
@@ -49,6 +51,18 @@ namespace FreelanceMarketplace.Data
             });
 
             //cau hinh rang buoc quan he
+            modelBuilder.Entity<ChatMessage>()
+                .HasOne(c => c.Sender)
+                .WithMany()
+                .HasForeignKey(c => c.SenderId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ChatMessage>()
+                .HasOne(c => c.Recipient)
+                .WithMany()
+                .HasForeignKey(c => c.RecipientId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<UserProfile>()
             .HasOne(up => up.User)
             .WithOne(u => u.UserProfile)
@@ -59,6 +73,12 @@ namespace FreelanceMarketplace.Data
             .WithMany(c => c.Projects)
             .HasForeignKey(p => p.CategoryId)
             .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Project>()
+                .HasMany(p => p.Images)
+                .WithOne(i => i.Project)
+                .HasForeignKey(i => i.ProjectId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Contracts>()
             .HasOne(c => c.Freelancer)
@@ -117,6 +137,13 @@ namespace FreelanceMarketplace.Data
             .HasOne(a => a.Project)
             .WithMany(p => p.Applies)
             .HasForeignKey(a => a.ProjectId);
+
+
+            modelBuilder.Entity<Wallet>()
+             .HasOne(w => w.User)
+             .WithOne(w => w.Wallet)
+                .HasForeignKey<Wallet>(w => w.WalletId)
+             .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

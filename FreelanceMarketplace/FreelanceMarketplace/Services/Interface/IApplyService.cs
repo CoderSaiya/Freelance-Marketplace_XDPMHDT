@@ -7,9 +7,11 @@ namespace FreelanceMarketplace.Services.Interfaces
     public interface IApplyService
     {
         Task<Apply> CreateApplyAsync(Apply apply);
-        Task<Apply> GetApplyByIdAsync(int applyId);
+        Task<Apply?> GetApplyByIdAsync(int applyId);
         Task<IEnumerable<Apply>> GetAppliesForProjectAsync(int projectId);
         Task<Apply> UpdateApplyAsync(Apply apply);
         Task<bool> DeleteApplyAsync(int applyId);
+        Task SendNotificationAsync(int userId, string message); 
     }
+
 }

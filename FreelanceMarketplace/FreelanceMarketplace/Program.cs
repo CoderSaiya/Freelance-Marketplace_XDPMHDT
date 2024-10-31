@@ -14,11 +14,10 @@ using FreelanceMarketplace.GraphQL.Schemas.Queries;
 using FreelanceMarketplace.GraphQL.Types;
 using FreelanceMarketplace.GraphQL.Schemas;
 using GraphQL;
-using GraphQL.Server;
 using GraphQL.Types;
 using FreelanceMarketplace.Services.Implementations;
 using FreelanceMarketplace.Services.Interfaces;
-using Microsoft.AspNetCore.Authentication.Cookies;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +28,7 @@ builder.Services.AddSignalR();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    //options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
@@ -69,6 +68,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.ClientId = "838128278169-ug2l134id0g6krlkhiklt8u606iln46u.apps.googleusercontent.com";
     options.ClientSecret = "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";
+    options.CallbackPath = "/auth/callback";
 });
 
 builder.Services.AddControllersWithViews();
@@ -78,7 +78,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
-        builder.WithOrigins("http://127.0.0.1:5500") // replace with your frontend port
+        builder.WithOrigins("http://localhost:5173") // replace with your frontend port
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();
@@ -91,6 +91,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
     options.AddPolicy("FreelancerOnly", policy => policy.RequireRole("Freelancer"));
     options.AddPolicy("ClientOnly", policy => policy.RequireRole("Client"));
+    options.AddPolicy("Public", policy => policy.RequireAssertion(context => true));
 });
 
 // Register services
@@ -198,6 +199,10 @@ builder.Services.AddScoped<ReviewInputType>();
 builder.Services.AddGraphQL(b => b
     .AddSelfActivatingSchema<MainSchema>()
     .AddSystemTextJson()
+    .AddErrorInfoProvider(opt =>
+    {
+        opt.ExposeExceptionDetails = builder.Environment.IsDevelopment();
+    })
     .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = builder.Environment.IsDevelopment())
     .AddGraphTypes(typeof(MainSchema).Assembly)
     .AddUserContextBuilder(ctx => new Dictionary<string, object?>
@@ -231,9 +236,18 @@ app.UseMiddleware<RoleMiddleware>();
 // Use UseEndpoints to map hub and controllers
 app.UseEndpoints(endpoints =>
 {
+    endpoints.MapHub<NotificationHub>("/notificationHub"); 
     endpoints.MapHub<ChatHub>("/chathub");
     endpoints.MapHub<VideoCallHub>("/videocallhub");
     endpoints.MapControllers();
+    endpoints.MapMethods("/api/Auth/signin-google", new[] { "OPTIONS" }, context =>
+    {
+        context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:5173");
+        context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+        context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+        context.Response.StatusCode = 200;
+        return Task.CompletedTask;
+    });
 });
 
 app.UseGraphQL<ISchema>("/graphql"); // GraphQL endpoint

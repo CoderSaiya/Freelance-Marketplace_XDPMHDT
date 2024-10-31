@@ -1,6 +1,8 @@
-﻿using FreelanceMarketplace.GraphQL.Types;
+﻿using FreelanceMarketplace.GraphQL.Authorization;
+using FreelanceMarketplace.GraphQL.Types;
 using FreelanceMarketplace.Services.Interface;
 using GraphQL;
+using GraphQL.Resolvers;
 using GraphQL.Types;
 
 namespace FreelanceMarketplace.GraphQL.Schemas.Queries
@@ -9,15 +11,19 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
     {
         public ProjectQuery(IServiceProvider serviceProvider)
         {
-            Field<ListGraphType<ProjectType>>("projects")
-                .ResolveAsync(async context =>
+            AddField(new FieldType
+            {
+                Name = "projects",
+                Type = typeof(ListGraphType<ProjectType>),
+                Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var projectService = scope.ServiceProvider.GetRequiredService<IProjectService>();
                         return await projectService.GetAllProjectsAsync();
                     }
-                });
+                })
+            });
 
             Field<ProjectType>("projectById")
                 .Arguments(new QueryArguments(
@@ -30,6 +36,16 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                     {
                         var projectService = scope.ServiceProvider.GetRequiredService<IProjectService>();
                         return await projectService.GetProjectByIdAsync(projectId);
+                    }
+                });
+
+            Field<ListGraphType<ProjectType>>("popularProjects")
+                .ResolveAsync(async context =>
+                {
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var projectService = scope.ServiceProvider.GetRequiredService<IProjectService>();
+                        return await projectService.GetPopularProjectsAsync();
                     }
                 });
         }

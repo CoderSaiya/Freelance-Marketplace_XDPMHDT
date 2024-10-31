@@ -40,6 +40,22 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                 })
             }.AuthorizeWith("Admin", "Client", "Freelancer"));
 
+            AddField(new FieldType
+            {
+                Name = "reviewsSortedByRating",
+                Type = typeof(ListGraphType<ReviewType>),
+                Arguments = new QueryArguments(
+                new QueryArgument<BooleanGraphType> { Name = "ascending", Description = "Sort in ascending order" }
+    ),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    bool ascending = context.GetArgument<bool>("ascending", false);  // Mặc định là sắp xếp giảm dần
+                    using var scope = serviceProvider.CreateScope();
+                    var reviewService = scope.ServiceProvider.GetRequiredService<IReviewService>();
+                    return await reviewService.GetReviewsSortedByRatingAsync(ascending);
+                })
+            }.AuthorizeWith("Admin", "Client", "Freelancer"));
+
         }
     }
 }

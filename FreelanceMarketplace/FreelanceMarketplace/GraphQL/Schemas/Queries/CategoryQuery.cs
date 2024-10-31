@@ -32,6 +32,17 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                         return await categoryService.GetCategoryByIdAsync(categoryId);
                     }
                 });
+
+            Field<ListGraphType<ProjectType>>("sortedProjects")
+               .ResolveAsync(async context =>
+               {
+                   using (var scope = serviceProvider.CreateScope())
+                   {
+                       var categoryService = scope.ServiceProvider.GetRequiredService<ICategoryService>();
+
+                       return await categoryService.GetProjectsSortedByCategoryPriorityAsync();
+                   }
+               });
         }
     }
 }
