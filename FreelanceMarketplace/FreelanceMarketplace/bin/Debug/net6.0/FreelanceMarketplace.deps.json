@@ -14,6 +14,7 @@
           "GraphQL.Server.Transports.AspNetCore": "8.0.3",
           "GraphQL.Server.Ui.Playground": "8.0.3",
           "MailKit": "4.8.0",
+          "Microsoft.AspNetCore.Authentication.Google": "6.0.33",
           "Microsoft.AspNetCore.Authentication.JwtBearer": "6.0.33",
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "6.0.33",
           "Microsoft.EntityFrameworkCore": "6.0.33",
@@ -164,6 +165,14 @@
           "lib/net6.0/MailKit.dll": {
             "assemblyVersion": "4.8.0.0",
             "fileVersion": "4.8.0.0"
+          }
+        }
+      },
+      "Microsoft.AspNetCore.Authentication.Google/6.0.33": {
+        "runtime": {
+          "lib/net6.0/Microsoft.AspNetCore.Authentication.Google.dll": {
+            "assemblyVersion": "6.0.33.0",
+            "fileVersion": "6.0.3324.37905"
           }
         }
       },
@@ -912,6 +921,13 @@
       "sha512": "sha512-zZ1UoM4FUnSFUJ9fTl5CEEaejR0DNP6+FDt1OfXnjg4igZntcir1tg/8Ufd6WY5vrpmvToAjluYqjVM24A+5lA==",
       "path": "mailkit/4.8.0",
       "hashPath": "mailkit.4.8.0.nupkg.sha512"
+    },
+    "Microsoft.AspNetCore.Authentication.Google/6.0.33": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Q22DpXokkjOhGWH7x7j6uj/Ss4AHrk2w2IY8nIXZEswKWglPtZqWrGTXCbCQpz4bVjSpsHFufyB5U6GZ29BHFQ==",
+      "path": "microsoft.aspnetcore.authentication.google/6.0.33",
+      "hashPath": "microsoft.aspnetcore.authentication.google.6.0.33.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Authentication.JwtBearer/6.0.33": {
       "type": "package",
