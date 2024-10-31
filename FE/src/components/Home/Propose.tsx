@@ -16,9 +16,9 @@ const Propose: React.FC = () => {
         Inspiration for your next trip
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-        {data?.data.projects?.map((project, index) => (
+        {data?.data.projects?.map((project) => (
           <ProjectCard
-            key={index}
+            key={project.projectId}
             image={project.imageUrls[0]}
             location={project.projectDescription}
             homesCount={project.budget}

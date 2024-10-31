@@ -13,8 +13,9 @@ const Upload: React.FC = () => {
     projectDescription: "",
     budget: 0.0,
     deadline: "",
-    skillRequired: "",
+    skillRequire: "",
     status: "",
+    userId: 0,
     categoryId: 0,
   });
 
@@ -73,7 +74,7 @@ const Upload: React.FC = () => {
       !formValues.projectName ||
       !formValues.budget ||
       !formValues.deadline ||
-      !formValues.skillRequired ||
+      !formValues.skillRequire ||
       !formValues.status ||
       !formValues.categoryId
     ) {
@@ -83,25 +84,9 @@ const Upload: React.FC = () => {
       return;
     }
 
-    const formattedData = {
-      projectName: formValues.projectName,
-      projectDescription: formValues.projectDescription || null,
-      budget: formValues.budget,
-      deadline: formValues.deadline,
-      skillRequired: formValues.skillRequired,
-      status: formValues.status,
-      categoryId: formValues.categoryId,
-    };
-
     const formDataImg = new FormData();
 
     try {
-      const createResponse = await createProject({
-        project: formattedData,
-      }).unwrap();
-
-      console.log("createResponse:", createResponse);
-
       if (file) {
         formDataImg.append("file", file);
 
@@ -110,19 +95,38 @@ const Upload: React.FC = () => {
           decoded[
             "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
           ];
-        console.log(createResponse.data.createProject.projectId);
-        console.log(userId);
 
-        if (createResponse.data.createProject.projectId !== null || createResponse.data.createProject.projectId !== undefined ) {
+        const formattedData = {
+          projectName: formValues.projectName,
+          projectDescription: formValues.projectDescription || null,
+          budget: formValues.budget,
+          deadline: formValues.deadline,
+          skillRequire: formValues.skillRequire,
+          status: formValues.status,
+          userId: +userId,
+          categoryId: formValues.categoryId,
+        };
+
+        const createResponse = await createProject({
+          project: formattedData,
+        }).unwrap();
+
+        console.log(createResponse);
+
+        if (
+          createResponse.data.createProject.projectId !== null ||
+          createResponse.data.createProject.projectId !== undefined
+        ) {
           formDataImg.append("userId", userId);
-          formDataImg.append("projectId", createResponse.data.createProject.projectId.toString());
+          formDataImg.append(
+            "projectId",
+            createResponse.data.createProject.projectId.toString()
+          );
           await uploadImg(formDataImg).unwrap();
         } else {
           console.error("projectId is missing in the response");
         }
       }
-
-      console.log("Project created:", createResponse);
     } catch (error) {
       console.error("Error creating project:", error);
     }
@@ -216,7 +220,7 @@ const Upload: React.FC = () => {
           projectDescription={formValues.projectDescription}
           budget={formValues.budget.toString()}
           deadline={formValues.deadline}
-          skillRequired={formValues.skillRequired}
+          skillRequire={formValues.skillRequire}
           status={formValues.status}
           categoryId={formValues.categoryId}
           onChange={handleInputChange}

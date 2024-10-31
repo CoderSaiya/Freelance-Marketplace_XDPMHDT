@@ -1,4 +1,5 @@
 import { CategoryType } from "./CategoryType";
+import { User } from "./UserType";
 
 export interface ProjectResponseType {
     data: {
@@ -8,8 +9,9 @@ export interface ProjectResponseType {
             projectDescription: string;
             budget: number;
             deadline: string;
-            skillRequired: string;
+            skillRequire: string;
             status: string;
+            user: User;
             category: CategoryType;
         }
     }

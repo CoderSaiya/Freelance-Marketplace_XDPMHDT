@@ -80,6 +80,10 @@ export const graphqlApi = createApi({
                   categoryId
                   categoryName
                 }
+                user {
+                  id
+                  username
+                }
               }
             }
           `,
