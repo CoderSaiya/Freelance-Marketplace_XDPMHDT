@@ -3,11 +3,13 @@ import FormWithFloatingLabels from "../components/Upload/FormWithFloatingLabels"
 import { useCreateProjectMutation } from "../apis/graphqlApi";
 import { useUploadImgMutation } from "../apis/restfulApi";
 import { notification } from "antd";
+import { BallTriangle } from "@agney/react-loading";
 
 const Upload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
     projectName: "",
     projectDescription: "",
@@ -69,6 +71,7 @@ const Upload: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    setLoading(true);
     console.log(file);
     if (
       !formValues.projectName ||
@@ -123,12 +126,23 @@ const Upload: React.FC = () => {
             createResponse.data.createProject.projectId.toString()
           );
           await uploadImg(formDataImg).unwrap();
+          setLoading(false);
+          notification.success({
+            message: "Successfully create",
+          });
         } else {
           console.error("projectId is missing in the response");
+          notification.error({
+            message: "Failed: projectId is missing in the response",
+          });
         }
       }
     } catch (error) {
       console.error("Error creating project:", error);
+
+      notification.error({
+        message: `Failed: ${error}`,
+      });
     }
   };
 
@@ -231,12 +245,17 @@ const Upload: React.FC = () => {
           <button className="bg-gray-100 text-black px-4 py-2 rounded-md shadow">
             Cancel
           </button>
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-md shadow"
-            onClick={handleSubmit}
-          >
-            Save
-          </button>
+
+          {loading ? (
+            <BallTriangle width="50" />
+          ) : (
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded-md shadow"
+              onClick={handleSubmit}
+            >
+              Save
+            </button>
+          )}
         </div>
       </div>
     </div>

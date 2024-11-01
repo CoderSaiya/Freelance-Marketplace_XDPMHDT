@@ -9,28 +9,19 @@ const LoadingWrapper: React.FC<React.PropsWithChildren<{}>> = ({
   const location = useLocation();
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    const handleRouteChangeStart = () => {
-      setIsLoading(true);
-    };
-    const handleRouteChangeEnd = () => {
-      timeoutId = setTimeout(() => {
-        setIsLoading(false);
-      }, 2000);
-    };
+    setIsLoading(true);
+    
+    const timeoutId = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
 
-    handleRouteChangeStart();
-    handleRouteChangeEnd();
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
+    return () => clearTimeout(timeoutId);
   }, [location]);
 
   return (
     <>
       {isLoading && <Loading />}
-      {children}
+      {!isLoading && children}
     </>
   );
 };
