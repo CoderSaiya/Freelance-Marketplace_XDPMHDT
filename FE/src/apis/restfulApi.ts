@@ -99,7 +99,7 @@ export const restfulApi = createApi({
         body: { code: googleResponseCode }, // Include the Google response code in the body
       }),
     }),
-    refreshToken: builder.mutation<{ accessToken: string; refreshToken: string }, { accessToken: string | null; refreshToken: string | null }>({
+    refreshToken: builder.mutation<{ data: { accessToken: string; refreshToken: string } }, { accessToken: string | null; refreshToken: string | null }>({
       query: (tokens) => ({
         url: 'Auth/refresh-token',
         method: 'POST',

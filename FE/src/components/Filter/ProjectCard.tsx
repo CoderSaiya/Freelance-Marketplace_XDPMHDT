@@ -26,7 +26,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, truncateDescription 
         <img src={project.owner.avatar} alt={project.owner.name} className="w-10 h-10 rounded-full mr-2" />
         <p>{project.owner.name}</p>
       </div>
-      <img src="https://via.placeholder.com/150" alt={project.name} className="mb-4 rounded-lg object-cover h-40 w-full" />
+      <img src={project.owner.avatar} alt={project.name} className="mb-4 rounded-lg object-cover h-40 w-full" />
       <h3 className="font-semibold text-lg">{project.name}</h3>
       <p className="text-gray-500">Category: {project.category}</p>
       <p className="text-gray-500">Deadline: {project.deadline}</p>
