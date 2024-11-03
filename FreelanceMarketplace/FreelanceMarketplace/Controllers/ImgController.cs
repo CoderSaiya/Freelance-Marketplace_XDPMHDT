@@ -1,6 +1,6 @@
 ﻿using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Services;
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 using Google.Apis.Drive.v3;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,4 +1,3 @@
-using FreelanceMarketplace.Services.Interface;
 using FreelanceMarketplace.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;

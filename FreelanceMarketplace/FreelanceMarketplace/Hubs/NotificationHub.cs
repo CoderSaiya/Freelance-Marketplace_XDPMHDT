@@ -1,7 +1,6 @@
-﻿
-using FreelanceMarketplace.Data;
+﻿using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Models;
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 

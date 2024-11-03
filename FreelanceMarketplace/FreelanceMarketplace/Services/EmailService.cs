@@ -1,7 +1,7 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit.Text;
 using MimeKit;
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 
 namespace FreelanceMarketplace.Services
 {

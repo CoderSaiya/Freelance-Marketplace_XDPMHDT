@@ -2,7 +2,7 @@
 using FreelanceMarketplace.Models.DTOs.Req;
 using FreelanceMarketplace.Models.DTOs.Res;
 
-namespace FreelanceMarketplace.Services.Interface
+namespace FreelanceMarketplace.Services.Interfaces
 {
     public interface IUserService
     {

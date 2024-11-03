@@ -1,6 +1,6 @@
 ﻿using FreelanceMarketplace.Models;
 
-namespace FreelanceMarketplace.Services.Interface
+namespace FreelanceMarketplace.Services.Interfaces
 {
     public interface IContractService
     {

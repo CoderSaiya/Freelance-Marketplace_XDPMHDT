@@ -1,6 +1,6 @@
 ﻿using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Models;
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace FreelanceMarketplace.Services

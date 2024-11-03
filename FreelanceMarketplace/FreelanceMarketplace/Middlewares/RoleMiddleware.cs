@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Security.Claims;
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 using FreelanceMarketplace.Security;
 
 namespace FreelanceMarketplace.Middlewares

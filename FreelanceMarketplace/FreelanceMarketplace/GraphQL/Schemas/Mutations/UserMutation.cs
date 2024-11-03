@@ -1,5 +1,5 @@
 ﻿using FreelanceMarketplace.GraphQL.Types;
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 using GraphQL.Types;
 using GraphQL;
 using FreelanceMarketplace.Models;
