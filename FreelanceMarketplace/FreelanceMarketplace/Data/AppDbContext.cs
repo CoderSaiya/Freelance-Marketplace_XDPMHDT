@@ -20,7 +20,6 @@ namespace FreelanceMarketplace.Data
         public DbSet<RefreshTokens> RefreshTokens { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Apply> Applies { get; set; }
-
         public DbSet<Wallet> Wallets { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,6 +44,7 @@ namespace FreelanceMarketplace.Data
                 entity.Property(e => e.Message).IsRequired();
             });
 
+
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.HasIndex(e => e.CategoryName).IsUnique();
@@ -64,15 +64,15 @@ namespace FreelanceMarketplace.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<UserProfile>()
-            .HasOne(up => up.User)
-            .WithOne(u => u.UserProfile)
-            .HasForeignKey<UserProfile>(up => up.UserId);
+               .HasOne(up => up.User)
+               .WithOne(u => u.UserProfile)
+               .HasForeignKey<UserProfile>(up => up.UserId);
 
             modelBuilder.Entity<Project>()
-            .HasOne(p => p.Category)
-            .WithMany(c => c.Projects)
-            .HasForeignKey(p => p.CategoryId)
-            .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(p => p.Category)
+                .WithMany(c => c.Projects)
+                .HasForeignKey(p => p.CategoryId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Project>()
                 .HasMany(p => p.Images)
@@ -80,17 +80,23 @@ namespace FreelanceMarketplace.Data
                 .HasForeignKey(i => i.ProjectId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Contracts>()
-            .HasOne(c => c.Freelancer)
-            .WithMany(u => u.FreelancerContracts)
-            .HasForeignKey(c => c.FreelancerId)
-            .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Project>()
+                .HasOne(p => p.Users)
+                .WithMany(u => u.Projects)
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Contracts>()
-            .HasOne(c => c.Client)
-            .WithMany(u => u.ClientContracts)
-            .HasForeignKey(c => c.ClientId)
-            .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(c => c.Freelancer)
+                .WithMany(u => u.FreelancerContracts)
+                .HasForeignKey(c => c.FreelancerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Contracts>()
+                .HasOne(c => c.Client)
+                .WithMany(u => u.ClientContracts)
+                .HasForeignKey(c => c.ClientId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Contracts>(entity =>
             {
@@ -105,39 +111,39 @@ namespace FreelanceMarketplace.Data
                 .HasForeignKey(p => p.CategoryId);
 
             modelBuilder.Entity<Review>()
-            .HasOne(r => r.User)
-            .WithMany(u => u.Reviews)
-            .HasForeignKey(r => r.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(r => r.User)
+                .WithMany(u => u.Reviews)
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Review>()
-            .HasOne(r => r.Contract)
-            .WithMany(c => c.Reviews)
-            .HasForeignKey(r => r.ContractId)
-            .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(r => r.Contract)
+                .WithMany(c => c.Reviews)
+                .HasForeignKey(r => r.ContractId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Payment>()
-            .HasOne(p => p.Contract)
-            .WithOne(c => c.Payment)
-            .HasForeignKey<Payment>(p => p.ContractId)
-            .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(p => p.Contract)
+                .WithOne(c => c.Payment)
+                .HasForeignKey<Payment>(p => p.ContractId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Img>()
-            .HasOne(i => i.UploadedByUser)
-            .WithMany(u => u.UploadedImages)
-            .HasForeignKey(i => i.UploadedByUserId)
-            .OnDelete(DeleteBehavior.Restrict);
+                .HasOne(i => i.UploadedByUser)
+                .WithMany(u => u.UploadedImages)
+                .HasForeignKey(i => i.UploadedByUserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Apply>()
-            .HasOne(a => a.User)
-            .WithMany(u => u.Applies)
-            .HasForeignKey(a => a.UserId);
+                .HasOne(a => a.User)
+                .WithMany(u => u.Applies)
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Apply>()
-            .HasOne(a => a.Project)
-            .WithMany(p => p.Applies)
-            .HasForeignKey(a => a.ProjectId);
-
+                .HasOne(a => a.Project)
+                .WithMany(p => p.Applies)
+                .HasForeignKey(a => a.ProjectId);
 
             modelBuilder.Entity<Wallet>()
              .HasOne(w => w.User)

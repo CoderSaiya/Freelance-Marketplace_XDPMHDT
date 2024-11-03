@@ -29,6 +29,6 @@ namespace FreelanceMarketplace.Models
         public ICollection<Apply> Applies { get; set; } = new List<Apply>();
         public ICollection<Img> UploadedImages { get; set; } = new List<Img>();
         public Wallet? Wallet { get; set; }
-
+        public ICollection<Project> Projects { get; set; } = new List<Project>();
     }
 }
