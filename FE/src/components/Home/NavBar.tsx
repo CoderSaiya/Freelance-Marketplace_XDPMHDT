@@ -5,7 +5,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import AddFundsModal from "./AddFundsModal";
 
-const stripePromise = loadStripe("YOUR_STRIPE_PUBLIC_KEY");
+const stripePromise = loadStripe("pk_test_51PtpAPGH56JC4HtH4uJvwovRnTiKX8M3vFocyHUrIeQ2bSVyRUVvo60vwJs7852MEvvLhsurDHdmOeMWxbmhtdUi00kZhuJ5GN");
 
 const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
