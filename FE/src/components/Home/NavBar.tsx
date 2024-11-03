@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { BellOutlined } from "@ant-design/icons";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import AddFundsModal from "./AddFundsModal";
+
+const stripePromise = loadStripe("YOUR_STRIPE_PUBLIC_KEY");
 
 const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isAddFundsModalOpen, setIsAddFundsModalOpen] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-  const isLogin = localStorage.getItem("access_token") === '';
+  const isLogin = localStorage.getItem("access_token") === "";
   const navigate = useNavigate();
 
   const handleMouseEnter = () => {
@@ -27,6 +33,14 @@ const Navbar: React.FC = () => {
     localStorage.setItem("refresh", "");
 
     navigate("/login");
+  };
+
+  const openAddFundsModal = () => {
+    setIsAddFundsModalOpen(true);
+  };
+
+  const closeAddFundsModal = () => {
+    setIsAddFundsModalOpen(false);
   };
 
   useEffect(() => {
@@ -102,6 +116,12 @@ const Navbar: React.FC = () => {
                 </Link>
                 <button
                   className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={openAddFundsModal}
+                >
+                  Add Funds
+                </button>
+                <button
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
                   onClick={handleLogout}
                 >
                   Log out
@@ -111,6 +131,13 @@ const Navbar: React.FC = () => {
           </>
         )}
       </div>
+
+      {/* Add Funds Modal */}
+      {isAddFundsModalOpen && (
+        <Elements stripe={stripePromise}>
+          <AddFundsModal onClose={closeAddFundsModal} />
+        </Elements>
+      )}
     </nav>
   );
 };
