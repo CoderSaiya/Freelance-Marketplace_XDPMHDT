@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FreelanceMarketplace.Services.Implementations
+namespace FreelanceMarketplace.Services
 {
     public class ApplyService : IApplyService
     {
