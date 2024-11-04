@@ -1,4 +1,5 @@
 import { SearchOutlined } from "@ant-design/icons";
+import Gradient from "./Gradient";
 
 const Banner = () => {
   return (
@@ -8,8 +9,9 @@ const Banner = () => {
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('img/banner.png')" }}
-        ></div>
+        >
+          <Gradient/>
+        </div>
 
         {/* Content with dark background */}
         <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
