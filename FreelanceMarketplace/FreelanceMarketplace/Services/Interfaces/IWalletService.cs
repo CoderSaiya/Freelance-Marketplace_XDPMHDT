@@ -5,6 +5,6 @@ namespace FreelanceMarketplace.Services.Interfaces
     public interface IWalletService
     {
         Task<Wallet> GetWalletByUserIdAsync(int userId);
-        Task<Wallet> UpdateWalletBalanceAsync(int userId, int amount);
+        Task<Wallet> UpdateWalletBalanceAsync(int userId, decimal amount);
     }
 }

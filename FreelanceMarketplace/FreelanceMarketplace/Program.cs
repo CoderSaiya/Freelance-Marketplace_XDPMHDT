@@ -15,6 +15,8 @@ using FreelanceMarketplace.GraphQL.Types;
 using FreelanceMarketplace.GraphQL.Schemas;
 using GraphQL;
 using GraphQL.Types;
+using FreelanceMarketplace.Models.DTOs;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -211,6 +213,8 @@ builder.Services.AddGraphQL(b => b
         { "User", ctx.User }
     })
 );
+
+builder.Services.Configure<StripeSetting>(builder.Configuration.GetSection("Stripe"));
 
 var app = builder.Build();
 
