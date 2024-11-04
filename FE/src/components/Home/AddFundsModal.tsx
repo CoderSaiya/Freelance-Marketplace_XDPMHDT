@@ -7,12 +7,11 @@ import {
   CardCvcElement,
 } from "@stripe/react-stripe-js";
 import { InfoCircleOutlined } from "@ant-design/icons";
+import { useStripePaymentMutation } from "../../apis/restfulApi";
 
 interface AddFundsModalProps {
   onClose: () => void;
 }
-
-const clientSecret = import.meta.env.VITE_STRIPE_SECRET_KEY;
 
 const CARD_ELEMENT_OPTIONS = {
   style: {
@@ -27,8 +26,8 @@ const CARD_ELEMENT_OPTIONS = {
       color: "#9e2146",
     },
     valid: {
-        color: "#54ff24"
-    }
+      color: "#54ff24",
+    },
   },
 };
 
@@ -43,6 +42,8 @@ const AddFundsModal: React.FC<AddFundsModalProps> = ({ onClose }) => {
     cardCvc: "",
   });
   const [cardholderName, setCardholderName] = useState("");
+
+  const [stripePayment] = useStripePaymentMutation();
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9.]/g, "");
@@ -61,6 +62,20 @@ const AddFundsModal: React.FC<AddFundsModalProps> = ({ onClose }) => {
 
     try {
       // Step 1: Request PaymentIntent from the server with total amount
+      const token = localStorage.getItem("access_token")?.toString();
+
+      const decoded = parseJwt(token);
+      const userId =
+        decoded[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+        ];
+
+      const response = await stripePayment({
+        amount: parseFloat(amount),
+        userId: userId,
+      }).unwrap();
+
+      const { clientSecret } = await response;
 
       // Step 2: Confirm the PaymentIntent
       const { error, paymentIntent } = await stripe.confirmCardPayment(
@@ -101,6 +116,21 @@ const AddFundsModal: React.FC<AddFundsModalProps> = ({ onClose }) => {
 
   const processingFee = 0.99;
   const totalAmount = parseFloat(amount || "0") + processingFee;
+
+  function parseJwt(token: string) {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map(function (c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+
+    return JSON.parse(jsonPayload);
+  }
 
   return (
     <div
