@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-// Hàm tính toán ngày deadline dựa trên số ngày
 const calculateDeadline = (days: number): string => {
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() + days);
