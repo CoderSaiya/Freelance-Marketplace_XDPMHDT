@@ -1,64 +1,102 @@
-import { SearchOutlined } from "@ant-design/icons";
+import React from "react";
 import Gradient from "./Gradient";
 
-const Banner = () => {
+const Banner: React.FC = () => {
   return (
-    <div className="h-screen flex items-center justify-center z-50">
-      {/* Wrapper with rounded corners */}
-      <div className="relative w-full h-full overflow-hidden shadow-lg">
-        {/* Background Image */}
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-        >
-          <Gradient/>
-        </div>
+    <div className="relative h-screen w-full overflow-hidden">
+      {/* Animated Background */}
+      <Gradient />
 
-        {/* Content with dark background */}
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
-          {/* Search bar */}
-          <div className="bg-white bg-opacity-20 p-4 rounded-full shadow-lg flex items-center gap-4 w-3/4 max-w-6xl">
-            <input
-              type="text"
-              placeholder="Name Project"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none"
-            />
-            <input
-              type="date"
-              placeholder="Check in"
-              className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none"
-            />
-            <select
-              className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none"
-              defaultValue=""
-            >
-              <option value="" disabled>
-                Category
-              </option>
-              <option value="1">1 Category</option>
-              <option value="2">2 Category</option>
-              <option value="3">3 Category</option>
-              <option value="4">4 Category</option>
-              <option value="5">5 Category</option>
-              <option value="6">6 Category</option>
-              <option value="7">7 Category</option>
-              <option value="8">8 Category</option>
-              <option value="9">9 Category</option>
-              <option value="10">10 Category</option>
-            </select>
+      {/* Diagonal Overlay */}
+      <div
+        className="absolute inset-0"
+        style={{
+          clipPath: "polygon(0 0, 100% 0, 100% 100%, 0 85%)",
+        }}
+      />
 
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center justify-center">
-              <SearchOutlined />
-            </button>
+      {/* Content Container */}
+      <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-full items-center">
+          {/* Left Side Content */}
+          <div className="space-y-6 max-w-xl pt-20 md:pt-0">
+            <div className="inline-block">
+              <span className="px-4 py-2 rounded-full bg-white/10 text-white text-sm backdrop-blur-sm">
+                Sessions 2025 • Early-bird registration now open
+              </span>
+            </div>
+
+            <h1 className="text-5xl font-bold text-white leading-tight">
+              Find Top Freelance Talent for Every Project
+            </h1>
+
+            <p className="text-lg text-white/80">
+              Collaborate with skilled freelancers to bring your ideas to life.
+              From design and development to writing and marketing, our platform
+              connects you with the right experts to get your project done
+              quickly and efficiently. Start your search today and unlock
+              endless possibilities!
+            </p>
+
+            <div className="flex gap-4 max-w-md">
+              <input
+                type="email"
+                placeholder="Email address"
+                className="flex-1 px-4 py-3 rounded-md bg-white/10 text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/30 backdrop-blur-sm border border-white/20"
+              />
+              <button className="px-6 py-3 bg-white text-black rounded-md hover:bg-white/90 transition-colors font-medium">
+                Start now →
+              </button>
+            </div>
           </div>
 
-          {/* Text and Button */}
-          <div className="text-center mt-12">
-            <h1 className="text-white text-4xl font-bold">
-              Are you looking for a job?
-            </h1>
-            <button className="mt-4 px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-gray-200">
-              Find
-            </button>
+          {/* Right Side - Job Form */}
+          <div className="relative mt-10 md:mt-0">
+            <div className="bg-white rounded-2xl shadow-xl p-6 max-w-md mx-auto">
+              <h1 className="font-semibold mb-10 text-2xl">Search for job</h1>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Name Project"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <select
+                    className="col-span-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    defaultValue=""
+                  >
+                    <option value="" disabled>
+                      Category
+                    </option>
+                    <option value="1">1 Category</option>
+                    <option value="2">2 Category</option>
+                    <option value="3">3 Category</option>
+                    <option value="4">4 Category</option>
+                    <option value="5">5 Category</option>
+                    <option value="6">6 Category</option>
+                    <option value="7">7 Category</option>
+                    <option value="8">8 Category</option>
+                    <option value="9">9 Category</option>
+                    <option value="10">10 Category</option>
+                  </select>
+                  <input
+                    type="number"
+                    placeholder="Budget"
+                    className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                  <input
+                    type="date"
+                    placeholder=""
+                    className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+
+                <button className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition-colors">
+                  Search
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
