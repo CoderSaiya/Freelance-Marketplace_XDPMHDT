@@ -26,7 +26,6 @@ namespace FreelanceMarketplace.Data
             //Cau hinh contribute (column)
             modelBuilder.Entity<RefreshTokens>()
                 .HasKey(rt => rt.Id);
-
             modelBuilder.Entity<RefreshTokens>()
                 .HasOne(rt => rt.User)
                 .WithMany(u => u.RefreshTokens)
@@ -44,10 +43,14 @@ namespace FreelanceMarketplace.Data
                 entity.Property(e => e.Message).IsRequired();
             });
 
-
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.HasIndex(e => e.CategoryName).IsUnique();
+            });
+
+            modelBuilder.Entity<Wallet>(entity =>
+            {
+                entity.Property(w => w.Balance).HasColumnType("decimal(18, 2)");
             });
 
             //cau hinh rang buoc quan he
@@ -146,10 +149,10 @@ namespace FreelanceMarketplace.Data
                 .HasForeignKey(a => a.ProjectId);
 
             modelBuilder.Entity<Wallet>()
-             .HasOne(w => w.User)
-             .WithOne(w => w.Wallet)
-                .HasForeignKey<Wallet>(w => w.WalletId)
-             .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(w => w.User)
+                .WithOne(u => u.Wallet)
+                .HasForeignKey<Wallet>(w => w.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

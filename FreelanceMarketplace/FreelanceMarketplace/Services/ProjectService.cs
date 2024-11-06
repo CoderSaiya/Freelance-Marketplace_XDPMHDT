@@ -19,10 +19,11 @@ namespace FreelanceMarketplace.Services
             try
             {
                 return await _context.Projects
-                    .Include(p => p.Category)  
+                    .Include(p => p.Category)
                     .Include(p => p.Applies)
                     .Include(p => p.Contract)
-                    .Include(p => p.Images)    
+                    .Include(p => p.Images)
+                    .Include(p => p.Users)
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -40,6 +41,7 @@ namespace FreelanceMarketplace.Services
                     .Include(p => p.Applies)
                     .Include(p => p.Contract)
                     .Include(p => p.Images)
+                    .Include(p => p.Users)
                     .FirstOrDefaultAsync(p => p.ProjectId == projectId);
 
                 if (project == null)
