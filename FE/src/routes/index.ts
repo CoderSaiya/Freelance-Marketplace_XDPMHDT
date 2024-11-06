@@ -32,7 +32,7 @@ const publicRoute: RouteType[] = [
   },
 
   {
-    path: "/detail",
+    path: "/detail/:projectId",
     component: DetailPage,
   }
 //   {

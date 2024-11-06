@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { Mutex } from 'async-mutex';
 import { setTokens, logout } from '../features/authSlice';
-import { ProjectImageResponse, ProjectResponseType } from '../types/ProjectType';
+import { ProjectImageResponse, ProjectResponseType, ProjectType } from '../types/ProjectType';
 import { restfulApi } from './restfulApi'
 
 interface GraphQLError {
@@ -101,7 +101,7 @@ export const graphqlApi = createApi({
   reducerPath: 'graphqlApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    createProject: builder.mutation<ProjectResponseType, { project: any }>({
+    createProject: builder.mutation<ProjectResponseType<{ createProject: ProjectType }>, { project: any }>({
       query: ({ project }) => ({
         url: 'graphql',
         method: 'POST',
@@ -153,20 +153,49 @@ export const graphqlApi = createApi({
                   categoryName
                 }
                 imageUrls
+                users {
+                  id
+                  username
+                }
               }
             }
           `,
         },
       }),
     }),
-    refreshToken: builder.mutation<{ accessToken: string; refreshToken: string }, { accessToken: string | null; refreshToken: string | null }>({
-      query: (tokens) => ({
-        url: 'api/Auth/refresh-token',
+    projectById: builder.query<ProjectResponseType<{ projectById: ProjectType }>, number>({
+      query: (projectId) => ({
+        url: 'graphql',
         method: 'POST',
-        body: tokens,
+        body: {
+          query: `
+            query getProjectById($projectId: Int!) {
+              projectById(projectId: $projectId) {
+                projectId
+                projectName
+                projectDescription
+                budget
+                deadline
+                skillRequire
+                status
+                createAt
+                category {
+                  categoryId
+                  categoryName
+                }
+                imageUrls
+                users {
+                  id
+                  username
+                }
+              }
+            }
+          `,
+          variables: { projectId },
+        },
       }),
     }),
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery } = graphqlApi;

@@ -9,19 +9,6 @@ const calculateDeadline = (days: number): string => {
   return currentDate.toISOString().split("T")[0]; // Định dạng YYYY-MM-DD
 };
 
-interface Project {
-  id: number;
-  name: string;
-  price: number;
-  description: string;
-  owner: {
-    name: string;
-    avatar: string;
-  };
-  category: string;
-  deadline: string;
-}
-
 interface Filters {
   categories: string[];
   priceRange: number[];

@@ -1,11 +1,31 @@
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faGavel, faMapMarkerAlt, faClock, faUser, faCheckCircle, faComments, faStar } from '@fortawesome/free-solid-svg-icons';
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faEnvelope,
+  faGavel,
+  faMapMarkerAlt,
+  faClock,
+  faUser,
+  faCheckCircle,
+  faComments,
+  faStar,
+} from "@fortawesome/free-solid-svg-icons";
+import { ProjectType } from "../../types/ProjectType";
 
-const ProjectDetailPage: React.FC = () => {
+const ProjectDetailPage: React.FC<ProjectType> = ({
+  projectId,
+  projectName,
+  projectDescription,
+  budget,
+  deadline,
+  skillRequire,
+  status,
+  users,
+  category,
+}) => {
   const renderStars = (rating: number): string => {
-    const fullStars = '★'.repeat(Math.floor(rating));
-    const emptyStars = '☆'.repeat(5 - Math.floor(rating));
+    const fullStars = "★".repeat(Math.floor(rating));
+    const emptyStars = "☆".repeat(5 - Math.floor(rating));
     return fullStars + emptyStars;
   };
 
@@ -16,14 +36,20 @@ const ProjectDetailPage: React.FC = () => {
         {/* Project Header */}
         <div className="flex justify-between items-start border-b pb-4 mb-4">
           <div>
-            <h1 className="text-2xl font-bold mb-1">Nghệ sĩ lồng tiếng năng động cho kênh YouTube giáo dục</h1>
+            <h1 className="text-2xl font-bold mb-1">
+              {projectName}
+            </h1>
             <div className="flex items-center text-sm text-gray-500">
-              <span className="bg-green-100 text-green-700 font-semibold px-2 py-1 rounded-full mr-2">Mở</span>
+              <span className="bg-green-100 text-green-700 font-semibold px-2 py-1 rounded-full mr-2">
+                Mở
+              </span>
               <p>Đã đăng: 1 ngày trước • Kết thúc sau 6 ngày</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xl font-semibold text-green-500 mb-1">250-750 đô la Mỹ</p>
+            <p className="text-xl font-semibold text-green-500 mb-1">
+              {budget} USD
+            </p>
             <p className="text-gray-500 text-sm">Thanh toán khi giao hàng</p>
           </div>
         </div>
@@ -31,17 +57,27 @@ const ProjectDetailPage: React.FC = () => {
         {/* Project Description */}
         <div className="mb-6">
           <p className="text-justify">
-            Tôi đang tìm kiếm một nghệ sĩ lồng tiếng chuyên nghiệp có giọng nói tràn đầy năng lượng và nhiệt tình để thổi hồn vào nội dung giáo dục trên YouTube của tôi hướng đến đối tượng là thanh thiếu niên...
+            {projectDescription}
           </p>
         </div>
 
         {/* Project Tags */}
         <div className="flex gap-2 mb-4">
-          <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">Tài năng giọng nói</span>
-          <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">Dịch vụ âm thanh</span>
-          <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">Quảng cáo</span>
-          <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">Sản xuất âm thanh</span>
-          <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">Tiếp tục truyền thông xã hội</span>
+          <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">
+            Tài năng giọng nói
+          </span>
+          <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">
+            Dịch vụ âm thanh
+          </span>
+          <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">
+            Quảng cáo
+          </span>
+          <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">
+            Sản xuất âm thanh
+          </span>
+          <span className="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm">
+            Tiếp tục truyền thông xã hội
+          </span>
         </div>
 
         {/* Project Info */}
@@ -78,12 +114,16 @@ const ProjectDetailPage: React.FC = () => {
               placeholder="Thời gian dự án"
               className="border rounded-md w-full p-2 mb-4"
             />
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md w-full">Đấu thầu dự án</button>
+            <button className="bg-blue-500 text-white px-4 py-2 rounded-md w-full">
+              Đấu thầu dự án
+            </button>
           </div>
 
           {/* Freelancer Benefits */}
           <div className="bg-gray-50 p-4 rounded-lg md:w-1/2">
-            <h3 className="font-semibold text-lg mb-4">Lợi ích của việc đấu thầu trên Freelancer</h3>
+            <h3 className="font-semibold text-lg mb-4">
+              Lợi ích của việc đấu thầu trên Freelancer
+            </h3>
             <ul className="list-none text-gray-700">
               <li className="flex items-center mb-2">
                 <span className="text-green-500 mr-2">✔</span>
@@ -107,22 +147,37 @@ const ProjectDetailPage: React.FC = () => {
 
         {/* Bidder List */}
         <div className="mt-6">
-          <h3 className="font-semibold text-lg mb-4">9 người làm việc tự do đang trả giá trung bình 288 đô la Mỹ cho công việc này</h3>
+          <h3 className="font-semibold text-lg mb-4">
+            9 người làm việc tự do đang trả giá trung bình 288 đô la Mỹ cho công
+            việc này
+          </h3>
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-4 border-t pt-4 mt-4">
-              <img src="https://via.placeholder.com/50" alt="Bidder" className="rounded-full" />
+              <img
+                src="https://via.placeholder.com/50"
+                alt="Bidder"
+                className="rounded-full"
+              />
               <div>
                 <h4 className="font-semibold">@Khanuitech</h4>
                 <p className="text-gray-500">300 đô la Mỹ trong 1 ngày</p>
-                <p className="text-yellow-500">{renderStars(4.2)} 4.2 (9 đánh giá)</p>
+                <p className="text-yellow-500">
+                  {renderStars(4.2)} 4.2 (9 đánh giá)
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-4 border-t pt-4 mt-4">
-              <img src="https://via.placeholder.com/50" alt="Bidder" className="rounded-full" />
+              <img
+                src="https://via.placeholder.com/50"
+                alt="Bidder"
+                className="rounded-full"
+              />
               <div>
                 <h4 className="font-semibold">@softsolution2000</h4>
                 <p className="text-gray-500">488 đô la Mỹ trong 7 ngày</p>
-                <p className="text-yellow-500">{renderStars(5.0)} 5.0 (1 đánh giá)</p>
+                <p className="text-yellow-500">
+                  {renderStars(5.0)} 5.0 (1 đánh giá)
+                </p>
               </div>
             </div>
           </div>
@@ -131,7 +186,9 @@ const ProjectDetailPage: React.FC = () => {
 
       {/* Right Column */}
       <div className="md:w-1/4 space-y-6">
-        <button className="bg-pink-500 text-white font-semibold w-full p-3 rounded-lg">Đăng một dự án như thế này</button>
+        <button className="bg-pink-500 text-white font-semibold w-full p-3 rounded-lg">
+          Đăng một dự án như thế này
+        </button>
 
         {/* Customer Info */}
         <div className="bg-white p-6 rounded-lg shadow-lg space-y-4">
@@ -144,7 +201,11 @@ const ProjectDetailPage: React.FC = () => {
             <FontAwesomeIcon icon={faUser} />
             <div className="flex items-center">
               {[...Array(5)].map((_, index) => (
-                <FontAwesomeIcon key={index} icon={faStar} className="text-gray-300" />
+                <FontAwesomeIcon
+                  key={index}
+                  icon={faStar}
+                  className="text-gray-300"
+                />
               ))}
               <span className="ml-1">0.0</span>
             </div>
@@ -159,32 +220,51 @@ const ProjectDetailPage: React.FC = () => {
           <h4 className="font-semibold text-md">Xác minh khách hàng</h4>
           <div className="text-gray-500 text-sm space-y-1">
             <div className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" />
+              <FontAwesomeIcon
+                icon={faCheckCircle}
+                className="text-green-500"
+              />
               <p>Xác minh danh tính</p>
             </div>
             <div className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" />
+              <FontAwesomeIcon
+                icon={faCheckCircle}
+                className="text-green-500"
+              />
               <p>Xác minh email</p>
             </div>
             <div className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" />
+              <FontAwesomeIcon
+                icon={faCheckCircle}
+                className="text-green-500"
+              />
               <p>Xác minh số điện thoại</p>
             </div>
           </div>
           <hr className="my-2" />
-          <h4 className="font-semibold text-md">Các công việc khác từ khách hàng này</h4>
-          <a href="#" className="text-blue-600 text-sm">YouTube Script về nền văn minh cổ đại</a>
+          <h4 className="font-semibold text-md">
+            Các công việc khác từ khách hàng này
+          </h4>
+          <a href="#" className="text-blue-600 text-sm">
+            YouTube Script về nền văn minh cổ đại
+          </a>
           <p className="text-gray-500 text-sm">10-30 đô la Mỹ</p>
-          <a href="#" className="text-blue-600 mt-4 text-sm">Người tạo video UGC thời trang Ả Rập</a>
+          <a href="#" className="text-blue-600 mt-4 text-sm">
+            Người tạo video UGC thời trang Ả Rập
+          </a>
           <p className="text-gray-500 text-sm">30-250 đô la Mỹ</p>
         </div>
 
         {/* Similar Projects */}
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h3 className="font-semibold text-lg mb-4">Công việc tương tự</h3>
-          <a href="#" className="text-blue-600">Thu âm bài hát nhạc Pop với nhạc cụ hợp âm</a>
+          <a href="#" className="text-blue-600">
+            Thu âm bài hát nhạc Pop với nhạc cụ hợp âm
+          </a>
           <p className="text-gray-500 text-sm">30-250 đô la Mỹ</p>
-          <a href="#" className="text-blue-600 mt-4">Video Demo Tính Năng Sản Phẩm</a>
+          <a href="#" className="text-blue-600 mt-4">
+            Video Demo Tính Năng Sản Phẩm
+          </a>
           <p className="text-gray-500 text-sm">12500-37500 INR</p>
         </div>
       </div>

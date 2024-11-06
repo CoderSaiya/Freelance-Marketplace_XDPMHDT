@@ -1,20 +1,20 @@
 import { CategoryType } from "./CategoryType";
 import { User } from "./UserType";
 
-export interface ProjectResponseType {
-    data: {
-        createProject: {
-            projectId: number;
-            projectName: string;
-            projectDescription: string;
-            budget: number;
-            deadline: string;
-            skillRequire: string;
-            status: string;
-            user: User;
-            category: CategoryType;
-        }
-    }
+export interface ProjectResponseType<T> {
+    data: T;
+}
+
+export interface ProjectType {
+    projectId: number;
+    projectName: string;
+    projectDescription: string;
+    budget: number;
+    deadline: string;
+    skillRequire: string;
+    status: string;
+    users?: User;
+    category?: CategoryType;
 }
 
 export interface ProjectInput {
@@ -45,4 +45,5 @@ export interface ProjectWithImage {
     createAt: Date;
     category: CategoryType;
     imageUrls: string[];
+    user: User;
 }

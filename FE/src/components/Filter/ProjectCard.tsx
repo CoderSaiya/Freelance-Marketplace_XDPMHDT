@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 interface ProjectCardProps {
   project: {
@@ -17,6 +18,12 @@ interface ProjectCardProps {
 }
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, truncateDescription }) => {
+  const navigate = useNavigate();
+
+  const handleApplyClick = () => {
+    navigate(`/detail/${project.id}`);
+  };
+
   return (
     <div
       className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow flex flex-col justify-between"
@@ -34,7 +41,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, truncateDescription 
         {truncateDescription(project.description)}
       </p>
       <p className="text-blue-700 font-semibold">${project.price}</p>
-      <button className="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 mt-4">Apply</button>
+      <button onClick={handleApplyClick} className="bg-blue-500 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-600 mt-4">
+        Apply
+      </button>
     </div>
   );
 };
