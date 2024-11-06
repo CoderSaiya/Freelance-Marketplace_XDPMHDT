@@ -3,6 +3,7 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import ProfilePage from "../pages/Profile";
 import FilterPage from "../pages/Filter";
+import DetailPage from "../pages/Detail";
 import Upload from "../pages/Upload";
 import { RouteType } from "../types";
 import Chat from "../pages/Chat";
@@ -28,6 +29,11 @@ const publicRoute: RouteType[] = [
   {
     path: "/filter",
     component: FilterPage,
+  },
+
+  {
+    path: "/detail",
+    component: DetailPage,
   }
 //   {
 //     path: "/chat",

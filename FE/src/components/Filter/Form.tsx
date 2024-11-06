@@ -3,7 +3,6 @@ import { useGetProjectQuery } from "../../apis/graphqlApi";
 import ProjectCard from "./ProjectCard";
 import FilterColumn from "./FilterColumn"; // Import the new component
 
-// Hàm tính toán ngày deadline dựa trên số ngày
 const calculateDeadline = (days: number): string => {
   const currentDate = new Date();
   currentDate.setDate(currentDate.getDate() + days);
