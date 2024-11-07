@@ -8,9 +8,17 @@ const renderStars = (rating: number) => {
 
   return (
     <>
-      {Array(fullStars).fill(<FontAwesomeIcon icon={faStar} className="text-yellow-500" />)}
-      {halfStar && <FontAwesomeIcon icon={faStarHalfAlt} className="text-yellow-500" />}
-      {Array(emptyStars).fill(<FontAwesomeIcon icon={faStarEmpty} className="text-gray-300" />)}
+      {Array(fullStars)
+        .fill(null)
+        .map((_, index) => (
+          <FontAwesomeIcon key={`full-${index}`} icon={faStar} className="text-yellow-500" />
+        ))}
+      {halfStar && <FontAwesomeIcon key="half" icon={faStarHalfAlt} className="text-yellow-500" />}
+      {Array(emptyStars)
+        .fill(null)
+        .map((_, index) => (
+          <FontAwesomeIcon key={`empty-${index}`} icon={faStarEmpty} className="text-gray-300" />
+        ))}
     </>
   );
 };

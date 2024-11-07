@@ -27,7 +27,7 @@ const ProjectDetailPage: React.FC<ProjectType> = (props) => {
         <button className="bg-pink-500 text-white font-semibold w-full p-3 rounded-lg">
           Đăng một dự án như thế này
         </button>
-        <ClientInfo />
+        <ClientInfo username={String(props.users?.username)} createAt={String(props.users?.createAt)}/>
         <SimilarProjects />
       </div>
     </div>

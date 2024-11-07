@@ -189,6 +189,7 @@ export const graphqlApi = createApi({
                 users {
                   id
                   username
+                  createAt
                 }
               }
             }

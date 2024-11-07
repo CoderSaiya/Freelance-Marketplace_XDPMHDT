@@ -5,4 +5,5 @@ export type User = {
     email: string;
     role: string;
     isEmailConfirmed: boolean;
+    createAt: string;
 }
