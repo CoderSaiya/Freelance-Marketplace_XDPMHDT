@@ -36,6 +36,10 @@ namespace FreelanceMarketplace.Models
 
         [ForeignKey("CategoryId")]
         public Category? Category { get; set; }
+        [Required]
+        public int UserId { get; set; }
+        [ForeignKey("Id")]
+        public Users? Users { get; set; }
         public Contracts? Contract { get; set; }
         public ICollection<Apply> Applies { get; set; } = new List<Apply>();
         public ICollection<Img> Images { get; set; } = new List<Img>();

@@ -8,7 +8,8 @@ namespace FreelanceMarketplace.GraphQL.Types
         {
             Name = "ApplyInput";
 
-            Field<NonNullGraphType<IntGraphType>>("userId");
+            Field<NonNullGraphType<IntGraphType>>("freelancerId");
+            Field<NonNullGraphType<IntGraphType>>("clientId");
             Field<NonNullGraphType<IntGraphType>>("projectId");
             Field<IntGraphType>("duration");
             Field<StringGraphType>("status");

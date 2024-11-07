@@ -20,19 +20,23 @@
         {
             "/api/chat/send",
             "/api/user",
-            "/api/chat/history"
+            "/api/chat/history",
         };
 
         public static readonly string[] FreelancerEndpoints =
         {
             "/api/chat/send",
-            "/api/chat/history"
+            "/api/chat/history",
+            "/api/stripe/create-payment-intent",
+            "/api/stripe/webhook"
         };
 
         public static readonly string[] ClientEndpoints =
         {
             "/api/chat/send",
             "/api/chat/history",
+            "/api/stripe/create-payment-intent",
+            "/api/stripe/webhook"
 
         };
     }

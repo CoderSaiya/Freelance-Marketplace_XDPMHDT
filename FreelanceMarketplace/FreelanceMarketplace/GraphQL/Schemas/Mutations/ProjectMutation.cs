@@ -1,10 +1,12 @@
 ﻿using FreelanceMarketplace.GraphQL.Types;
 using FreelanceMarketplace.Models;
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 using GraphQL;
 using GraphQL.Types;
 using GraphQL.Resolvers;
 using FreelanceMarketplace.GraphQL.Authorization;
+using System.Security.Claims;
+using System.ComponentModel;
 
 namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
 {
@@ -12,6 +14,42 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
     {
         public ProjectMutation(IProjectService projectService)
         {
+            //AddField(new FieldType
+            //{
+            //    Name = "createProject",
+            //    Type = typeof(ProjectType),
+            //    Arguments = new QueryArguments(
+            //    new QueryArgument<NonNullGraphType<ProjectInputType>> { Name = "project" }
+            //),
+            //    Resolver = new FuncFieldResolver<object>(async context =>
+            //    {
+            //        var httpContext = context.UserContext as HttpContext;
+            //        var user = httpContext.User;
+            //        var userIdClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            //        if (string.IsNullOrEmpty(userIdClaim))
+            //        {
+            //            throw new ExecutionError("User ID not found in token");
+            //        }
+
+            //        if (!int.TryParse(userIdClaim, out var userId))
+            //        {
+            //            throw new ExecutionError("Invalid User ID format");
+            //        }
+
+            //        var projectInput = context.GetArgument<Project>("project");
+
+            //        var file = httpContext.Request.Form.Files.FirstOrDefault();
+
+            //        if (file == null)
+            //        {
+            //            throw new ExecutionError("File not found in request");
+            //        }
+
+            //        return await projectService.CreateProjectAsync(projectInput, file, userId);
+            //    })
+            //}.AuthorizeWith("Admin", "Client"));
+
             AddField(new FieldType
             {
                 Name = "createProject",
@@ -32,6 +70,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
                         Deadline = DateTime.Parse(projectInput["deadline"].ToString()),
                         Status = projectInput["status"]?.ToString(),
                         CategoryId = Convert.ToInt32(projectInput["categoryId"]),
+                        UserId = Convert.ToInt32(projectInput["userId"]),
                         SkillRequire = projectInput.ContainsKey("skillRequire") ? projectInput["skillRequire"].ToString() : null
                     };
 

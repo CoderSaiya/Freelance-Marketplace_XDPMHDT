@@ -1,6 +1,6 @@
 ﻿using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Models;
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 using Google.Apis.Drive.v3.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;

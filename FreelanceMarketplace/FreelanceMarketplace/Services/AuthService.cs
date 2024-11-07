@@ -8,7 +8,7 @@ using FreelanceMarketplace.Models.DTOs.Res;
 namespace FreelanceMarketplace.Services
 {
     using FreelanceMarketplace.Models.DTOs.Req;
-    using FreelanceMarketplace.Services.Interface;
+    using FreelanceMarketplace.Services.Interfaces;
     using Google.Apis.Auth.OAuth2.Responses;
     using Microsoft.Extensions.Configuration;
     using Microsoft.IdentityModel.Tokens;

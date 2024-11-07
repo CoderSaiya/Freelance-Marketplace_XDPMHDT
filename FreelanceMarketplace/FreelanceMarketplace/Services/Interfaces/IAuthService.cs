@@ -3,7 +3,7 @@ using FreelanceMarketplace.Models.DTOs.Res;
 using Google.Apis.Auth.OAuth2.Responses;
 using System.Security.Claims;
 
-namespace FreelanceMarketplace.Services.Interface
+namespace FreelanceMarketplace.Services.Interfaces
 {
     public interface IAuthService
     {

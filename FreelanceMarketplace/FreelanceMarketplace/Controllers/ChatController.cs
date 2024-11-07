@@ -2,7 +2,7 @@
 using FreelanceMarketplace.Hubs;
 using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Models.DTOs.Res;
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;

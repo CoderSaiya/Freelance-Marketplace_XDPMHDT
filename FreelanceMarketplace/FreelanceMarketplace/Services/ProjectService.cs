@@ -1,6 +1,6 @@
 ﻿using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Models;
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace FreelanceMarketplace.Services
@@ -19,10 +19,11 @@ namespace FreelanceMarketplace.Services
             try
             {
                 return await _context.Projects
-                    .Include(p => p.Category)  
+                    .Include(p => p.Category)
                     .Include(p => p.Applies)
                     .Include(p => p.Contract)
-                    .Include(p => p.Images)    
+                    .Include(p => p.Images)
+                    .Include(p => p.Users)
                     .ToListAsync();
             }
             catch (Exception ex)
@@ -40,6 +41,7 @@ namespace FreelanceMarketplace.Services
                     .Include(p => p.Applies)
                     .Include(p => p.Contract)
                     .Include(p => p.Images)
+                    .Include(p => p.Users)
                     .FirstOrDefaultAsync(p => p.ProjectId == projectId);
 
                 if (project == null)
@@ -121,7 +123,7 @@ namespace FreelanceMarketplace.Services
 
                 var activeProjects = await _context.Applies
                     .Include(a => a.Project)
-                    .Where(a => a.UserId == userId && a.Status == "Accepted")
+                    .Where(a => a.FreelancerId == userId && a.Status == "Accepted")
                     .ToListAsync();
 
                 DateTime newProjectStart = DateTime.Now;
@@ -135,10 +137,10 @@ namespace FreelanceMarketplace.Services
 
                     if (newProjectStart < projectEnd && newProjectEnd > projectStart)
                     {
-                        return true; 
+                        return true;
                     }
                 }
-                return false; 
+                return false;
             }
             catch (Exception ex)
             {

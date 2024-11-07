@@ -1,4 +1,4 @@
-﻿namespace FreelanceMarketplace.Services.Interface
+﻿namespace FreelanceMarketplace.Services.Interfaces
 {
     public interface IEmailService
     {

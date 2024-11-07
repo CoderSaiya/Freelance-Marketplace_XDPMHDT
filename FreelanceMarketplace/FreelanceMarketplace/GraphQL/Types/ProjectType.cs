@@ -18,6 +18,7 @@ namespace FreelanceMarketplace.GraphQL.Types
             Field(x => x.CreateAt);
 
             Field<CategoryType>("category");
+            Field<UserType>("users");
             Field<ListGraphType<ApplyType>>("applies");
             Field<ListGraphType<StringGraphType>>("imageUrls")
             .Resolve(context => context.Source.Images.Select(i => i.ImageUrl));

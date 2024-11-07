@@ -2,7 +2,7 @@
 using FreelanceMarketplace.Models.DTOs.Req;
 using FreelanceMarketplace.Models.DTOs.Res;
 using FreelanceMarketplace.Models;
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;

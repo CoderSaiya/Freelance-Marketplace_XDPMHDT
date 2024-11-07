@@ -1,5 +1,4 @@
-﻿using Google.Apis.Drive.v3.Data;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FreelanceMarketplace.Models
@@ -9,17 +8,10 @@ namespace FreelanceMarketplace.Models
     {
         [Key]
         public int WalletId { get; set; }
-
         [Required]
-        [ForeignKey("UserId")] 
+        [ForeignKey("UserId")]
         public int UserId { get; set; }
-        public int? Balance { get; set; }
-
+        public decimal? Balance { get; set; }
         public Users? User { get; set; }
-
-
-
-
     }
-
 }

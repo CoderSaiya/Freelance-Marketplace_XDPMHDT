@@ -1,6 +1,6 @@
 ﻿using GraphQL.Types;
 using GraphQL;
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 using FreelanceMarketplace.GraphQL.Types;
 using FreelanceMarketplace.GraphQL.Authorization;
 using GraphQL.Resolvers;

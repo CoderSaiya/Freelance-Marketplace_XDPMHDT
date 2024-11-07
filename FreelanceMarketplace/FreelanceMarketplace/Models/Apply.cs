@@ -10,16 +10,23 @@ namespace FreelanceMarketplace.Models
         public int ApplyId { get; set; }
 
         [Required]
-        public int UserId { get; set; }
+        public int FreelancerId { get; set; }
 
-        [ForeignKey("UserId")]
-        public Users? User { get; set; }
+        [ForeignKey("FreelancerId")]
+        public Users? Freelancer { get; set; }
+
+        [Required]
+        public int ClientId { get; set; }
+
+        [ForeignKey("ClientId")]
+        public Users? Client { get; set; }
 
         [Required]
         public int ProjectId { get; set; }
 
         [ForeignKey("ProjectId")]
         public Project? Project { get; set; }
+
         public int Duration { get; set; }
         public string Status { get; set; } = "Pending";
         public DateTime CreateAt { get; set; } = DateTime.Now;

@@ -1,4 +1,4 @@
-using FreelanceMarketplace.Services.Interface;
+using FreelanceMarketplace.Services.Interfaces;
 using FreelanceMarketplace.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +15,7 @@ using FreelanceMarketplace.GraphQL.Types;
 using FreelanceMarketplace.GraphQL.Schemas;
 using GraphQL;
 using GraphQL.Types;
-using FreelanceMarketplace.Services.Implementations;
-using FreelanceMarketplace.Services.Interfaces;
+using FreelanceMarketplace.Models.DTOs;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -108,6 +107,7 @@ builder.Services.AddScoped<IUserProfileService, UserProfileService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IWalletService, WalletService>();
 
 // Configure Entity Framework
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -166,6 +166,7 @@ builder.Services.AddScoped<ProjectQuery>();
 builder.Services.AddScoped<UserProfileQuery>();
 builder.Services.AddScoped<NotificationQuery>();
 builder.Services.AddScoped<ApplyQuery>();
+builder.Services.AddScoped<WalletQuery>();
 
 builder.Services.AddScoped<UserMutation>();
 builder.Services.AddScoped<ContractMutation>();
@@ -174,6 +175,7 @@ builder.Services.AddScoped<ProjectMutation>();
 builder.Services.AddScoped<UserProfileMutation>();
 builder.Services.AddScoped<NotificationMutation>();
 builder.Services.AddScoped<ApplyMutation>();
+builder.Services.AddScoped<WalletMutation>();
 
 builder.Services.AddScoped<UserType>();
 builder.Services.AddScoped<RefreshTokenType>();
@@ -195,6 +197,8 @@ builder.Services.AddScoped<PaymentInputType>();
 builder.Services.AddScoped<ReviewType>();
 builder.Services.AddScoped<ReviewInputType>();
 
+builder.Services.AddScoped<WalletType>();
+
 // Adjust the GraphQL configuration to use AddSelfActivatingSchema
 builder.Services.AddGraphQL(b => b
     .AddSelfActivatingSchema<MainSchema>()
@@ -203,13 +207,14 @@ builder.Services.AddGraphQL(b => b
     {
         opt.ExposeExceptionDetails = builder.Environment.IsDevelopment();
     })
-    .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = builder.Environment.IsDevelopment())
     .AddGraphTypes(typeof(MainSchema).Assembly)
     .AddUserContextBuilder(ctx => new Dictionary<string, object?>
     {
         { "User", ctx.User }
     })
 );
+
+builder.Services.Configure<StripeSetting>(builder.Configuration.GetSection("Stripe"));
 
 var app = builder.Build();
 
@@ -236,7 +241,6 @@ app.UseMiddleware<RoleMiddleware>();
 // Use UseEndpoints to map hub and controllers
 app.UseEndpoints(endpoints =>
 {
-    endpoints.MapHub<NotificationHub>("/notificationHub"); 
     endpoints.MapHub<ChatHub>("/chathub");
     endpoints.MapHub<VideoCallHub>("/videocallhub");
     endpoints.MapControllers();
