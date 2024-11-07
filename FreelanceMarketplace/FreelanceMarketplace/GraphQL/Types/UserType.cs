@@ -13,6 +13,7 @@ namespace FreelanceMarketplace.GraphQL.Types
             Field(x => x.Email);
             Field(x => x.Role);
             Field(x => x.IsEmailConfirmed);
+            Field(x => x.CreateAt);
             Field<ListGraphType<ProjectType>>("projects");
             Field<ListGraphType<RefreshTokenType>>("refreshTokens");
             Field<UserProfileType>("userProfile");
