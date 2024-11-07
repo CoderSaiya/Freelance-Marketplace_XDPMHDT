@@ -4,7 +4,7 @@ import ProjectHeader from "./ProjectHeader";
 import ProjectDescription from "./ProjectDescription";
 import ProjectTags from "./ProjectTags";
 import ProjectInfo from "./ProjectInfo";
-import BidAndBenefits from "./BidAndBenefits";
+import ApplyAndBenefits from "./ApplyAndBenefits";
 import ApplierList from "./ApplierList";
 import ClientInfo from "./ClientInfo";
 import SimilarProjects from "./SimilarProjects";
@@ -18,7 +18,7 @@ const ProjectDetailPage: React.FC<ProjectType> = (props) => {
         <ProjectDescription description={props.projectDescription} />
         <ProjectTags tags={["Tài năng giọng nói", "Dịch vụ âm thanh", "Quảng cáo", "Sản xuất âm thanh", "Tiếp tục truyền thông xã hội"]} />
         <ProjectInfo />
-        <BidAndBenefits />
+        <ApplyAndBenefits projectId={props.projectId}/>
         <ApplierList />
       </div>
 

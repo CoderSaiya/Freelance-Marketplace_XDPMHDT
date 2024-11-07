@@ -5,3 +5,10 @@ export interface ApplyType {
     duration: number;
     status: 'Pending' | 'Accepted' | 'Rejected';
 }
+
+export interface ApplyInput {
+    userId: number;
+    projectId: number;
+    duration: number;
+    status: 'Pending' | 'Accepted' | 'Rejected';
+}

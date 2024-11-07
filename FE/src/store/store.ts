@@ -2,10 +2,19 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './authSlice'
 import { restfulApi } from '../apis/restfulApi';
 import { graphqlApi } from '../apis/graphqlApi';
+import { persistReducer, persistStore } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 
-export const store = configureStore({
+const persistConfig = {
+  key: 'root',
+  storage,
+};
+
+const persistedReducer = persistReducer(persistConfig, authReducer);
+
+const store = configureStore({
   reducer: {
-    auth: authReducer,
+    auth: persistedReducer,
     [restfulApi.reducerPath]: restfulApi.reducer,
     [graphqlApi.reducerPath]: graphqlApi.reducer,
   },
@@ -15,6 +24,8 @@ export const store = configureStore({
       .concat(graphqlApi.middleware),
 });
 
+const persistor = persistStore(store);
+
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
-export default store;
+export { store, persistor };

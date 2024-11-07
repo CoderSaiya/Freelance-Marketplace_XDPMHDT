@@ -1,7 +1,10 @@
 import React from "react";
 import LazyComponent from "../components/Home/LazyComponent";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
 
 const Home: React.FC = () => {
+  console.log(useSelector((state:RootState) => state.auth.userId))
   return (
     <>
       <LazyComponent 

@@ -3,7 +3,7 @@ import { Mutex } from 'async-mutex';
 import { setTokens, logout } from '../features/authSlice';
 import { ProjectImageResponse, ProjectType } from '../types/ProjectType';
 import { restfulApi } from './restfulApi'
-import { ApplyType } from '../types/ApplyType';
+import { ApplyInput, ApplyType } from '../types/ApplyType';
 import { ResponseType } from '../types';
 
 interface GraphQLError {
@@ -212,7 +212,7 @@ export const graphqlApi = createApi({
         }
       })
     }),
-    createApply: builder.mutation<ResponseType<{ createApply: ApplyType }>, { apply: any }>({
+    createApply: builder.mutation<ResponseType<{ createApply: ApplyType }>, { apply: ApplyInput }>({
       query: ({ apply }) => ({
         url: 'graphql',
         method: 'POST',
@@ -244,4 +244,4 @@ export const graphqlApi = createApi({
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation } = graphqlApi;

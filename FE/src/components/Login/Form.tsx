@@ -7,6 +7,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import { notification } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
+import { jwtDecode } from "jwt-decode";
+import { setUser } from "../../store/authSlice";
+import { useDispatch } from "react-redux";
 
 const Form: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -17,6 +20,7 @@ const Form: React.FC = () => {
   const [loginGoogle, { data, error, isSuccess }] = useLoginGoogleMutation();
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get("code");
@@ -69,19 +73,17 @@ const Form: React.FC = () => {
       }
 
       if (accessToken) {
-        // const decodedToken: any = jwtDecode(accessToken);
-        // const userId =
-        //   decodedToken[
-        //     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-        //   ];
-        // const userName =
-        //   decodedToken[
-        //     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
-        //   ];
+        const decodedToken: any = jwtDecode(accessToken);
+        const userId = decodedToken[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+        ];
+        const userName = decodedToken[
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+        ];
 
         // console.log(userId);
 
-        // dispatch(setUser({ userId: userId, username: userName }));
+        dispatch(setUser({ userId, username: userName }));
 
         localStorage.setItem("access_token", accessToken);
         localStorage.setItem("refresh", refreshToken);
