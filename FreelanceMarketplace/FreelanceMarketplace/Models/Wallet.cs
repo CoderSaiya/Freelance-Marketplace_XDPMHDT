@@ -9,9 +9,9 @@ namespace FreelanceMarketplace.Models
         [Key]
         public int WalletId { get; set; }
         [Required]
-        [ForeignKey("UserId")]
         public int UserId { get; set; }
         public decimal? Balance { get; set; }
+        [ForeignKey("UserId")]
         public Users? User { get; set; }
     }
 }

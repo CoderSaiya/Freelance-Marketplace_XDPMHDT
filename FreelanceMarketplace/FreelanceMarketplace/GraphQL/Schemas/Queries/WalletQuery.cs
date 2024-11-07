@@ -7,14 +7,18 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
 {
     public class WalletQuery : ObjectGraphType
     {
-        public WalletQuery(IWalletService walletService)
+        public WalletQuery(IServiceProvider serviceProvider)
         {
-            Field<WalletType>("wallet")
+            Field<WalletType>("getWallet")
             .Arguments(new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "userId" }))
             .ResolveAsync(async context =>
             {
                 var userId = context.GetArgument<int>("userId");
-                return await walletService.GetWalletByUserIdAsync(userId);
+                using (var scope = serviceProvider.CreateScope())
+                {
+                    var walletService = scope.ServiceProvider.GetRequiredService<IWalletService>();
+                    return await walletService.GetWalletByUserIdAsync(userId);
+                }
             });
         }
     }
