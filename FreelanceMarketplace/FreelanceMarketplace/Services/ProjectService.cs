@@ -123,7 +123,7 @@ namespace FreelanceMarketplace.Services
 
                 var activeProjects = await _context.Applies
                     .Include(a => a.Project)
-                    .Where(a => a.UserId == userId && a.Status == "Accepted")
+                    .Where(a => a.FreelancerId == userId && a.Status == "Accepted")
                     .ToListAsync();
 
                 DateTime newProjectStart = DateTime.Now;
@@ -137,10 +137,10 @@ namespace FreelanceMarketplace.Services
 
                     if (newProjectStart < projectEnd && newProjectEnd > projectStart)
                     {
-                        return true; 
+                        return true;
                     }
                 }
-                return false; 
+                return false;
             }
             catch (Exception ex)
             {
