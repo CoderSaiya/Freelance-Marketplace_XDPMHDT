@@ -6,6 +6,7 @@ import { restfulApi } from './restfulApi'
 import { ApplyInput, ApplyType } from '../types/ApplyType';
 import { ResponseType } from '../types';
 import { WalletType } from '../types/WalletType';
+import { CategoryType } from '../types/CategoryType';
 
 interface GraphQLError {
   message: string;
@@ -199,20 +200,6 @@ export const graphqlApi = createApi({
         },
       }),
     }),
-    getCategory: builder.query({
-      query: () => ({
-        url: 'graphql',
-        method: 'POST',
-        body: {
-          query: `
-            query categories {
-              categoryId
-              categoryName
-            }
-          `,
-        }
-      })
-    }),
     createApply: builder.mutation<ResponseType<{ createApply: ApplyType }>, { apply: ApplyInput }>({
       query: ({ apply }) => ({
         url: 'graphql',
@@ -281,7 +268,23 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    getCategory: builder.query<ResponseType<{ categories: CategoryType[] }>, void>({
+      query: () => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query {
+              categories {
+                categoryId
+                categoryName
+              }
+            }
+          `,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery, useGetCategoryQuery } = graphqlApi;

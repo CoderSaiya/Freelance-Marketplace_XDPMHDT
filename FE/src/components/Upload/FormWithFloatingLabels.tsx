@@ -1,5 +1,6 @@
 import React from "react";
 import FloatingLabelInput from "./FloatingLabelInput";
+import { CategoryType } from "../../types/CategoryType";
 
 interface FormProps {
   projectName: string;
@@ -9,7 +10,8 @@ interface FormProps {
   skillRequire: string;
   status: string;
   categoryId: number;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  categories: CategoryType[];
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -21,6 +23,7 @@ const FormWithFloatingLabels: React.FC<FormProps> = ({
   skillRequire,
   status,
   categoryId,
+  categories,
   onChange,
   onSubmit,
 }) => {
@@ -66,13 +69,21 @@ const FormWithFloatingLabels: React.FC<FormProps> = ({
         onChange={onChange}
         name="status"
       />
-      <FloatingLabelInput
-        label="Category ID"
-        type="number"
-        value={categoryId.toString()}
-        onChange={onChange}
-        name="categoryId"
-      />
+      <div className="flex flex-col">
+        <select
+          name="categoryId"
+          value={categoryId}
+          onChange={onChange}
+          className="px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+        >
+          <option value="">Select Category</option>
+          {categories.map((category) => (
+            <option key={category.categoryId} value={category.categoryId}>
+              {category.categoryName}
+            </option>
+          ))}
+        </select>
+      </div>
     </form>
   );
 };

@@ -1,7 +1,10 @@
 import React from "react";
 import Gradient from "./Gradient";
+import { useGetCategoryQuery } from "../../apis/graphqlApi";
 
 const Banner: React.FC = () => {
+  const { data } = useGetCategoryQuery();
+  const categories = data?.data.categories;
   return (
     <div className="relative h-screen w-full overflow-hidden">
       {/* Animated Background */}
@@ -69,16 +72,14 @@ const Banner: React.FC = () => {
                     <option value="" disabled>
                       Category
                     </option>
-                    <option value="1">1 Category</option>
-                    <option value="2">2 Category</option>
-                    <option value="3">3 Category</option>
-                    <option value="4">4 Category</option>
-                    <option value="5">5 Category</option>
-                    <option value="6">6 Category</option>
-                    <option value="7">7 Category</option>
-                    <option value="8">8 Category</option>
-                    <option value="9">9 Category</option>
-                    <option value="10">10 Category</option>
+                    {categories?.map((category) => (
+                      <option
+                        key={category.categoryId}
+                        value={category.categoryId}
+                      >
+                        {category.categoryName}
+                      </option>
+                    ))}
                   </select>
                   <input
                     type="number"

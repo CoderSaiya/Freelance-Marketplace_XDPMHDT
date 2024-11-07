@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import FormWithFloatingLabels from "../components/Upload/FormWithFloatingLabels";
-import { useCreateProjectMutation } from "../apis/graphqlApi";
+import {
+  useCreateProjectMutation,
+  useGetCategoryQuery,
+} from "../apis/graphqlApi";
 import { useUploadImgMutation } from "../apis/restfulApi";
 import { notification } from "antd";
 import { BallTriangle } from "@agney/react-loading";
@@ -20,6 +23,9 @@ const Upload: React.FC = () => {
     userId: 0,
     categoryId: 0,
   });
+
+  const { data } = useGetCategoryQuery();
+  const categories = data?.data.categories || [];
 
   const [createProject] = useCreateProjectMutation();
   const [uploadImg] = useUploadImgMutation();
@@ -50,7 +56,9 @@ const Upload: React.FC = () => {
     }, 300);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
 
     setFormValues((prevValues) => {
@@ -60,7 +68,6 @@ const Upload: React.FC = () => {
           [name]: parseFloat(value),
         };
       }
-
       return {
         ...prevValues,
         [name]: value,
@@ -237,6 +244,7 @@ const Upload: React.FC = () => {
           skillRequire={formValues.skillRequire}
           status={formValues.status}
           categoryId={formValues.categoryId}
+          categories={categories}
           onChange={handleInputChange}
           onSubmit={handleSubmit}
         />{" "}
