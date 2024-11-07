@@ -5,6 +5,7 @@ import { ProjectImageResponse, ProjectType } from '../types/ProjectType';
 import { restfulApi } from './restfulApi'
 import { ApplyInput, ApplyType } from '../types/ApplyType';
 import { ResponseType } from '../types';
+import { WalletType } from '../types/WalletType';
 
 interface GraphQLError {
   message: string;
@@ -260,7 +261,27 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    getWallet: builder.query<ResponseType<{ getWallet: WalletType }>, number>({
+      query: (userId) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query getWallet($userId: Int!) {
+              getWallet(userId: $userId) {
+                walletId
+                balance
+                user {
+                  id
+                }
+              }
+            }
+          `,
+          variables: { userId },
+        },
+      }),
+    }),
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation, useHasAppliedForProjectQuery } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery } = graphqlApi;

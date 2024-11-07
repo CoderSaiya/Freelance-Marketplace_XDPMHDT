@@ -1,8 +1,8 @@
-import { Payment } from "./PaymentType";
+import { User } from "./UserType";
 
-export interface Wallet {
-    id: number;
+export interface WalletType {
+    walletId: number;
     userId: number;
     balance: number;
-    transactions: Payment[];
+    user: User
 }

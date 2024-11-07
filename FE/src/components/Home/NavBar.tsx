@@ -4,8 +4,13 @@ import { BellOutlined } from "@ant-design/icons";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import AddFundsModal from "./AddFundsModal";
+import { useGetWalletQuery } from "../../apis/graphqlApi";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
-const stripePromise = loadStripe("pk_test_51PtpAPGH56JC4HtH4uJvwovRnTiKX8M3vFocyHUrIeQ2bSVyRUVvo60vwJs7852MEvvLhsurDHdmOeMWxbmhtdUi00kZhuJ5GN");
+const stripePromise = loadStripe(
+  "pk_test_51PtpAPGH56JC4HtH4uJvwovRnTiKX8M3vFocyHUrIeQ2bSVyRUVvo60vwJs7852MEvvLhsurDHdmOeMWxbmhtdUi00kZhuJ5GN"
+);
 
 const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -13,6 +18,10 @@ const Navbar: React.FC = () => {
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   const isLogin = localStorage.getItem("access_token") === "";
   const navigate = useNavigate();
+
+  const userId = useSelector((state: RootState) => state.auth.userId);
+  console.log(userId);
+  const { data } = useGetWalletQuery(Number(userId));
 
   const handleMouseEnter = () => {
     if (timeoutId) {
@@ -86,12 +95,17 @@ const Navbar: React.FC = () => {
               onMouseLeave={handleMouseLeave}
             >
               {/* User Avatar */}
-              <button className="flex items-center">
+              <button className="flex items-center mr-4">
                 <img
                   src="/img/logo.png"
                   alt="User Avatar"
                   className="w-12 h-12 rounded-full"
                 />
+
+                <div className="flex flex-col items-start">
+                  <h2 className="text-base">Username</h2>
+                  <span className="text-sm">${data?.data.getWallet.balance} USD</span>
+                </div>
               </button>
 
               {/* Dropdown Menu */}

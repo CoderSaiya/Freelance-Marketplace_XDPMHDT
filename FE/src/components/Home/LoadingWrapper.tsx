@@ -2,7 +2,7 @@ import { useLocation } from "react-router-dom";
 import Loading from "./Loading";
 import { useEffect, useState } from "react";
 
-const LoadingWrapper: React.FC<React.PropsWithChildren<{}>> = ({
+const LoadingWrapper: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
