@@ -1,26 +1,36 @@
 import React, { useState } from "react";
-import { useCreateApplyMutation } from "../../apis/graphqlApi";
+import {
+  useCreateApplyMutation,
+  useHasAppliedForProjectQuery,
+} from "../../apis/graphqlApi";
 import { ApplyInput } from "../../types/ApplyType";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 
 interface Props {
+  clientId: number;
   projectId: number;
 }
 
-const ApplyAndBenefits: React.FC<Props> = ({ projectId }) => {
+const ApplyAndBenefits: React.FC<Props> = ({ clientId, projectId }) => {
   const [duration, setDuration] = useState(0);
 
   const [createApply] = useCreateApplyMutation();
 
   const userId = useSelector((state: RootState) => state.auth.userId);
 
-  console.log(duration);
+  const { data } = useHasAppliedForProjectQuery({
+    projectId: projectId,
+    freelancerId: Number(userId),
+  });
+
+  const isApplied = data?.data.hasAppliedForProject;
 
   const handelApply = async () => {
     console.log(userId);
     const apply: ApplyInput = {
-      userId: Number(userId),
+      freelancerId: Number(userId),
+      clientId: clientId,
       projectId: projectId,
       duration: duration,
       status: "Pending",
@@ -40,18 +50,27 @@ const ApplyAndBenefits: React.FC<Props> = ({ projectId }) => {
       {/* Bid Section */}
       <div className="bg-gray-50 p-4 rounded-lg md:w-1/2">
         <h2 className="font-semibold text-lg mb-4">Your Apply</h2>
-        <input
-          type="number"
-          placeholder="Your deadline (date)"
-          className="border rounded-md w-full p-2 mb-4"
-          onChange={(e) => setDuration(Number(e.target.value))}
-        />
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
-          onClick={handelApply}
-        >
-          Apply Project
-        </button>
+        {!isApplied ? (
+          <>
+            <input
+              type="number"
+              placeholder="Your deadline (date)"
+              className="border rounded-md w-full p-2 mb-4"
+              onChange={(e) => setDuration(Number(e.target.value))}
+            />
+            <button
+              className="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
+              onClick={handelApply}
+            >
+              Apply Project
+            </button>{" "}
+          </>
+        ) : (
+          <div className="flex">
+            <span className="text-green-500 mr-2">✔</span>
+            <h2 className="font-semibold">You are already applied</h2>
+          </div>
+        )}
       </div>
 
       {/* Freelancer Benefits */}

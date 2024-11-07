@@ -18,7 +18,7 @@ const ProjectDetailPage: React.FC<ProjectType> = (props) => {
         <ProjectDescription description={props.projectDescription} />
         <ProjectTags tags={["Tài năng giọng nói", "Dịch vụ âm thanh", "Quảng cáo", "Sản xuất âm thanh", "Tiếp tục truyền thông xã hội"]} />
         <ProjectInfo />
-        <ApplyAndBenefits projectId={props.projectId}/>
+        <ApplyAndBenefits clientId={Number(props.users?.id)} projectId={props.projectId}/>
         <ApplierList />
       </div>
 

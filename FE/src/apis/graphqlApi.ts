@@ -218,15 +218,20 @@ export const graphqlApi = createApi({
         method: 'POST',
         body: {
           query: `
-            mutation createApply($project: ApplyInput!) {
+            mutation createApply($apply: ApplyInput!) {
               createApply(apply: $apply) {
                 applyId
-                userId
+                freelancerId
+                clientId
                 projectId
                 duration
                 status
                 createAt
-                user {
+                freelancer {
+                  id
+                  username
+                }
+                client {
                   id
                   username
                 }
@@ -241,7 +246,21 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    hasAppliedForProject: builder.query<ResponseType<{ hasAppliedForProject: boolean }>, { projectId: number, freelancerId: number }>({
+      query: ({ projectId, freelancerId }) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query hasAppliedForProject($projectId: Int!, $freelancerId: Int!) {
+              hasAppliedForProject(projectId: $projectId, freelancerId: $freelancerId)
+            }
+          `,
+          variables: { projectId, freelancerId },
+        },
+      }),
+    }),
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation, useHasAppliedForProjectQuery } = graphqlApi;

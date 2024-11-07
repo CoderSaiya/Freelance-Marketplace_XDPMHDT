@@ -1,13 +1,15 @@
 export interface ApplyType {
     applyId: number;
     projectId: number;
-    userId: number;
+    freelancerId: number;
+    clientId: number;
     duration: number;
     status: 'Pending' | 'Accepted' | 'Rejected';
 }
 
 export interface ApplyInput {
-    userId: number;
+    freelancerId: number;
+    clientId: number;
     projectId: number;
     duration: number;
     status: 'Pending' | 'Accepted' | 'Rejected';
