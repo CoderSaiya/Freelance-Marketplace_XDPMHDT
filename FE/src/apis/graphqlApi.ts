@@ -1,8 +1,10 @@
 import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { Mutex } from 'async-mutex';
 import { setTokens, logout } from '../features/authSlice';
-import { ProjectImageResponse, ProjectResponseType, ProjectType } from '../types/ProjectType';
+import { ProjectImageResponse, ProjectType } from '../types/ProjectType';
 import { restfulApi } from './restfulApi'
+import { ApplyType } from '../types/ApplyType';
+import { ResponseType } from '../types';
 
 interface GraphQLError {
   message: string;
@@ -101,7 +103,7 @@ export const graphqlApi = createApi({
   reducerPath: 'graphqlApi',
   baseQuery: baseQueryWithReauth,
   endpoints: (builder) => ({
-    createProject: builder.mutation<ProjectResponseType<{ createProject: ProjectType }>, { project: any }>({
+    createProject: builder.mutation<ResponseType<{ createProject: ProjectType }>, { project: any }>({
       query: ({ project }) => ({
         url: 'graphql',
         method: 'POST',
@@ -163,7 +165,7 @@ export const graphqlApi = createApi({
         },
       }),
     }),
-    projectById: builder.query<ProjectResponseType<{ projectById: ProjectType }>, number>({
+    projectById: builder.query<ResponseType<{ projectById: ProjectType }>, number>({
       query: (projectId) => ({
         url: 'graphql',
         method: 'POST',
@@ -192,6 +194,49 @@ export const graphqlApi = createApi({
             }
           `,
           variables: { projectId },
+        },
+      }),
+    }),
+    getCategory: builder.query({
+      query: () => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query categories {
+              categoryId
+              categoryName
+            }
+          `,
+        }
+      })
+    }),
+    createApply: builder.mutation<ResponseType<{ createApply: ApplyType }>, { apply: any }>({
+      query: ({ apply }) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            mutation createApply($project: ApplyInput!) {
+              createApply(apply: $apply) {
+                applyId
+                userId
+                projectId
+                duration
+                status
+                createAt
+                user {
+                  id
+                  username
+                }
+                project {
+                  projectId
+                  projectName
+                }
+              }
+            }
+          `,
+          variables: { apply },
         },
       }),
     }),

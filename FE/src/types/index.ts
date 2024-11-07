@@ -44,3 +44,7 @@ export interface AboutTabProps {
 export interface DecodedToken {
   role: string;
 }
+
+export interface ResponseType<T> {
+  data: T;
+}

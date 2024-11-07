@@ -1,4 +1,4 @@
-export interface Apply {
+export interface ApplyType {
     applyId: number;
     projectId: number;
     userId: number;
