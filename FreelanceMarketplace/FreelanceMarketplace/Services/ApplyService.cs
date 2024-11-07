@@ -4,7 +4,6 @@ using FreelanceMarketplace.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FreelanceMarketplace.Services
@@ -12,58 +11,39 @@ namespace FreelanceMarketplace.Services
     public class ApplyService : IApplyService
     {
         private readonly AppDbContext _context;
-        private readonly INotificationService _notificationService;
-        private const int MaxAppliesPerProject = 10;
 
-        public ApplyService(AppDbContext context, INotificationService notificationService)
+        public ApplyService(AppDbContext context)
         {
             _context = context;
-            _notificationService = notificationService;
         }
 
         public async Task<Apply> CreateApplyAsync(Apply apply)
         {
             try
             {
-                var project = await _context.Projects.FindAsync(apply.ProjectId);
-                if (project == null || project.Status != "Open")
-                {
-                    throw new InvalidOperationException("The project is not open for applications.");
-                }
-
-                var applyCount = await _context.Applies
-                    .CountAsync(a => a.ProjectId == apply.ProjectId);
-                if (applyCount >= MaxAppliesPerProject)
-                {
-                    throw new InvalidOperationException("The maximum number of applications for this project has been reached.");
-                }
-
                 await _context.Applies.AddAsync(apply);
                 await _context.SaveChangesAsync();
-
-                await SendNotificationAsync(apply.UserId, "Your application has been submitted successfully.");
-
                 return apply;
             }
             catch (Exception ex)
             {
-                throw new Exception("Error creating application", ex);
+                throw new Exception("Error creating apply", ex);
             }
         }
 
-        public async Task<Apply?> GetApplyByIdAsync(int applyId)
+        public async Task<Apply> GetApplyByIdAsync(int applyId)
         {
             try
             {
                 return await _context.Applies
-                    .Include(a => a.User)
+                    .Include(a => a.Freelancer)
+                    .Include(a => a.Client)
                     .Include(a => a.Project)
-                    .SingleOrDefaultAsync(a => a.ApplyId == applyId)
-                    ?? throw new Exception($"Application with ID {applyId} not found");
+                    .SingleOrDefaultAsync(a => a.ApplyId == applyId);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error retrieving application with ID {applyId}", ex);
+                throw new Exception($"Error retrieving apply with ID {applyId}", ex);
             }
         }
 
@@ -72,13 +52,14 @@ namespace FreelanceMarketplace.Services
             try
             {
                 return await _context.Applies
-                    .Include(a => a.User)
+                    .Include(a => a.Freelancer)
+                    .Include(a => a.Client)
                     .Where(a => a.ProjectId == projectId)
                     .ToListAsync();
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error retrieving applications for project with ID {projectId}", ex);
+                throw new Exception($"Error retrieving applies for project with ID {projectId}", ex);
             }
         }
 
@@ -88,21 +69,15 @@ namespace FreelanceMarketplace.Services
             {
                 var existingApply = await _context.Applies.FindAsync(apply.ApplyId);
                 if (existingApply == null)
-                    throw new KeyNotFoundException("Application not found");
+                    throw new KeyNotFoundException("Apply not found");
 
                 _context.Entry(existingApply).CurrentValues.SetValues(apply);
                 await _context.SaveChangesAsync();
-
-                var message = apply.Status == "Accepted"
-                    ? "Your application has been accepted."
-                    : "Your application has been rejected.";
-                await SendNotificationAsync(apply.UserId, message);
-
                 return existingApply;
             }
             catch (Exception ex)
             {
-                throw new Exception("Error updating application", ex);
+                throw new Exception("Error updating apply", ex);
             }
         }
 
@@ -119,21 +94,16 @@ namespace FreelanceMarketplace.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Error deleting application", ex);
+                throw new Exception("Error deleting apply", ex);
             }
         }
 
-        public async Task SendNotificationAsync(int userId, string message)
+        public async Task<bool> HasFreelancerAppliedForProjectAsync(int freelancerId, int projectId)
         {
-            var notification = new Notification
-            {
-                UserId = userId,
-                Message = message,
-                CreatedAt = DateTime.UtcNow,
-                IsRead = false
-            };
+            var application = await _context.Applies
+                .FirstOrDefaultAsync(a => a.FreelancerId == freelancerId && a.ProjectId == projectId);
 
-            await _notificationService.CreateNotificationAsync(notification);
+            return application != null;
         }
     }
 }

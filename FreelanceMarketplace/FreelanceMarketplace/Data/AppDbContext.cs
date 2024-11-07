@@ -38,11 +38,6 @@ namespace FreelanceMarketplace.Data
                 entity.Property(e => e.Role).IsRequired().HasMaxLength(10);
             });
 
-            modelBuilder.Entity<ChatMessage>(entity =>
-            {
-                entity.Property(e => e.Message).IsRequired();
-            });
-
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.HasIndex(e => e.CategoryName).IsUnique();
@@ -138,10 +133,20 @@ namespace FreelanceMarketplace.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Apply>()
-                .HasOne(a => a.User)
+                .HasOne(a => a.Freelancer)
                 .WithMany(u => u.Applies)
-                .HasForeignKey(a => a.UserId)
+                .HasForeignKey(a => a.FreelancerId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Apply>()
+               .HasOne(a => a.Client)
+               .WithMany()
+               .HasForeignKey(a => a.ClientId)
+               .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Apply>()
+                .Navigation(a => a.Client)
+                .UsePropertyAccessMode(PropertyAccessMode.Property);
 
             modelBuilder.Entity<Apply>()
                 .HasOne(a => a.Project)
