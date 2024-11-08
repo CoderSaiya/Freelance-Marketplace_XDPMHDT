@@ -22,7 +22,19 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                     var id = context.GetArgument<int>("id");
                     return await userProfileService.GetUserProfileByIdAsync(id);
                 })
-            }); // No AuthorizeWith since profiles are public
+            }.AuthorizeWith("Client", "Freelancer", "Admin"));
+
+            AddField(new FieldType
+            {
+                Name = "profileByUserId",
+                Type = typeof(UserProfileType),
+                Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "userId" }),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    var userId = context.GetArgument<int>("userId");
+                    return await userProfileService.GetUserProfileByUserIdAsync(userId);
+                })
+            }.AuthorizeWith("Client", "Freelancer", "Admin"));
 
             AddField(new FieldType
             {

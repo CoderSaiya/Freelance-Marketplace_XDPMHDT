@@ -9,14 +9,18 @@ namespace FreelanceMarketplace.Models
         public int Id { get; set; }
         public float Rating { get; set; }
         public string? Company { get; set; }
+        public string? Phone { get; set; }
+        public DateTime? Birthday { get; set; }
+        public string? Gender { get; set; }
         public string? Location { get; set; }
         public string? Bio { get; set; }
         public string? Skill { get; set; }
         public string? Avatar { get; set; }
         public string? Industry { get; set; }
+        [Required]
         public int UserId { get; set; }
-        public string Status = "Active";
+        public string Status { get; set; } = "Active";
         [ForeignKey("UserId")]
-        public Users? User { get; set; }
+        public Users? Users { get; set; }
     }
 }

@@ -55,7 +55,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                         return userService.GetUserById(userId);
                     }
                 })
-            }.AuthorizeWith("Admin"));
+            }.AuthorizeWith("Admin", "Freelancer", "Client"));
         }
     }
 }

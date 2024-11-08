@@ -62,9 +62,10 @@ namespace FreelanceMarketplace.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<UserProfile>()
-               .HasOne(up => up.User)
+               .HasOne(up => up.Users)
                .WithOne(u => u.UserProfile)
-               .HasForeignKey<UserProfile>(up => up.UserId);
+               .HasForeignKey<UserProfile>(up => up.UserId)
+               .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Project>()
                 .HasOne(p => p.Category)
