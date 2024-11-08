@@ -6,7 +6,7 @@ export type User = {
     role: string;
     isEmailConfirmed: boolean;
     createAt: string;
-    userProfile?: UserProfileType;
+    userProfile: UserProfileType;
 }
 
 export interface UserProfileType {
@@ -14,9 +14,25 @@ export interface UserProfileType {
     rating: number;
     company?: string;
     location?: string;
+    phone?: string;
+    birthday?: Date;
+    gender?: string;
     bio?: string;
     skill?: string;
     avatar?: string;
     Industry?: string;
     status: string;
 };
+
+export interface UserProfileInput {
+    rating: number;
+    company: string;
+    location: string;
+    phone: string;
+    birthday: Date;
+    gender: string;
+    bio: string;
+    skill: string;
+    avatar: string;
+    industry: string;
+}

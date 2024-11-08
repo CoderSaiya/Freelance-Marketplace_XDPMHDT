@@ -16,6 +16,22 @@ export interface BreadcrumbProps {
 export interface ProfileHeaderProps {
   isEditing: boolean;
   setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
+  contactInfo: {
+    phone: string;
+    address: string;
+    email: string;
+    birthday: Date;
+    gender: string;
+    rating: number;
+    company: string;
+    location: string;
+    bio: string;
+    skill: string;
+    avatar: string;
+    industry: string;
+  };
+  userId: number;
+  username: string;
 }
 
 export interface TabsProps {
@@ -31,6 +47,13 @@ export interface AboutTabProps {
     email: string;
     birthday: string;
     gender: string;
+    rating: number;
+    company: string;
+    location: string;
+    bio: string;
+    skill: string;
+    avatar: string;
+    industry: string;
   };
   setContactInfo: React.Dispatch<React.SetStateAction<{
     phone: string;
@@ -38,6 +61,13 @@ export interface AboutTabProps {
     email: string;
     birthday: string;
     gender: string;
+    rating: number;
+    company: string;
+    location: string;
+    bio: string;
+    skill: string;
+    avatar: string;
+    industry: string;
   }>>;
 }
 

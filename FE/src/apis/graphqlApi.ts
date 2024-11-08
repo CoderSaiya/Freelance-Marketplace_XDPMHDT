@@ -7,7 +7,7 @@ import { ApplyInput, ApplyType } from '../types/ApplyType';
 import { ResponseType } from '../types';
 import { WalletType } from '../types/WalletType';
 import { CategoryType } from '../types/CategoryType';
-import { User } from '../types/UserType';
+import { User, UserProfileInput, UserProfileType } from '../types/UserType';
 
 interface GraphQLError {
   message: string;
@@ -29,6 +29,7 @@ interface GraphQLResponse<T> {
 
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
+console.log(BASE_URL)
 const mutex = new Mutex();
 
 const baseQuery = fetchBaseQuery({
@@ -285,7 +286,7 @@ export const graphqlApi = createApi({
         },
       }),
     }),
-    getProfile: builder.query<ResponseType<{ userById: User }>, number>({
+    userById: builder.query<ResponseType<{ userById: User }>, number>({
       query: (userId) => ({
         url: 'graphql',
         method: 'POST',
@@ -295,17 +296,40 @@ export const graphqlApi = createApi({
               userById(userId: $userId) {
                 id
                 username
+                email
                 userProfile {
                   rating
+                  company
+                  phone
+                  birthday
+                  gender
+                  location
                 }
               }
             }
           `,
-          variables: { userId }
+          variables: { userId },
+        },
+      }),
+    }),
+    updateUserProfile: builder.mutation<ResponseType<{ updateUserProfile: UserProfileType }>, { userId: number; userProfileInput: UserProfileInput }>({
+      query: ({ userId, userProfileInput }) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            mutation UpdateUserProfile($userId: Int!, $userProfileInput: UserProfileInput!) {
+              updateUserProfile(userId: $userId, userProfileInput: $userProfileInput) {
+                id
+                gender
+              } 
+            } 
+            `,
+          variables: { userId, userProfileInput },
         },
       }),
     }),
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery, useGetCategoryQuery, useGetProfileQuery } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery, useGetCategoryQuery, useUserByIdQuery, useUpdateUserProfileMutation } = graphqlApi;

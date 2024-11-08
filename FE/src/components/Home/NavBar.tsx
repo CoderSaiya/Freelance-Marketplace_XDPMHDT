@@ -20,7 +20,6 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   const userId = useSelector((state: RootState) => state.auth.userId);
-  console.log(userId);
   const { data } = useGetWalletQuery(Number(userId));
 
   const handleMouseEnter = () => {

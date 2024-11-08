@@ -5,18 +5,36 @@ import TimelineTab from "../components/Profile/Tabs/TimelineTab";
 import AboutTab from "../components/Profile/Tabs/AboutTab";
 import ProjectManagementTab from "../components/Profile/Tabs/ProjectManagement";
 import { jwtDecode } from "jwt-decode";
+import { useSelector } from "react-redux";
+import { RootState } from "../store/store";
+import { useUserByIdQuery } from "../apis/graphqlApi";
 
 const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState("About");
   const [isEditing, setIsEditing] = useState(false);
   const [role, setRole] = useState<string | null>(null);
 
+  const userId = useSelector((state: RootState) => state.auth.userId);
+
+  const { data, refetch } = useUserByIdQuery(Number(userId));
+
+  const email = data?.data.userById.email;
+  const profile = data?.data.userById.userProfile;
+  const username = data?.data.userById.username || "";
+
   const [contactInfo, setContactInfo] = useState({
-    phone: "+84 123 456 789",
-    address: "TP.HCM",
-    email: "BinhGa@gmail.com",
-    birthday: "June 30, 2004",
-    gender: "Male",
+    phone: profile?.phone || "Not add",
+    address: profile?.location || "Not add",
+    email: email || "",
+    birthday: profile?.birthday,
+    gender: profile?.gender || "Not add",
+    rating: profile?.rating || 0.0,
+    company: profile?.company || "Not add",
+    location: profile?.location || "Not add",
+    bio: profile?.bio || "Not add",
+    skill: profile?.skill || "Not add",
+    avatar: profile?.avatar || "Not add",
+    industry: profile?.Industry || "Not add"
   });
 
   const getRoleFromToken = () => {
@@ -65,7 +83,7 @@ const Profile: React.FC = () => {
 
   return (
     <div className="container mx-auto py-8 px-6">
-      <ProfileHeader isEditing={isEditing} setIsEditing={setIsEditing} />
+      <ProfileHeader isEditing={isEditing} setIsEditing={setIsEditing} contactInfo={contactInfo} userId={Number(userId)} username={username}/>
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
       {/* Content */}
       {renderContent()}
