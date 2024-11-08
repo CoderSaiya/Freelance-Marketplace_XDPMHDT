@@ -7,6 +7,7 @@ import { ApplyInput, ApplyType } from '../types/ApplyType';
 import { ResponseType } from '../types';
 import { WalletType } from '../types/WalletType';
 import { CategoryType } from '../types/CategoryType';
+import { User } from '../types/UserType';
 
 interface GraphQLError {
   message: string;
@@ -284,7 +285,27 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    getProfile: builder.query<ResponseType<{ userById: User }>, number>({
+      query: (userId) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query getUserById($userId: Int!) {
+              userById(userId: $userId) {
+                id
+                username
+                userProfile {
+                  rating
+                }
+              }
+            }
+          `,
+          variables: { userId }
+        },
+      }),
+    }),
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery, useGetCategoryQuery } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery, useGetCategoryQuery, useGetProfileQuery } = graphqlApi;

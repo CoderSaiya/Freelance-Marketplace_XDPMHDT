@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import ProfileHeader from "../components/Profile/ProfileHeader";
 import Tabs from "../components/Profile/Tabs";
-import TimelineTab from "../components/Profile/Tabs/TimeLineTab";
+import TimelineTab from "../components/Profile/Tabs/TimelineTab";
 import AboutTab from "../components/Profile/Tabs/AboutTab";
 import ProjectManagementTab from "../components/Profile/Tabs/ProjectManagement";
 import { jwtDecode } from "jwt-decode";
 
-const Profile = () => {
+const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState("About");
   const [isEditing, setIsEditing] = useState(false);
   const [role, setRole] = useState<string | null>(null);
@@ -25,9 +25,15 @@ const Profile = () => {
       try {
         const decoded: any = jwtDecode(token);
         console.log("Decoded Token:", decoded);
-        return decoded[
-          "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-        ] || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"] || null;
+        return (
+          decoded[
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+          ] ||
+          decoded[
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"
+          ] ||
+          null
+        );
       } catch (error) {
         console.error("Failed to decode token", error);
       }
