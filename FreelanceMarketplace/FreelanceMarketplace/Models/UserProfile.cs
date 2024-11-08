@@ -15,6 +15,7 @@ namespace FreelanceMarketplace.Models
         public string? Avatar { get; set; }
         public string? Industry { get; set; }
         public int UserId { get; set; }
+        public string Status = "Active";
         [ForeignKey("UserId")]
         public Users? User { get; set; }
     }

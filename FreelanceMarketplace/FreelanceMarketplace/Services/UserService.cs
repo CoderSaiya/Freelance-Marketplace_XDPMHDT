@@ -42,6 +42,29 @@ namespace FreelanceMarketplace.Services
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
+            var wallet = new Wallet
+            {
+                UserId = user.Id,
+                Balance = 0.0m
+            };
+            _context.Wallets.Add(wallet);
+            await _context.SaveChangesAsync();
+
+            var userProfile = new UserProfile
+            {
+                UserId = user.Id,
+                Rating = 0,
+                Company = null,
+                Location = null,
+                Bio = null,
+                Skill = null,
+                Avatar = null,
+                Industry = null,
+                Status = "Active"
+            };
+            _context.UserProfiles.Add(userProfile);
+            await _context.SaveChangesAsync();
+
             var confirmationLink = $"https://localhost:7115/api/Auth/confirm-email?userId={user.Id}&token={user.EmailConfirmationToken}";
 
             var emailBody = $@"
