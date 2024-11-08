@@ -46,13 +46,13 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                 Name = "userById",
                 Type = typeof(UserType),
                 Arguments = new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "userId" }),
-                Resolver = new FuncFieldResolver<object>(context =>
+                Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     int userId = context.GetArgument<int>("userId");
                     using (var scope = serviceProvider.CreateScope())
                     {
                         var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
-                        return userService.GetUserById(userId);
+                        return await userService.GetUserById(userId);
                     }
                 })
             }.AuthorizeWith("Admin", "Freelancer", "Client"));

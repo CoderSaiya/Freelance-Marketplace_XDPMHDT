@@ -49,6 +49,11 @@ namespace FreelanceMarketplace.Data
             });
 
             //cau hinh rang buoc quan he
+            modelBuilder.Entity<Users>()
+                .HasOne(u => u.UserProfile)
+                .WithOne(p => p.Users)
+                .HasForeignKey<UserProfile>(p => p.UserId);
+
             modelBuilder.Entity<ChatMessage>()
                 .HasOne(c => c.Sender)
                 .WithMany()

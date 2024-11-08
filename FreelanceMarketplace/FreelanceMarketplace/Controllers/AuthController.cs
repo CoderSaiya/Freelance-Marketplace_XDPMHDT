@@ -111,9 +111,9 @@ public class AuthController : Controller
     }
 
     [HttpPost("refresh-token")]
-    public IActionResult RefreshToken([FromBody] TokenDto request)
+    public async Task<IActionResult> RefreshTokenAsync([FromBody] TokenDto request)
     {
-        var tokenResponse = _authService.RefreshToken(request.RefreshToken);
+        var tokenResponse = await _authService.RefreshTokenAsync(request.RefreshToken);
         if (tokenResponse == null)
         {
             return Unauthorized(new Response<string>

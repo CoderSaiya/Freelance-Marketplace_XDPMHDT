@@ -19,8 +19,7 @@ namespace FreelanceMarketplace.GraphQL.Types
             Field(x => x.Avatar);
             Field(x => x.Industry);
             Field(x => x.Status);
-
-            Field<UserType>("users");
+            Field(x => x.UserId);
         }
     }
 }

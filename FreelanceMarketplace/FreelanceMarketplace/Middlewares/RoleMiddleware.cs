@@ -56,7 +56,7 @@ namespace FreelanceMarketplace.Middlewares
                             return;
                         }
 
-                        var newAccessToken = authService.RefreshToken(refreshToken);
+                        var newAccessToken = authService.RefreshTokenAsync(refreshToken);
 
                         if (newAccessToken == null)
                         {
@@ -66,7 +66,7 @@ namespace FreelanceMarketplace.Middlewares
                             return;
                         }
 
-                        context.Response.Headers["X-New-Access-Token"] = newAccessToken.AccessToken;
+                        context.Response.Headers["X-New-Access-Token"] = newAccessToken.Result.AccessToken;
                         _logger.LogInformation("Access token refreshed successfully.");
                     }
                 }

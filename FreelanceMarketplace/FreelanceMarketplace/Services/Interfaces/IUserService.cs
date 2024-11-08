@@ -13,7 +13,7 @@ namespace FreelanceMarketplace.Services.Interfaces
         RefreshTokens GetRefreshToken(int userId);
         RefreshTokens GetRefreshTokenByToken(string token);
         void MarkRefreshTokenAsUsed(RefreshTokens refreshToken);
-        Users GetUserById(int userId);
+        Task<Users> GetUserById(int userId);
         Users GetUserByUsername(string username);
         Task<Users> GetUserByUsernameAsync(string username);
         List<Users> GetUsers();

@@ -8,7 +8,7 @@ namespace FreelanceMarketplace.Services.Interfaces
     public interface IAuthService
     {
         TokenDto Login(string username, string password);
-        TokenRes RefreshToken(string token);
+        Task<TokenRes> RefreshTokenAsync(string token);
         string GenerateAccessToken(IEnumerable<Claim> claims);
         string GenerateRefreshToken();
         ClaimsPrincipal ValidateToken(string token);

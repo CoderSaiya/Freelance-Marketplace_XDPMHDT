@@ -49,7 +49,7 @@ namespace FreelanceMarketplace.Services
             return new TokenDto(accessToken, refreshToken);
         }
 
-        public TokenRes RefreshToken(string token)
+        public async Task<TokenRes> RefreshTokenAsync(string token)
         {
             var refreshToken = _userService.GetRefreshTokenByToken(token);
             if (refreshToken == null || refreshToken.ExpiryDate < DateTime.UtcNow || refreshToken.IsUsed || refreshToken.IsRevoked)
@@ -59,13 +59,13 @@ namespace FreelanceMarketplace.Services
 
             _userService.MarkRefreshTokenAsUsed(refreshToken);
 
-            var user = _userService.GetUserById(refreshToken.UserId);
+            var user = await _userService.GetUserById(refreshToken.UserId);
             var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Role, user.Role)
-        };
+            {
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
 
             var newAccessToken = GenerateAccessToken(claims);
             var newRefreshToken = GenerateRefreshToken();

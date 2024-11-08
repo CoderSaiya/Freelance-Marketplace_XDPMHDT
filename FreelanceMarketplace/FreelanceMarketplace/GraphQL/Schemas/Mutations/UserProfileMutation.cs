@@ -40,7 +40,15 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
                     userProfile.Company = context.GetArgument<string>("company") ?? userProfile.Company;
                     userProfile.Location = context.GetArgument<string>("location") ?? userProfile.Location;
                     userProfile.Phone = context.GetArgument<string>("phone") ?? userProfile.Phone;
-                    userProfile.Birthday = context.GetArgument<DateTime?>("birthday") ?? userProfile.Birthday;
+                    var birthday = context.GetArgument<DateTime?>("birthday");
+                    if (birthday.HasValue)
+                    {
+                        userProfile.Birthday = birthday.Value.Date;
+                    }
+                    else
+                    {
+                        userProfile.Birthday = userProfile.Birthday;
+                    }
                     userProfile.Gender = context.GetArgument<string>("gender") ?? userProfile.Gender;
                     userProfile.Bio = context.GetArgument<string>("bio") ?? userProfile.Bio;
                     userProfile.Skill = context.GetArgument<string>("skill") ?? userProfile.Skill;

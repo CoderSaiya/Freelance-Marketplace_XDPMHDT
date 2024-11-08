@@ -146,9 +146,24 @@ namespace FreelanceMarketplace.Services
             _context.SaveChanges();
         }
 
-        public Users GetUserById(int userId)
+        public async Task<Users> GetUserById(int userId)
         {
-            return _context.Users.Find(userId);
+            try
+            {
+                var user = await _context.Users
+                    .Include(u => u.UserProfile)
+                    .Include(u => u.Wallet)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
+
+                if (user == null)
+                    throw new KeyNotFoundException("User not found");
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving user with ID {userId}", ex);
+            }
         }
 
         public Users GetUserByUsername(string username)
