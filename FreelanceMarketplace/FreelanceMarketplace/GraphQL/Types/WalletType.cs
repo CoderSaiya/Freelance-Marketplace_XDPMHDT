@@ -11,6 +11,7 @@ namespace FreelanceMarketplace.GraphQL.Types
             Field(x => x.WalletId);
             Field(x => x.UserId);
             Field(x => x.Balance);
+
             Field<UserType>("user");
         }
     }

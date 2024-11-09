@@ -2,6 +2,7 @@
 using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Models.DTOs.Req;
 using FreelanceMarketplace.Services.Interfaces;
+using Google.Apis.Drive.v3.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -45,7 +46,7 @@ namespace FreelanceMarketplace.Services
             var wallet = new Wallet
             {
                 UserId = user.Id,
-                Balance = 0.0m
+                Balance = 0
             };
             _context.Wallets.Add(wallet);
             await _context.SaveChangesAsync();

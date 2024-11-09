@@ -38,7 +38,7 @@ namespace FreelanceMarketplace.Models
         public Category? Category { get; set; }
         [Required]
         public int UserId { get; set; }
-        [ForeignKey("Id")]
+        [ForeignKey("UserId")]
         public Users? Users { get; set; }
         public Contracts? Contract { get; set; }
         public ICollection<Apply> Applies { get; set; } = new List<Apply>();

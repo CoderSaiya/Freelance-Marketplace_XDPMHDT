@@ -179,7 +179,10 @@ builder.Services.AddScoped<WalletMutation>();
 
 builder.Services.AddScoped<UserType>();
 builder.Services.AddScoped<RefreshTokenType>();
+
 builder.Services.AddScoped<UserProfileType>();
+builder.Services.AddScoped<UserProfileInputType>();
+
 builder.Services.AddScoped<ProjectType>();
 builder.Services.AddScoped<ContractType>();
 builder.Services.AddScoped<ContractInputType>();

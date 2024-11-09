@@ -19,41 +19,27 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
                 Type = typeof(UserProfileType),
                 Arguments = new QueryArguments(
                     new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "userId" },
-                    new QueryArgument<FloatGraphType> { Name = "rating" },
-                    new QueryArgument<StringGraphType> { Name = "company" },
-                    new QueryArgument<StringGraphType> { Name = "location" },
-                    new QueryArgument<StringGraphType> { Name = "phone" },
-                    new QueryArgument<DateTimeGraphType> { Name = "birthday" },
-                    new QueryArgument<StringGraphType> { Name = "gender" },
-                    new QueryArgument<StringGraphType> { Name = "bio" },
-                    new QueryArgument<StringGraphType> { Name = "skill" },
-                    new QueryArgument<StringGraphType> { Name = "avatar" },
-                    new QueryArgument<StringGraphType> { Name = "industry" }
+                    new QueryArgument<NonNullGraphType<UserProfileInputType>> { Name = "userProfileInput" }
                 ),
                 Resolver = new FuncFieldResolver<object>(async context =>
                 {
+                    Console.WriteLine("hehe");
                     var userId = context.GetArgument<int>("userId");
+                    var input = context.GetArgument<UserProfile>("userProfileInput");
+
                     var userProfile = await userProfileService.GetUserProfileByUserIdAsync(userId);
                     if (userProfile == null) return null;
 
-                    userProfile.Rating = context.GetArgument<float?>("rating") ?? userProfile.Rating;
-                    userProfile.Company = context.GetArgument<string>("company") ?? userProfile.Company;
-                    userProfile.Location = context.GetArgument<string>("location") ?? userProfile.Location;
-                    userProfile.Phone = context.GetArgument<string>("phone") ?? userProfile.Phone;
-                    var birthday = context.GetArgument<DateTime?>("birthday");
-                    if (birthday.HasValue)
-                    {
-                        userProfile.Birthday = birthday.Value.Date;
-                    }
-                    else
-                    {
-                        userProfile.Birthday = userProfile.Birthday;
-                    }
-                    userProfile.Gender = context.GetArgument<string>("gender") ?? userProfile.Gender;
-                    userProfile.Bio = context.GetArgument<string>("bio") ?? userProfile.Bio;
-                    userProfile.Skill = context.GetArgument<string>("skill") ?? userProfile.Skill;
-                    userProfile.Avatar = context.GetArgument<string>("avatar") ?? userProfile.Avatar;
-                    userProfile.Industry = context.GetArgument<string>("industry") ?? userProfile.Industry;
+                    userProfile.Rating = input.Rating;
+                    userProfile.Company = input.Company ?? userProfile.Company;
+                    userProfile.Location = input.Location ?? userProfile.Location;
+                    userProfile.Phone = input.Phone ?? userProfile.Phone;
+                    userProfile.Birthday = input.Birthday ?? userProfile.Birthday;
+                    userProfile.Gender = input.Gender ?? userProfile.Gender;
+                    userProfile.Bio = input.Bio ?? userProfile.Bio;
+                    userProfile.Skill = input.Skill ?? userProfile.Skill;
+                    userProfile.Avatar = input.Avatar ?? userProfile.Avatar;
+                    userProfile.Industry = input.Industry ?? userProfile.Industry;
 
                     return await userProfileService.UpdateUserProfileAsync(userProfile);
                 })
