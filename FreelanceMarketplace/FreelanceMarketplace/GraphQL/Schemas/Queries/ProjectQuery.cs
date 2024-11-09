@@ -39,6 +39,24 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                     }
                 });
 
+            AddField(new FieldType
+            {
+                Name = "projectByClient",
+                Type = typeof(ListGraphType<ProjectType>),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "clientId" }
+                ),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    int clientId = context.GetArgument<int>("clientId");
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var projectService = scope.ServiceProvider.GetRequiredService<IProjectService>();
+                        return await projectService.GetProjectByClientAsync(clientId);
+                    }
+                })
+            }).AuthorizeWith("Client", "Admin");
+
             Field<ListGraphType<ProjectType>>("popularProjects")
                 .ResolveAsync(async context =>
                 {

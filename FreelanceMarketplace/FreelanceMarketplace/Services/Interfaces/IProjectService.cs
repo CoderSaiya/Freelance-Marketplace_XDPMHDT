@@ -5,6 +5,7 @@ namespace FreelanceMarketplace.Services.Interfaces
     public interface IProjectService
     {
         Task<List<Project>> GetAllProjectsAsync();
+        Task<List<Project>> GetProjectByClientAsync(int clientId);
         Task<Project?> GetProjectByIdAsync(int projectId);
         Task<Project> CreateProjectAsync(Project project);
         Task<Project> UpdateProjectAsync(int projectId, Project updatedProject);

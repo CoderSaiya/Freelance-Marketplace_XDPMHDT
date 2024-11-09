@@ -13,7 +13,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
         {
             AddField(new FieldType
             {
-                Name = "applies",
+                Name = "appliesByProjectId",
                 Type = typeof(ListGraphType<ApplyType>),
                 Arguments = new QueryArguments(
                     new QueryArgument<IntGraphType> { Name = "projectId" }
@@ -27,6 +27,38 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                     }
                 })
             }.AuthorizeWith("Freelancer", "Client"));
+
+            AddField(new FieldType
+            {
+                Name = "applies",
+                Type = typeof(ListGraphType<ApplyType>),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var applyService = scope.ServiceProvider.GetRequiredService<IApplyService>();
+                        return await applyService.GetApplyAsync();
+                    }
+                })
+            }.AuthorizeWith("Freelancer", "Client"));
+
+            AddField(new FieldType
+            {
+                Name = "applyByFreelancerId",
+                Type = typeof(ListGraphType<ApplyType>),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "freelancerId" }
+                ),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    int freelancerId = context.GetArgument<int>("freelancerId");
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var applyService = scope.ServiceProvider.GetRequiredService<IApplyService>();
+                        return await applyService.GetApplyByFreelancerIdAsync(freelancerId);
+                    }
+                })
+            }.AuthorizeWith("Freelancer", "Admin"));
 
             AddField(new FieldType
             {

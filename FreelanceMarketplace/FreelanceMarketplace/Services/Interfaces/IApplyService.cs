@@ -6,6 +6,8 @@ namespace FreelanceMarketplace.Services.Interfaces
 {
     public interface IApplyService
     {
+        Task<List<Apply>> GetApplyAsync();
+        Task<List<Apply>> GetApplyByFreelancerIdAsync(int freelancerId);
         Task<Apply> CreateApplyAsync(Apply apply);
         Task<Apply> GetApplyByIdAsync(int applyId);
         Task<IEnumerable<Apply>> GetAppliesForProjectAsync(int projectId);

@@ -32,6 +32,32 @@ namespace FreelanceMarketplace.Services
             }
         }
 
+        public async Task<List<Project>> GetProjectByClientAsync(int clientId)
+        {
+            try
+            {
+                var project = await _context.Projects
+                    .Include(p => p.Category)
+                    .Include(p => p.Applies)
+                        .ThenInclude(a => a.Freelancer)
+                        .ThenInclude(f => f.UserProfile)
+                    .Include(p => p.Contract)
+                    .Include(p => p.Images)
+                    .Include(p => p.Users)
+                    .Where(p => p.UserId == clientId)
+                    .ToListAsync();
+
+                if (project == null)
+                    throw new KeyNotFoundException("Project not found");
+
+                return project;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving project with Client ID {clientId}", ex);
+            }
+        }
+
         public async Task<Project?> GetProjectByIdAsync(int projectId)
         {
             try
@@ -88,7 +114,7 @@ namespace FreelanceMarketplace.Services
 
                 _context.Projects.Update(existingProject);
                 await _context.SaveChangesAsync();
-                return existingProject; 
+                return existingProject;
             }
             catch (Exception ex)
             {

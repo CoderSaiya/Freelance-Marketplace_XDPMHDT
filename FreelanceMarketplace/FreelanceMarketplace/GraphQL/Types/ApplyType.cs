@@ -14,6 +14,7 @@ namespace FreelanceMarketplace.GraphQL.Types
             Field(x => x.Duration);
             Field(x => x.Status);
             Field(x => x.CreateAt);
+
             Field<UserType>("freelancer");
             Field<UserType>("client");
             Field<ProjectType>("project");
