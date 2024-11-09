@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useGetProjectQuery } from "../../apis/graphqlApi";
+import React, { useEffect, useState } from "react";
+import { useGetCategoryQuery, useGetProjectQuery } from "../../apis/graphqlApi";
 import ProjectCard from "./ProjectCard";
 import FilterColumn from "./FilterColumn"; // Import the new component
 import Breadcrumb from "../Public/Breadcrumb";
@@ -28,6 +28,22 @@ const FilterPage = () => {
     { name: "Projects", link: "" },
   ];
 
+  const { data: categoryData } = useGetCategoryQuery();
+  const categories = categoryData?.data.categories;
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const category = searchParams.get("category");
+    const budget = searchParams.get("budget");
+    const deliveryTime = searchParams.get("deliveryTime");
+
+    setFilters({
+      categories: category ? [category] : [],
+      priceRange: budget ? [0, parseInt(budget)] : [0, 1000],
+      deliveryTime: deliveryTime || "Anytime",
+    });
+  }, [location.search]);
+
   const { data, error, isLoading } = useGetProjectQuery();
 
   const projects =
@@ -41,29 +57,30 @@ const FilterPage = () => {
         avatar: project.imageUrls[0], // Use the first image as avatar
       },
       category: project.category.categoryName,
+      categoryId: project.category.categoryId,
       deadline: calculateDeadline(15), // Adjust as needed
     })) || [];
 
-  const handleFilterChange = (filter: keyof Filters, value: string | number[]): void => {
+  const handleFilterChange = (
+    filter: keyof Filters,
+    value: string | number[]
+  ): void => {
     setFilters((prevFilters) => ({
       ...prevFilters,
       [filter]: value,
     }));
   };
 
-  const handleCategoryChange = (category: string): void => {
+  const handleCategoryChange = (categoryId: number): void => {
+    const categoryIdStr = categoryId.toString();
     const currentCategories = filters.categories;
-    if (currentCategories.includes(category)) {
-      setFilters({
-        ...filters,
-        categories: currentCategories.filter((cat) => cat !== category),
-      });
-    } else {
-      setFilters({
-        ...filters,
-        categories: [...currentCategories, category],
-      });
-    }
+    
+    setFilters({
+      ...filters,
+      categories: currentCategories.includes(categoryIdStr)
+        ? currentCategories.filter((id) => id !== categoryIdStr)
+        : [...currentCategories, categoryIdStr],
+    });
   };
 
   const getDaysFromDeliveryTime = (): number => {
@@ -97,7 +114,7 @@ const FilterPage = () => {
     const matchesDeadline = filterByDeadline(project.deadline);
     const matchesCategory =
       filters.categories.length > 0
-        ? filters.categories.includes(project.category)
+        ? filters.categories.includes(String(project.categoryId))
         : true;
     return inPriceRange && matchesDeadline && matchesCategory;
   });
@@ -115,6 +132,7 @@ const FilterPage = () => {
         filters={filters}
         handleFilterChange={handleFilterChange}
         handleCategoryChange={handleCategoryChange}
+        categories={categories || []}
       />
 
       {/* Project List */}

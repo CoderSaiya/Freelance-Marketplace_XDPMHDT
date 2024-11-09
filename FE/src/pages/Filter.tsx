@@ -1,7 +1,7 @@
 import React from 'react';
 import Form from '../components/Filter/Form';
 
-const Login: React.FC = () => {
+const Filter: React.FC = () => {
 
 return (
     <div>
@@ -10,4 +10,4 @@ return (
   );
 };
 
-export default Login;
+export default Filter;

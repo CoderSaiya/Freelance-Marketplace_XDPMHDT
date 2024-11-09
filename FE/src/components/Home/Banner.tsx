@@ -1,10 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import Gradient from "./Gradient";
 import { useGetCategoryQuery } from "../../apis/graphqlApi";
+import { useNavigate } from "react-router-dom";
 
 const Banner: React.FC = () => {
+  const [category, setCategory] = useState("");
+  const [budget, setBudget] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
+
+  const navigate = useNavigate();
+
   const { data } = useGetCategoryQuery();
-  const categories = data?.data.categories; 
+  const categories = data?.data.categories;
+
+  const handleSearch = () => {
+    const queryParams = new URLSearchParams();
+    if (category) queryParams.append("category", category);
+    if (budget) queryParams.append("budget", budget);
+    if (deliveryDate) queryParams.append("deliveryTime", deliveryDate);
+
+    navigate(`/filter?${queryParams.toString()}`);
+  };
   return (
     <div className="relative h-screen w-full overflow-hidden">
       {/* Animated Background */}
@@ -68,6 +84,7 @@ const Banner: React.FC = () => {
                   <select
                     className="col-span-2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                     defaultValue=""
+                    onChange={(e) => setCategory(e.target.value)}
                   >
                     <option value="" disabled>
                       Category
@@ -85,15 +102,20 @@ const Banner: React.FC = () => {
                     type="number"
                     placeholder="Budget"
                     className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    onChange={(e) => setBudget(e.target.value)}
                   />
                   <input
                     type="date"
                     placeholder=""
                     className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    onChange={(e) => setDeliveryDate(e.target.value)}
                   />
                 </div>
 
-                <button className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition-colors">
+                <button
+                  className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition-colors"
+                  onClick={handleSearch}
+                >
                   Search
                 </button>
               </div>

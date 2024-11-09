@@ -1,4 +1,5 @@
 import React from 'react';
+import { CategoryType } from '../../types/CategoryType';
 
 interface Filters {
   categories: string[];
@@ -9,13 +10,15 @@ interface Filters {
 interface FilterColumnProps {
   filters: Filters;
   handleFilterChange: (filter: keyof Filters, value: string | number[]) => void;
-  handleCategoryChange: (category: string) => void;
+  handleCategoryChange: (categoryId: number) => void;
+  categories: CategoryType[];
 }
 
 const FilterColumn: React.FC<FilterColumnProps> = ({
   filters,
   handleFilterChange,
   handleCategoryChange,
+  categories,
 }) => {
   return (
     <div
@@ -34,15 +37,15 @@ const FilterColumn: React.FC<FilterColumnProps> = ({
       {/* Category Filter */}
       <div className="mb-6">
         <h3 className="font-semibold text-gray-700">Category</h3>
-        {['Web Development', 'Graphic Design', 'Mobile Development', 'Content Writing'].map((category) => (
-          <label className="block mt-2" key={category}>
+        {categories.map((category) => (
+          <label className="block mt-2" key={category.categoryId}>
             <input
               type="checkbox"
-              value={category}
-              checked={filters.categories.includes(category)}
-              onChange={() => handleCategoryChange(category)}
+              value={category.categoryId}
+              checked={filters.categories.includes(category.categoryId.toString())}
+              onChange={() => handleCategoryChange(category.categoryId)}
             />{' '}
-            {category}
+            {category.categoryName}
           </label>
         ))}
       </div>
