@@ -1,3 +1,4 @@
+import { ApplyType } from "./ApplyType";
 import { CategoryType } from "./CategoryType";
 import { User } from "./UserType";
 
@@ -13,8 +14,10 @@ export interface ProjectType {
     deadline: string;
     skillRequire: string;
     status: string;
+    createAt: string;
     users?: User;
     category?: CategoryType;
+    applies: ApplyType[]
 }
 
 export interface ProjectInput {

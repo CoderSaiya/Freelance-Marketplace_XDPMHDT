@@ -1,3 +1,4 @@
+import path from "path"
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
@@ -9,7 +10,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      'apollo-upload-client': 'apollo-upload-client/public/index.js',
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 })

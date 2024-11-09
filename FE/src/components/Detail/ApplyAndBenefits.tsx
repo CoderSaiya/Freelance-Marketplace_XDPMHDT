@@ -6,6 +6,7 @@ import {
 import { ApplyInput } from "../../types/ApplyType";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import { notification } from "antd";
 
 interface Props {
   clientId: number;
@@ -19,7 +20,7 @@ const ApplyAndBenefits: React.FC<Props> = ({ clientId, projectId }) => {
 
   const userId = useSelector((state: RootState) => state.auth.userId);
 
-  const { data } = useHasAppliedForProjectQuery({
+  const { data, refetch } = useHasAppliedForProjectQuery({
     projectId: projectId,
     freelancerId: Number(userId),
   });
@@ -38,8 +39,11 @@ const ApplyAndBenefits: React.FC<Props> = ({ clientId, projectId }) => {
 
     console.log(apply);
     try {
-      const response = await createApply({ apply }).unwrap();
-      console.log("Apply response:", response);
+      await createApply({ apply }).unwrap();
+      refetch();
+      notification.success({
+        message: "Sucessfully apply!!!"
+      })
     } catch (err) {
       console.error("Error applying:", err);
     }

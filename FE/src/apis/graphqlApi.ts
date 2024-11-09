@@ -204,6 +204,105 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    projectByClient: builder.query<ResponseType<{ projectByClient: ProjectType[] }>, number>({
+      query: (clientId) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query getProjectByClientId($clientId: Int!) {
+              projectByClient(clientId: $clientId) {
+                projectId
+                projectName
+                projectDescription
+                budget
+                deadline
+                skillRequire
+                status
+                createAt
+                category {
+                  categoryId
+                  categoryName
+                }
+                imageUrls
+                users {
+                  id
+                  username
+                  createAt
+                }
+                applies {
+                  applyId
+                  status
+                  freelancer {
+                    username
+                    createAt
+                    email
+                    userProfile {
+                      rating
+                      phone
+                    }
+                  }
+                }
+              }
+            }
+          `,
+          variables: { clientId },
+        },
+      }),
+    }),
+    getApplies: builder.query<ResponseType<{ applies: ApplyType[] }>, void>({
+      query: () => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query {
+              applies {
+                applyId
+                freelancerId
+                projectId
+                duration
+                status
+                freelancer {
+                  username
+                }
+                client {
+                  username
+                }
+              }
+            }
+          `,
+        },
+      }),
+    }),
+    getApplyByFreelancer: builder.query<ResponseType<{ applyByFreelancerId: ApplyType[] }>, number>({
+      query: (freelancerId) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query getApplyByFreelancer($freelancerId : Int!) {
+              applyByFreelancerId(freelancerId : $freelancerId) {
+                applyId
+                freelancerId
+                projectId
+                duration
+                status
+                createAt
+                freelancer {
+                  username
+                }
+                project {
+                  projectName
+                  budget
+                }
+              }
+            }
+          `,
+          variables: { freelancerId },
+        },
+      }),
+    }),
     createApply: builder.mutation<ResponseType<{ createApply: ApplyType }>, { apply: ApplyInput }>({
       query: ({ apply }) => ({
         url: 'graphql',
@@ -350,4 +449,4 @@ export const graphqlApi = createApi({
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery, useUpdateWalletBalanceMutation, useGetCategoryQuery, useUserByIdQuery, useUpdateUserProfileMutation } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useGetApplyByFreelancerQuery, useProjectByIdQuery, useProjectByClientQuery, useGetAppliesQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery, useUpdateWalletBalanceMutation, useGetCategoryQuery, useUserByIdQuery, useUpdateUserProfileMutation } = graphqlApi;
