@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useGetProjectQuery } from "../../apis/graphqlApi";
 import ProjectCard from "./ProjectCard";
 import FilterColumn from "./FilterColumn"; // Import the new component
+import Breadcrumb from "../Public/Breadcrumb";
 
 const calculateDeadline = (days: number): string => {
   const currentDate = new Date();
@@ -21,6 +22,11 @@ const FilterPage = () => {
     priceRange: [0, 1000],
     deliveryTime: "Anytime",
   });
+
+  const breadcrumbItems = [
+    { name: "Home", link: "/" },
+    { name: "Projects", link: "" },
+  ];
 
   const { data, error, isLoading } = useGetProjectQuery();
 
@@ -101,6 +107,9 @@ const FilterPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8 flex">
+      {/* Breadcrumb */}
+      <Breadcrumb items={breadcrumbItems} />
+
       {/* Filter Column */}
       <FilterColumn
         filters={filters}

@@ -4,7 +4,7 @@ import { useGetCategoryQuery } from "../../apis/graphqlApi";
 
 const Banner: React.FC = () => {
   const { data } = useGetCategoryQuery();
-  const categories = data?.data.categories;
+  const categories = data?.data.categories; 
   return (
     <div className="relative h-screen w-full overflow-hidden">
       {/* Animated Background */}

@@ -8,6 +8,7 @@ import { jwtDecode } from "jwt-decode";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { useUserByIdQuery } from "../apis/graphqlApi";
+import Breadcrumb from "../components/Public/Breadcrumb";
 
 const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState("About");
@@ -36,6 +37,11 @@ const Profile: React.FC = () => {
     avatar: profile?.avatar || "Not add",
     industry: profile?.Industry || "Not add"
   });
+
+  const breadcrumbItems = [
+    { name: "Home", link: "/" },
+    { name: "Profile", link: "" },
+  ];
 
   const getRoleFromToken = () => {
     const token = localStorage.getItem("access_token");
@@ -83,6 +89,9 @@ const Profile: React.FC = () => {
 
   return (
     <div className="container mx-auto py-8 px-6">
+      {/* Breadcrumb */}
+      <Breadcrumb items={breadcrumbItems} />
+
       <ProfileHeader isEditing={isEditing} setIsEditing={setIsEditing} contactInfo={contactInfo} userId={Number(userId)} username={username}/>
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
       {/* Content */}

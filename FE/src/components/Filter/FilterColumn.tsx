@@ -25,7 +25,7 @@ const FilterColumn: React.FC<FilterColumnProps> = ({
         width: '250px',
         height: 'calc(100vh - 80px)',
         overflowY: 'auto',
-        top: '80px',
+        top: '150px',
         left: 0,
       }}
     >
