@@ -20,7 +20,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   const userId = useSelector((state: RootState) => state.auth.userId);
-  const { data } = useGetWalletQuery(Number(userId));
+  const { data, refetch } = useGetWalletQuery(Number(userId));
 
   const handleMouseEnter = () => {
     if (timeoutId) {
@@ -148,7 +148,7 @@ const Navbar: React.FC = () => {
       {/* Add Funds Modal */}
       {isAddFundsModalOpen && (
         <Elements stripe={stripePromise}>
-          <AddFundsModal onClose={closeAddFundsModal} />
+          <AddFundsModal onClose={closeAddFundsModal} refetch={refetch} />
         </Elements>
       )}
     </nav>

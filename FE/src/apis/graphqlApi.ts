@@ -52,6 +52,8 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
   //   return result;
   // }
 
+  console.log(result);
+
   const responseData: GraphQLResponse<any> = result.data as GraphQLResponse<any>;
 
   console.log(responseData);
@@ -270,6 +272,22 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    updateWalletBalance: builder.mutation<ResponseType<{ updateWalletBalance: WalletType }>, { userId: number; amount: number }>({
+      query: ({ userId, amount }) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            mutation UpdateWalletBalance($userId: Int!, $amount: Decimal!) {
+              updateWalletBalance(userId: $userId, amount: $amount) {
+                walletId
+              }
+            }
+          `,
+          variables: { userId, amount },
+        },
+      }),
+    }),
     getCategory: builder.query<ResponseType<{ categories: CategoryType[] }>, void>({
       query: () => ({
         url: 'graphql',
@@ -332,4 +350,4 @@ export const graphqlApi = createApi({
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery, useGetCategoryQuery, useUserByIdQuery, useUpdateUserProfileMutation } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useProjectByIdQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery, useUpdateWalletBalanceMutation, useGetCategoryQuery, useUserByIdQuery, useUpdateUserProfileMutation } = graphqlApi;

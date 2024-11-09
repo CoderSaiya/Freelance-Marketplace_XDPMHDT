@@ -8,9 +8,14 @@ import {
 } from "@stripe/react-stripe-js";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import { useStripePaymentMutation } from "../../apis/restfulApi";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { useUpdateWalletBalanceMutation } from "../../apis/graphqlApi";
+import { notification } from "antd";
 
 interface AddFundsModalProps {
   onClose: () => void;
+  refetch: () => void;
 }
 
 const CARD_ELEMENT_OPTIONS = {
@@ -31,7 +36,7 @@ const CARD_ELEMENT_OPTIONS = {
   },
 };
 
-const AddFundsModal: React.FC<AddFundsModalProps> = ({ onClose }) => {
+const AddFundsModal: React.FC<AddFundsModalProps> = ({ onClose, refetch }) => {
   const stripe = useStripe();
   const elements = useElements();
   const [amount, setAmount] = useState("0");
@@ -42,8 +47,13 @@ const AddFundsModal: React.FC<AddFundsModalProps> = ({ onClose }) => {
     cardCvc: "",
   });
   const [cardholderName, setCardholderName] = useState("");
+  const processingFee: number = 0.99;
+  const totalAmount = parseFloat(amount || "0") + processingFee;
 
   const [stripePayment] = useStripePaymentMutation();
+  const [updateWalletBalance] = useUpdateWalletBalanceMutation();
+
+  const userId = useSelector((state: RootState) => state.auth.userId);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9.]/g, "");
@@ -62,17 +72,9 @@ const AddFundsModal: React.FC<AddFundsModalProps> = ({ onClose }) => {
 
     try {
       // Step 1: Request PaymentIntent from the server with total amount
-      const token = localStorage.getItem("access_token")?.toString();
-
-      const decoded = parseJwt(token);
-      const userId =
-        decoded[
-          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-        ];
-
       const response = await stripePayment({
-        amount: parseFloat(amount),
-        userId: userId,
+        amount: totalAmount,
+        userId: Number(userId),
       }).unwrap();
 
       const { clientSecret } = await response;
@@ -97,6 +99,16 @@ const AddFundsModal: React.FC<AddFundsModalProps> = ({ onClose }) => {
         }));
       } else if (paymentIntent && paymentIntent.status === "succeeded") {
         console.log("Payment successful!", paymentIntent);
+        await updateWalletBalance({
+          userId: Number(userId),
+          amount: Number(amount),
+        }).unwrap();
+        refetch();
+
+        notification.success({
+          message: "Sucessfully add funds!!!",
+        });
+
         onClose();
       }
     } catch (err) {
@@ -113,25 +125,6 @@ const AddFundsModal: React.FC<AddFundsModalProps> = ({ onClose }) => {
       onClose();
     }
   };
-
-  const processingFee = 0.99;
-  const totalAmount = parseFloat(amount || "0") + processingFee;
-
-  function parseJwt(token: string) {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split("")
-        .map(function (c) {
-          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-        })
-        .join("")
-    );
-
-    return JSON.parse(jsonPayload);
-  }
-
   return (
     <div
       className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"

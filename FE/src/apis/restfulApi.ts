@@ -36,44 +36,67 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
   await mutex.waitForUnlock();
   let result = await baseQuery(args, api, extraOptions);
 
-  if (result.error && result.error.status === 401) { 
-    console.log('401 error detected, attempting token refresh.');
+  // Handle 401 Unauthorized with non-JSON response
+  if (result.error) {
+    const isParsingError = result.error.status === 'PARSING_ERROR';
+    const isUnauthorized = result.error.originalStatus === 401;
 
-    if (!mutex.isLocked()) {
-      const release = await mutex.acquire();
-      try {
-        const refreshToken = localStorage.getItem('refresh');
-        if (refreshToken) {
-          const refreshResult = await api.dispatch(
-            restfulApi.endpoints.refreshToken.initiate({ accessToken: localStorage.getItem('access_token'), refreshToken })
-          ).unwrap();
+    if (isParsingError && isUnauthorized) {
+      // If response is plain text Unauthorized, handle it without parsing
+      if (!mutex.isLocked()) {
+        const release = await mutex.acquire();
 
-          const newAccessToken = refreshResult.data.accessToken;
-          const newRefreshToken = refreshResult.data.refreshToken;
+        try {
+          const refreshToken = localStorage.getItem('refresh');
+          const accessToken = localStorage.getItem('access_token');
 
-          if (newAccessToken && newRefreshToken) {
-            api.dispatch(setTokens({ accessToken: newAccessToken, refreshToken: newRefreshToken }));
-            localStorage.setItem('access_token', newAccessToken);
-            localStorage.setItem('refresh', newRefreshToken);
+          if (!refreshToken || !accessToken) {
+            api.dispatch(logout());
+            return result;
+          }
 
-            // Retry the original query with the new token
+          const refreshResult = await baseQuery(
+            {
+              url: 'Auth/refresh-token',
+              method: 'POST',
+              body: {
+                accessToken,
+                refreshToken,
+              },
+            },
+            api,
+            extraOptions
+          );
+
+          if (refreshResult.data) {
+            const data = refreshResult.data as { accessToken: string; refreshToken: string };
+            localStorage.setItem('access_token', data.accessToken);
+            localStorage.setItem('refresh', data.refreshToken);
+            api.dispatch(setTokens({
+              accessToken: data.accessToken,
+              refreshToken: data.refreshToken,
+            }));
+
+            // Retry the original request with the new token
             result = await baseQuery(args, api, extraOptions);
           } else {
-            api.dispatch(logout());
+            // api.dispatch(logout());
           }
+        } finally {
+          release();
         }
-      } finally {
-        release();
+      } else {
+        await mutex.waitForUnlock();
+        result = await baseQuery(args, api, extraOptions);
       }
-    } else {
-      await mutex.waitForUnlock();
-      result = await baseQuery(args, api, extraOptions);
+    } else if (result.error.status === 401) {
+      // If it's a regular 401 error, proceed with re-authentication flow
+      api.dispatch(logout());
     }
   }
 
   return result;
 };
-
 
 // Create the API
 export const restfulApi = createApi({
