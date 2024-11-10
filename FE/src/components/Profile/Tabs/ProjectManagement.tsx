@@ -241,9 +241,7 @@ const ProjectManagementTab = ({ role }: { role: string }) => {
                                   <h3 className="text-lg font-semibold">
                                     {apply.freelancer.username}
                                   </h3>
-                                  <p className="text-gray-600">
-                                    abc
-                                  </p>
+                                  <p className="text-gray-600">abc</p>
                                 </div>
                                 <div className="flex items-center gap-2">
                                   <Badge
@@ -283,7 +281,8 @@ const ProjectManagementTab = ({ role }: { role: string }) => {
                                 </div>
                                 <div className="flex items-center gap-2 text-gray-600">
                                   <Star className="w-4 h-4" />
-                                  Rating: {apply.freelancer.userProfile.rating || "N/A"}
+                                  Rating: {apply.freelancer.userProfile.rating}
+                                  /5
                                 </div>
                                 <div className="flex items-center gap-2 text-gray-600">
                                   <Mail className="w-4 h-4" />

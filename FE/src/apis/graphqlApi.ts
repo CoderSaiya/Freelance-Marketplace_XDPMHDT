@@ -233,6 +233,7 @@ export const graphqlApi = createApi({
                 applies {
                   applyId
                   status
+                  createAt
                   freelancer {
                     username
                     createAt
@@ -429,6 +430,32 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    userByUsername: builder.query<ResponseType<{ userByUsername: User }>, string>({
+      query: (username) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query getUserById($username: String!) {
+              userByUsername(username: $username) {
+                id
+                username
+                email
+                userProfile {
+                  rating
+                  company
+                  phone
+                  birthday
+                  gender
+                  location
+                }
+              }
+            }
+          `,
+          variables: { username },
+        },
+      }),
+    }),
     updateUserProfile: builder.mutation<ResponseType<{ updateUserProfile: UserProfileType }>, { userId: number; userProfileInput: UserProfileInput }>({
       query: ({ userId, userProfileInput }) => ({
         url: 'graphql',
@@ -449,4 +476,4 @@ export const graphqlApi = createApi({
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery, useGetApplyByFreelancerQuery, useProjectByIdQuery, useProjectByClientQuery, useGetAppliesQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery, useUpdateWalletBalanceMutation, useGetCategoryQuery, useUserByIdQuery, useUpdateUserProfileMutation } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useGetApplyByFreelancerQuery, useProjectByIdQuery, useProjectByClientQuery, useGetAppliesQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery, useUpdateWalletBalanceMutation, useGetCategoryQuery, useUserByIdQuery,useUserByUsernameQuery, useUpdateUserProfileMutation } = graphqlApi;

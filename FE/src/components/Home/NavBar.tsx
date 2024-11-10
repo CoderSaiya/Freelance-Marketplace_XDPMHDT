@@ -20,6 +20,7 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   const userId = useSelector((state: RootState) => state.auth.userId);
+  const username = useSelector((state: RootState) => state.auth.username);
   const { data, refetch } = useGetWalletQuery(Number(userId));
 
   const handleMouseEnter = () => {
@@ -120,7 +121,7 @@ const Navbar: React.FC = () => {
                 }`}
               >
                 <Link
-                  to="/profile"
+                  to={`/profile?username=${username}`}
                   className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
                 >
                   Profile

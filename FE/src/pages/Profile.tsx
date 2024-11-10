@@ -5,23 +5,29 @@ import TimelineTab from "../components/Profile/Tabs/TimelineTab";
 import AboutTab from "../components/Profile/Tabs/AboutTab";
 import ProjectManagementTab from "../components/Profile/Tabs/ProjectManagement";
 import { jwtDecode } from "jwt-decode";
-import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
-import { useUserByIdQuery } from "../apis/graphqlApi";
+import { useUserByUsernameQuery } from "../apis/graphqlApi";
 import Breadcrumb from "../components/Public/Breadcrumb";
+import { useNavigate } from "react-router-dom";
 
 const Profile: React.FC = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const usernameParam = urlParams.get("username");
+  const navigate = useNavigate();
+
+  if (usernameParam === null) {
+    navigate("/");
+  }
+
   const [activeTab, setActiveTab] = useState("About");
   const [isEditing, setIsEditing] = useState(false);
   const [role, setRole] = useState<string | null>(null);
 
-  const userId = useSelector((state: RootState) => state.auth.userId);
+  const { data, refetch } = useUserByUsernameQuery(String(usernameParam));
 
-  const { data, refetch } = useUserByIdQuery(Number(userId));
-
-  const email = data?.data.userById.email;
-  const profile = data?.data.userById.userProfile;
-  const username = data?.data.userById.username || "";
+  const userId = data?.data.userByUsername.id;
+  const email = data?.data.userByUsername.email;
+  const profile = data?.data.userByUsername.userProfile;
+  const username = data?.data.userByUsername.username || "";
 
   const [contactInfo, setContactInfo] = useState({
     phone: profile?.phone || "Not add",
