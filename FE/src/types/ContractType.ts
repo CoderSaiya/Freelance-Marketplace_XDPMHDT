@@ -4,7 +4,8 @@ export interface Contract {
     clientId: number;
     freelancerId: number;
     paymentAmount: number;
-    status: 'Active' | 'Completed' | 'Disputed';
+    status: 'Pending' | 'Completed' | 'Disputed';
     startDate: string;
     endDate: string;
+    filePath: string;
 }

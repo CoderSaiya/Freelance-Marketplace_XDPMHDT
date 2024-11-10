@@ -8,6 +8,7 @@ import { ResponseType } from '../types';
 import { WalletType } from '../types/WalletType';
 import { CategoryType } from '../types/CategoryType';
 import { User, UserProfileInput, UserProfileType } from '../types/UserType';
+import { Contract } from '@/types/ContractType';
 
 interface GraphQLError {
   message: string;
@@ -129,7 +130,7 @@ export const graphqlApi = createApi({
                   categoryId
                   categoryName
                 }
-                user {
+                users {
                   id
                   username
                 }
@@ -352,6 +353,20 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    acceptApply: builder.mutation<ResponseType<{ acceptApply: boolean }>, number>({
+      query: (applyId) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            mutation AcceptApply($applyId: Int!) {
+              acceptApply(applyId: $applyId)
+            }
+          `,
+          variables: { applyId },
+        },
+      }),
+    }),
     getWallet: builder.query<ResponseType<{ getWallet: WalletType }>, number>({
       query: (userId) => ({
         url: 'graphql',
@@ -473,7 +488,39 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    updateURLFileContract: builder.mutation<ResponseType<{ updateURLFileContract: Contract }>, { freelanceId: number; projectId: number; url: string }>({
+      query: ({ freelanceId, projectId, url }) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            mutation UpdateURLFileContract($freelanceId: Int!, $projectId: Int!, $url: String!) {
+              updateURLFileContract(freelanceId: $freelanceId, projectId: $projectId, url: $url) {
+                filePath
+              } 
+            } 
+            `,
+          variables: { freelanceId, projectId, url },
+        },
+      }),
+    }),
+    contractByProjectId: builder.mutation<ResponseType<{ contractByProjectId: Contract }>, number>({
+      query: (projectId) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            mutation GetContractByProjectId($projectId: Int!) {
+              contractByProjectId(projectId: $projectId) {
+                filePath
+              }
+            }
+          `,
+          variables: { projectId },
+        },
+      }),
+    }),
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery, useGetApplyByFreelancerQuery, useProjectByIdQuery, useProjectByClientQuery, useGetAppliesQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useGetWalletQuery, useUpdateWalletBalanceMutation, useGetCategoryQuery, useUserByIdQuery,useUserByUsernameQuery, useUpdateUserProfileMutation } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useGetApplyByFreelancerQuery, useProjectByIdQuery, useProjectByClientQuery, useGetAppliesQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useAcceptApplyMutation, useGetWalletQuery, useUpdateWalletBalanceMutation, useGetCategoryQuery, useUserByIdQuery, useUserByUsernameQuery, useUpdateUserProfileMutation, useUpdateURLFileContractMutation, useContractByProjectIdMutation } = graphqlApi;

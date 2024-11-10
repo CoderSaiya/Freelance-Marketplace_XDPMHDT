@@ -142,7 +142,7 @@ export const restfulApi = createApi({
         body: tokens,
       }),
     }),
-    uploadImg: builder.mutation<{ ImageUrl: string }, FormData>({
+    uploadImg: builder.mutation<{ imageUrl: string }, FormData>({
       query: (formData) => ({
         url: 'Img',
         method: 'POST',

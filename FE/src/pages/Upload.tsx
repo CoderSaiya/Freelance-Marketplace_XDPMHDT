@@ -138,6 +138,7 @@ const Upload: React.FC = () => {
             "projectId",
             createResponse.data.createProject.projectId.toString()
           );
+          formDataImg.append("mimeType", "image/jpeg");
           await uploadImg(formDataImg).unwrap();
           setLoading(false);
           notification.success({
