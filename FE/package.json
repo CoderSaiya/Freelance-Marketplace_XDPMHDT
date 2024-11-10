@@ -12,6 +12,7 @@
   "dependencies": {
     "@agney/react-loading": "^0.1.2",
     "@ant-design/icons": "^5.5.1",
+    "@emotion/styled": "^11.13.0",
     "@fortawesome/free-solid-svg-icons": "^6.6.0",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@microsoft/signalr": "^8.0.7",

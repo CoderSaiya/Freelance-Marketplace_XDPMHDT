@@ -1,7 +1,7 @@
 export interface RouteType {
   path: string;
   component: React.FC;
-  layout?: React.FC;
+  layout?: React.FC<{ children: React.ReactNode }>;
 }
 
 export interface BreadcrumbItem {

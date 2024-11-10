@@ -3,9 +3,149 @@ import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import Banner from "../components/Home/Banner";
 import Propose from "../components/Home/Propose";
-import Footer from "../components/Home/Footer";
-import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
+import styled from "@emotion/styled";
+
+interface Sponsor {
+  id: number;
+  name: string;
+  logo: string;
+}
+
+const ScrollContainer = styled.div`
+  position: relative;
+  padding: 2.5rem 0;
+  background: rgb(249 250 251);
+  overflow: hidden;
+`;
+
+const ScrollTrack = styled.div`
+  display: flex;
+  width: fit-content;
+  gap: 2rem;
+  padding: 1rem 0;
+`;
+
+const ScrollContent = styled(motion.div)`
+  display: flex;
+  gap: 2rem;
+  flex-shrink: 0;
+`;
+
+const sponsors: Sponsor[] = [
+  {
+    id: 1,
+    name: "UTH",
+    logo: "https://tuyensinh.ut.edu.vn/wp-content/uploads/2022/07/logo-full.png",
+  },
+  {
+    id: 2,
+    name: "GCP",
+    logo: "https://static-00.iconduck.com/assets.00/google-cloud-icon-2048x1646-7admxejz.png",
+  },
+  {
+    id: 3,
+    name: "npm",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/d/db/Npm-logo.svg",
+  },
+  {
+    id: 4,
+    name: "React",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/React-icon.svg/1200px-React-icon.svg.png",
+  },
+  {
+    id: 5,
+    name: "Microsolf",
+    logo: "https://blogs.microsoft.com/wp-content/uploads/prod/2012/08/8867.Microsoft_5F00_Logo_2D00_for_2D00_screen.jpg",
+  },
+  {
+    id: 6,
+    name: ".NET Core",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/.NET_Core_Logo.svg/2048px-.NET_Core_Logo.svg.png",
+  },
+  {
+    id: 7,
+    name: "Vite",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Vitejs-logo.svg/2078px-Vitejs-logo.svg.png",
+  },
+  { id: 8, name: "Huy Gà", logo: "img/huyga.png" },
+];
+
+const InfiniteScroll: React.FC = () => {
+  const duplicatedSponsors = [...sponsors, ...sponsors, ...sponsors];
+  return (
+    <ScrollContainer className="select-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-semibold text-gray-900">
+            Thanks for supported
+          </h2>
+        </div>
+      </div>
+
+      {/* First Row - Moving Left */}
+      <ScrollTrack>
+        <ScrollContent
+          animate={{
+            x: [0, -50 * sponsors.length],
+          }}
+          transition={{
+            x: {
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear",
+              repeatType: "loop",
+            },
+          }}
+          className="flex"
+        >
+          {duplicatedSponsors.map((sponsor, idx) => (
+            <div
+              key={`${sponsor.id}-${idx}`}
+              className="flex-shrink-0 h-20 flex items-center justify-center bg-white rounded-lg shadow-sm px-8 hover:shadow-md transition-shadow duration-300"
+            >
+              <img
+                src={sponsor.logo}
+                alt={sponsor.name}
+                className="h-12 w-auto transform hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+          ))}
+        </ScrollContent>
+      </ScrollTrack>
+
+      {/* Second Row - Moving Right */}
+      <ScrollTrack className="mt-8">
+        <ScrollContent
+          animate={{
+            x: [-50 * sponsors.length, 0],
+          }}
+          transition={{
+            x: {
+              duration: 20,
+              repeat: Infinity,
+              ease: "linear",
+              repeatType: "loop",
+            },
+          }}
+          className="flex"
+        >
+          {duplicatedSponsors.map((sponsor, idx) => (
+            <div
+              key={`${sponsor.id}-${idx}-reverse`}
+              className="flex-shrink-0 h-20 flex items-center justify-center bg-white rounded-lg shadow-sm px-8 hover:shadow-md transition-shadow duration-300"
+            >
+              <img
+                src={sponsor.logo}
+                alt={sponsor.name}
+                className="h-12 w-auto transform hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+          ))}
+        </ScrollContent>
+      </ScrollTrack>
+    </ScrollContainer>
+  );
+};
 
 const AnimatedSection: React.FC<{
   children: React.ReactNode;
@@ -14,7 +154,7 @@ const AnimatedSection: React.FC<{
   const [ref, inView] = useInView({
     threshold: 0.1,
     triggerOnce: false,
-    rootMargin: "-50px 0px"
+    rootMargin: "-50px 0px",
   });
 
   return (
@@ -27,7 +167,7 @@ const AnimatedSection: React.FC<{
       }}
       transition={{
         duration: 0.6,
-        ease: "easeOut"
+        ease: "easeOut",
       }}
       className="relative w-full"
     >
@@ -48,11 +188,7 @@ const ParallaxSection: React.FC<{
     restDelta: 0.001,
   });
 
-  return (
-    <motion.div style={{ y: smoothY }}>
-      {children}
-    </motion.div>
-  );
+  return <motion.div style={{ y: smoothY }}>{children}</motion.div>;
 };
 
 const ScrollToTopButton: React.FC = () => {
@@ -79,7 +215,7 @@ const ScrollToTopButton: React.FC = () => {
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M18 15l-6-6-6 6"/>
+        <path d="M18 15l-6-6-6 6" />
       </svg>
     </motion.button>
   );
@@ -87,7 +223,7 @@ const ScrollToTopButton: React.FC = () => {
 
 const Home: React.FC = () => {
   const { scrollYProgress } = useScroll();
-  
+
   // Smooth scroll progress animation
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -117,7 +253,7 @@ const Home: React.FC = () => {
         </AnimatedSection>
 
         <AnimatedSection yOffset={30}>
-          <Footer />
+          <InfiniteScroll />
         </AnimatedSection>
       </div>
 

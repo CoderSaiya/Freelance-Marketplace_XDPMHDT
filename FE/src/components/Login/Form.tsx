@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   useLoginUserMutation,
   useLoginGoogleMutation,
@@ -46,14 +46,32 @@ const Form: React.FC = () => {
     setIsLogin(!isLogin);
   };
 
-  const formVariants = {
-    hidden: { opacity: 0, scale: 0.8, x: 0 },
-    visible: { opacity: 1, scale: 1, x: isLogin ? "0%" : "100%" },
+  const containerVariants = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0 }
   };
 
-  const imageVariants = {
-    hidden: { opacity: 0, scale: 0.8, x: 0 },
-    visible: { opacity: 1, scale: 1, x: isLogin ? "0%" : "-100%" },
+  const slideVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 1000 : -1000,
+      opacity: 0
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? 1000 : -1000,
+      opacity: 0
+    })
+  };
+
+  const transition = {
+    x: { type: "spring", stiffness: 300, damping: 30 },
+    opacity: { duration: 0.2 }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -154,162 +172,188 @@ const Form: React.FC = () => {
   }, [isSuccess, data, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white overflow-hidden">
-      <div className="relative w-full max-w-5xl h-[600px] flex">
-        {/* Form */}
-        <motion.div
-          className="w-1/2 h-full flex flex-col justify-center p-16 bg-white"
-          initial="hidden"
-          animate="visible"
-          variants={formVariants}
-          transition={{
-            type: "spring",
-            stiffness: 150,
-            damping: 80,
-            duration: 1.2,
-          }}
-        >
-          <div className="w-full max-w-lg mx-auto">
-            <div className="mb-6 flex items-center">
-              <img src="/img/logo.png" alt="Logo" className="w-12 h-12" />
-              <span className="ml-4 text-2xl font-bold">
-                Freelance Marketplace
-              </span>
-            </div>
-            <h2 className="text-3xl font-bold">
-              {isLogin ? "Sign in to your account" : "Create an account"}
-            </h2>
-            <p className="text-gray-500 mb-4">
-              Experience the power of networking
-            </p>
-            <form className="space-y-6 mt-4">
-              {!isLogin && (
-                <div>
-                  <label htmlFor="name" className="block text-gray-700">
-                    Full Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    className="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-              )}
-              {!isLogin && (
-                <div>
-                  <label htmlFor="email" className="block text-gray-700">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    className="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your email"
-                  />
-                </div>
-              )}
-              <div>
-                <label htmlFor="username" className="block text-gray-700">
-                  Username
-                </label>
-                <input
-                  type="text"
-                  id="username"
-                  className="mt-1 w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter your username"
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-              <div>
-                <label htmlFor="password" className="block text-gray-700">
-                  Password
-                </label>
-                <div className="relative flex items-center">
-                  <input
-                    type={isShowPass ? "text" : "password"}
-                    id="password"
-                    className="mt-1 w-full px-4 py-2 pr-10 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter your password"
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
-                    onClick={() => setIsShowPass(!isShowPass)}
-                  >
-                    <EyeOutlined />
-                  </button>
-                </div>
+    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-[#4158D0] via-[#C850C0] to-[#FFCC70]">
+      <motion.div 
+        className="w-full max-w-6xl mx-4 h-[750px] relative bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden"
+        variants={containerVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+      >
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-32 -left-32 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-pink-500/30 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        </div>
 
-                {isLogin && (
-                  <div className="text-right">
-                    <a
-                      href="#"
-                      className="text-sm text-blue-600 hover:underline"
-                    >
-                      Forgot your password?
-                    </a>
-                  </div>
-                )}
-              </div>
-              <button
-                type="button"
-                className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
-                onClick={handleLogin}
-              >
-                {isLogin ? "Sign in" : "Sign up"}
-              </button>
-              <button
-                type="button"
-                className="w-full flex items-center justify-center bg-gray-100 border border-gray-300 py-2 rounded-md mt-2 hover:bg-gray-200 transition"
-                onClick={handleLoginGoogle}
-              >
-                <img
-                  src="/img/google.png"
-                  alt="Google Logo"
-                  className="w-5 h-5 mr-2"
-                />
-                {isLogin ? "Sign in with Google" : "Sign up with Google"}
-              </button>
-            </form>
-            <div className="mt-6">
-              <p className="text-gray-500">
-                {isLogin
-                  ? "Don't have an account? "
-                  : "Already have an account? "}
-                <a
-                  href="#"
-                  className="text-blue-600 hover:underline"
-                  onClick={toggleForm}
+        <div className="relative w-full h-full flex">
+          {/* Form Container */}
+          <AnimatePresence initial={false} mode="wait" custom={isLogin ? 1 : -1}>
+            <motion.div
+              key={isLogin ? "login" : "register"}
+              className="absolute top-0 left-0 w-full h-full flex"
+              custom={isLogin ? 1 : -1}
+              variants={slideVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={transition}
+            >
+              {/* Content Side */}
+              <div className="w-1/2 h-full p-12 flex flex-col justify-center">
+                <motion.div 
+                  className="w-full max-w-md mx-auto"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
                 >
-                  {isLogin ? "Sign up" : "Sign in"}
-                </a>
-              </p>
-            </div>
-          </div>
-        </motion.div>
+                  <div className="flex items-center mb-8">
+                    <img src="/img/logo.png" alt="Logo" className="w-12 h-12" />
+                    <h1 className="ml-4 text-2xl font-bold text-white">
+                      Freelance Marketplace
+                    </h1>
+                  </div>
 
-        {/* Image */}
-        <motion.div
-          className="w-1/2 h-full"
-          initial="hidden"
-          animate="visible"
-          variants={imageVariants}
-          transition={{
-            type: "spring",
-            stiffness: 150,
-            damping: 80,
-            duration: 1.2,
-          }}
-        >
-          <img
-            src="/img/login.png"
-            alt="Decorative"
-            className="w-full h-full object-cover rounded-lg shadow-lg "
-          />
-        </motion.div>
-      </div>
+                  <h2 className="text-4xl font-bold text-white mb-2">
+                    {isLogin ? "Welcome Back!" : "Create Account"}
+                  </h2>
+                  <p className="text-white/80 mb-8">
+                    {isLogin 
+                      ? "We're excited to see you again!" 
+                      : "Start your journey with us today"}
+                  </p>
+
+                  <form className="space-y-6">
+                    {!isLogin && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                      >
+                        <label className="block text-white/90 mb-2 font-medium">
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
+                          placeholder="Enter your email"
+                        />
+                      </motion.div>
+                    )}
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      <label className="block text-white/90 mb-2 font-medium">
+                        Username
+                      </label>
+                      <input
+                        type="text"
+                        className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
+                        placeholder="Enter your username"
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
+                    </motion.div>
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      <label className="block text-white/90 mb-2 font-medium">
+                        Password
+                      </label>
+                      <div className="relative">
+                        <input
+                          type={isShowPass ? "text" : "password"}
+                          className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
+                          placeholder="Enter your password"
+                          onChange={(e) => setPassword(e.target.value)}
+                        />
+                        <button
+                          type="button"
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/70 hover:text-white transition-colors"
+                          onClick={() => setIsShowPass(!isShowPass)}
+                        >
+                          <EyeOutlined />
+                        </button>
+                      </div>
+                    </motion.div>
+
+                    {isLogin && (
+                      <div className="flex justify-end">
+                        <a href="#" className="text-white/80 hover:text-white text-sm">
+                          Forgot your password?
+                        </a>
+                      </div>
+                    )}
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.7 }}
+                      className="space-y-4 pt-2"
+                    >
+                      <button
+                        type="button"
+                        onClick={handleLogin}
+                        className="w-full py-3 rounded-xl bg-white text-purple-600 font-semibold hover:bg-white/90 transform hover:scale-[1.02] transition-all duration-200"
+                      >
+                        {isLogin ? "Sign in" : "Sign up"}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleLoginGoogle}
+                        className="w-full py-3 rounded-xl bg-white/10 border border-white/20 text-white font-semibold hover:bg-white/20 flex items-center justify-center gap-2 transform hover:scale-[1.02] transition-all duration-200"
+                      >
+                        <img src="/img/google.png" alt="Google" className="w-5 h-5" />
+                        <span>
+                          {isLogin ? "Sign in with Google" : "Sign up with Google"}
+                        </span>
+                      </button>
+                    </motion.div>
+                  </form>
+
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="mt-8 text-center text-white/80"
+                  >
+                    {isLogin ? "Don't have an account? " : "Already have an account? "}
+                    <button
+                      onClick={() => setIsLogin(!isLogin)}
+                      className="text-white font-semibold hover:text-white/80 transition-colors"
+                    >
+                      {isLogin ? "Sign up" : "Sign in"}
+                    </button>
+                  </motion.p>
+                </motion.div>
+              </div>
+
+              {/* Image Side */}
+              <div className="w-1/2 h-full p-12 flex items-center justify-center">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="w-full h-full relative rounded-2xl overflow-hidden"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm"></div>
+                  <img
+                    src="/img/login.png"
+                    alt="Decorative"
+                    className="w-full h-full object-cover"
+                  />
+                </motion.div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </motion.div>
     </div>
   );
 };

@@ -7,6 +7,7 @@ import DetailPage from "../pages/Detail";
 import Upload from "../pages/Upload";
 import { RouteType } from "../types";
 import Chat from "../pages/Chat";
+import NoLayout from "@/layouts/NoLayout";
 
 const publicRoute: RouteType[] = [
   {
@@ -18,7 +19,7 @@ const publicRoute: RouteType[] = [
   {
     path: "/login",
     component: Login,
-    
+    layout: NoLayout,
   },
 
   {
@@ -35,40 +36,6 @@ const publicRoute: RouteType[] = [
     path: "/detail/:projectId",
     component: DetailPage,
   }
-//   {
-//     path: "/chat",
-//     component: ChatPage,
-//     layout: NoLayout,
-//   },
-//   {
-//     path: "/ads",
-//     component: AdsPage,
-//   },
-//   {
-//     path: "/admin",
-//     component: AdminPage,
-//     layout: AdminLayout,
-//   },
-//   {
-//     path: "/auth/login",
-//     component: LoginPage,
-//   },
-//   {
-//     path: "/auth/register",
-//     component: RegisterPage,
-//   },
-//   {
-//     path: "/product",
-//     component: ProductPage,
-//   },
-//   {
-//     path: "/product/productDetail/:id",
-//     component: ProductDetailPage,
-//   },
-//   {
-//     path: "/post",
-//     component: PostPage,
-//   },
 ];
 
 const privateRoute: RouteType[] = [
