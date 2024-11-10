@@ -78,3 +78,16 @@ export interface DecodedToken {
 export interface ResponseType<T> {
   data: T;
 }
+
+export interface ResponseRestful<T> {
+  success: boolean;
+  message: string;
+  Data: T;
+}
+
+export interface RegisterReq {
+  username: string;
+  password: string;
+  email: string;
+  role: string;
+}

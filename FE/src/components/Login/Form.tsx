@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   useLoginUserMutation,
   useLoginGoogleMutation,
+  useRegisterUserMutation,
 } from "../../apis/restfulApi";
 import { useNavigate } from "react-router-dom";
 import { notification } from "antd";
@@ -10,13 +11,16 @@ import { EyeOutlined } from "@ant-design/icons";
 import { jwtDecode } from "jwt-decode";
 import { setUser } from "../../store/authSlice";
 import { useDispatch } from "react-redux";
+import { RegisterReq } from "@/types";
 
 const Form: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
   const [isShowPass, setIsShowPass] = useState(false);
   const [loginUser] = useLoginUserMutation();
+  const [registerUser]  = useRegisterUserMutation();
   const [loginGoogle, { data, error, isSuccess }] = useLoginGoogleMutation();
 
   const navigate = useNavigate();
@@ -74,6 +78,31 @@ const Form: React.FC = () => {
     opacity: { duration: 0.2 }
   };
 
+  const handleSignup = async (e:React.FormEvent) => {
+    e.preventDefault();
+
+    const registBody:RegisterReq = {
+      username: username,
+      password: password,
+      email: email,
+      role: 'Client'
+    }
+
+    try {
+      await registerUser(registBody).unwrap();
+
+      notification.success({
+        message: "Sucessfully!!!"
+      })
+
+    }catch(error) {
+      console.log(error);
+      notification.error({
+        message: "Failed: " + error
+      })
+    }
+  }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -99,15 +128,10 @@ const Form: React.FC = () => {
           "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
         ];
 
-        // console.log(userId);
-
         dispatch(setUser({ userId, username: userName }));
 
         localStorage.setItem("access_token", accessToken);
         localStorage.setItem("refresh", refreshToken);
-
-        // console.log("User ID:", userId);
-        // console.log("Username:", userName);
       }
 
       notification.success({
@@ -237,6 +261,7 @@ const Form: React.FC = () => {
                           type="email"
                           className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
                           placeholder="Enter your email"
+                          onChange={(e) => setEmail(e.target.value)}
                         />
                       </motion.div>
                     )}
@@ -298,7 +323,7 @@ const Form: React.FC = () => {
                     >
                       <button
                         type="button"
-                        onClick={handleLogin}
+                        onClick={isLogin ? handleLogin : handleSignup}
                         className="w-full py-3 rounded-xl bg-white text-purple-600 font-semibold hover:bg-white/90 transform hover:scale-[1.02] transition-all duration-200"
                       >
                         {isLogin ? "Sign in" : "Sign up"}
@@ -342,7 +367,7 @@ const Form: React.FC = () => {
                   transition={{ delay: 0.4 }}
                   className="w-full h-full relative rounded-2xl overflow-hidden"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-sm"></div>
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20"></div>
                   <img
                     src="/img/login.png"
                     alt="Decorative"
