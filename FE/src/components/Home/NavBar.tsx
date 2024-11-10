@@ -81,9 +81,11 @@ const Navbar: React.FC = () => {
               </button>
             </Link>
 
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">
-              Sign up
-            </button>
+            <Link to={"/login?isRegister=true"}>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium">
+                Sign up
+              </button>
+            </Link>
           </>
         ) : (
           <>
@@ -103,7 +105,9 @@ const Navbar: React.FC = () => {
 
                 <div className="flex flex-col items-start">
                   <h2 className="text-base">Username</h2>
-                  <span className="text-sm">${data?.data.getWallet.balance} USD</span>
+                  <span className="text-sm">
+                    ${data?.data.getWallet.balance} USD
+                  </span>
                 </div>
               </button>
 

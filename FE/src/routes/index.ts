@@ -8,6 +8,7 @@ import Upload from "../pages/Upload";
 import { RouteType } from "../types";
 import Chat from "../pages/Chat";
 import NoLayout from "@/layouts/NoLayout";
+import WelcomePage from "@/pages/Welcome";
 
 const publicRoute: RouteType[] = [
   {
@@ -35,7 +36,13 @@ const publicRoute: RouteType[] = [
   {
     path: "/detail/:projectId",
     component: DetailPage,
-  }
+  },
+
+  {
+    path: "/welcome",
+    component: WelcomePage,
+    layout: NoLayout,
+  },
 ];
 
 const privateRoute: RouteType[] = [
