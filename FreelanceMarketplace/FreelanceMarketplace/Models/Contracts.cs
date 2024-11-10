@@ -35,6 +35,7 @@ namespace FreelanceMarketplace.Models
 
         [MaxLength(1000)]
         public string Status { get; set; } = "Pending";
+        public string? FilePath { get; set; }
         public Payment? Payment { get; set; }
         public ICollection<Review> Reviews { get; set; } = new List<Review>();
     }

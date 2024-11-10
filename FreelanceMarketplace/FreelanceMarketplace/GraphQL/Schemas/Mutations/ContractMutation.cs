@@ -5,6 +5,7 @@ using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using FreelanceMarketplace.GraphQL.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
 {
@@ -55,6 +56,38 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
                     return await contractService.DeleteContractAsync(contractId);
                 })
             }.AuthorizeWith("Admin"));
+
+            AddField(new FieldType
+            {
+                Name = "updateURLFileContract",
+                Type = typeof(ContractType),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "freelanceId" },
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "projectId" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "url" }
+                ),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    var contractId = context.GetArgument<int>("freelanceId");
+                    var projectId = context.GetArgument<int>("projectId");
+                    var url = context.GetArgument<string>("url");
+                    return await contractService.UpdateURLFileContractAsync(contractId, projectId, url);
+                })
+            }.AuthorizeWith("Freelancer"));
+
+            AddField(new FieldType
+            {
+                Name = "contractByProjectId",
+                Type = typeof(ContractType),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "projectId" }
+                ),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    int projectId = context.GetArgument<int>("projectId");
+                    return await contractService.GetContractByProject(projectId);
+                })
+            }.AuthorizeWith("Admin", "Client", "Freelancer"));
         }
     }
 }

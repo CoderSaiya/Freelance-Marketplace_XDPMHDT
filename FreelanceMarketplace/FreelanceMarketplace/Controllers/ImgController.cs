@@ -13,6 +13,7 @@ namespace FreelanceMarketplace.Controllers
         private readonly IImgService _imgService;
         private readonly GoogleDriveService _googleDriveService;
         private const string FolderId = "192Dg2_GakCpgOg_gxdGqstnU2ki6pkql";
+        private const string File_FolderId = "1t0pnNoYeZhaJ4CSCWlD2wKFzTwBMey_u";
 
         public ImgController(IImgService imgService, GoogleDriveService googleDriveService)
         {
@@ -43,28 +44,56 @@ namespace FreelanceMarketplace.Controllers
 
         [HttpPost]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> UploadProductImage(IFormFile file, [FromForm] int userId, [FromForm] int projectId)
+        public async Task<IActionResult> UploadProductImage(IFormFile file, [FromForm] int userId, [FromForm] int projectId, [FromForm] string mimeType = "image/jpeg")
         {
             if (file == null || file.Length == 0)
             {
                 return BadRequest("No file uploaded.");
             }
 
-            Console.WriteLine(file);
+            string folderId = mimeType == "image/jpeg" ? FolderId : File_FolderId;
+            string imageUrl = await _googleDriveService.UploadFileToDrive(file.OpenReadStream(), file.FileName, folderId, mimeType);
 
-            string imageUrl = await _googleDriveService.UploadFileToDrive(file.OpenReadStream(), file.FileName, FolderId);
             if (string.IsNullOrEmpty(imageUrl))
             {
-                return StatusCode(500, "Failed to upload image.");
+                return StatusCode(500, "Failed to upload file to Google Drive.");
             }
 
-            Task<Img> image = _imgService.CreateImageAsync(file, projectId, userId, imageUrl);
-            if (image == null)
+            try
             {
-                return StatusCode(401, "Faied to stored image");
-            }
+                var image = await _imgService.CreateImageAsync(file, projectId, userId, imageUrl);
 
-            return Ok(new { ImageUrl = imageUrl });
+                if (image == null)
+                {
+                    return StatusCode(500, "Failed to store image in the database.");
+                }
+
+                return Ok(new { ImageUrl = imageUrl });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return StatusCode(500, $"Error creating image record: {ex.Message}");
+            }
+        }
+
+        [HttpGet("download/{fileId}")]
+        public async Task<IActionResult> DownloadImage(string fileId)
+        {
+            try
+            {
+                Stream fileStream = await _googleDriveService.DownloadFileFromDrive(fileId);
+                if (fileStream == null)
+                {
+                    return NotFound("File not found.");
+                }
+
+                return File(fileStream, "application/octet-stream", "downloaded_image.jpg");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error downloading file: {ex.Message}");
+            }
         }
     }
 }

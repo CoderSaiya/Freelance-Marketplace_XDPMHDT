@@ -12,6 +12,7 @@ namespace FreelanceMarketplace.GraphQL.Types
             Field(x => x.EndDate, type: typeof(DateTimeGraphType));
             Field(x => x.PaymentAmount);
             Field(x => x.Status);
+            Field(x => x.FilePath);
 
             Field<ProjectType>("project").Resolve(context => context.Source.Project);
             Field<UserType>("freelancer").Resolve(context => context.Source.Freelancer);
