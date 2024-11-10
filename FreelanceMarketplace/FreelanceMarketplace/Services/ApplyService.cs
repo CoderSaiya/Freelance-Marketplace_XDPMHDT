@@ -31,6 +31,39 @@ namespace FreelanceMarketplace.Services
             }
         }
 
+        public async Task<List<Apply>> GetApplyAsync()
+        {
+            try
+            {
+                return await _context.Applies
+                    .Include(a => a.Freelancer)
+                    .Include(a => a.Client)
+                    .Include(a => a.Project)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving apply list", ex);
+            }
+        }
+
+        public async Task<List<Apply>> GetApplyByFreelancerIdAsync(int freelancerId)
+        {
+            try
+            {
+                return await _context.Applies
+                    .Include(a => a.Freelancer)
+                    .Include(a => a.Client)
+                    .Include(a => a.Project)
+                    .Where(a => a.FreelancerId == freelancerId)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error retrieving apply list", ex);
+            }
+        }
+
         public async Task<Apply> GetApplyByIdAsync(int applyId)
         {
             try
@@ -104,6 +137,48 @@ namespace FreelanceMarketplace.Services
                 .FirstOrDefaultAsync(a => a.FreelancerId == freelancerId && a.ProjectId == projectId);
 
             return application != null;
+        }
+
+        public async Task<bool> AcceptApply(int applyId)
+        {
+            try
+            {
+                var existingApply = await _context.Applies.FirstOrDefaultAsync(a => a.ApplyId == applyId);
+                if (existingApply == null)
+                    throw new KeyNotFoundException("Apply not found");
+                existingApply.Status = "Accepted";
+
+                var project = _context.Projects.FirstOrDefault(a => a.ProjectId == existingApply.ProjectId);
+                project.Status = "Processing";
+
+                var newContract = new Contracts
+                {
+                    ProjectId = existingApply.ProjectId,
+                    FreelancerId = existingApply.FreelancerId,
+                    ClientId = existingApply.ClientId,
+                    EndDate = DateTime.Now.AddDays(existingApply.Duration),
+                    PaymentAmount = project.Budget,
+                };
+
+
+                await _context.Contracts.AddAsync(newContract);
+
+                var otherApplies = await _context.Applies
+                    .Where(a => a.ProjectId == existingApply.ProjectId && a.ApplyId != applyId)
+                    .ToListAsync();
+
+                foreach (var apply in otherApplies)
+                {
+                    apply.Status = "Rejected";
+                }
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error updating apply", ex);
+            }
         }
     }
 }

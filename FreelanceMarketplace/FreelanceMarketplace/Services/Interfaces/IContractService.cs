@@ -6,7 +6,7 @@ namespace FreelanceMarketplace.Services.Interfaces
     {
         Task<List<Contracts>> GetAllContractsAsync();
         Task<Contracts?> GetContractByIdAsync(int contractId);
-        Task<Contracts> CreateContractAsync(Contracts contract);
+        Task<Contracts?> CreateContractAsync(Contracts contract);
         Task<Contracts?> UpdateContractAsync(int contractId, Contracts contract);
         Task<bool> DeleteContractAsync(int contractId);
     }

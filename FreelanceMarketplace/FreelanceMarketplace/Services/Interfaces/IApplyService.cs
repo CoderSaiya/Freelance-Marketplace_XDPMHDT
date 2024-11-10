@@ -14,5 +14,6 @@ namespace FreelanceMarketplace.Services.Interfaces
         Task<Apply> UpdateApplyAsync(Apply apply);
         Task<bool> DeleteApplyAsync(int applyId);
         Task<bool> HasFreelancerAppliedForProjectAsync(int freelancerId, int projectId);
+        Task<bool> AcceptApply(int applyId);
     }
 }

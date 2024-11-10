@@ -40,7 +40,7 @@ namespace FreelanceMarketplace.Services
                     .Include(p => p.Category)
                     .Include(p => p.Applies)
                         .ThenInclude(a => a.Freelancer)
-                        .ThenInclude(f => f.UserProfile)
+                            .ThenInclude(f => f.UserProfile)
                     .Include(p => p.Contract)
                     .Include(p => p.Images)
                     .Include(p => p.Users)

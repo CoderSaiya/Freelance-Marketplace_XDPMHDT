@@ -27,7 +27,7 @@ namespace FreelanceMarketplace.Models
         public string? SkillRequire { get; set; }
 
         [Required]
-        public string? Status { get; set; }
+        public string Status { get; set; } = "Active";
 
         public DateTime CreateAt { get; set; } = DateTime.Now;
 

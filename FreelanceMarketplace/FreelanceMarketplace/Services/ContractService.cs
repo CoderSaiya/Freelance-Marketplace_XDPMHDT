@@ -16,57 +16,38 @@ namespace FreelanceMarketplace.Services
 
         public async Task<List<Contracts>> GetAllContractsAsync()
         {
-            try
-            {
-                return await _context.Contracts
+            return await _context.Contracts
                 .Include(c => c.Freelancer)
                 .Include(c => c.Client)
                 .Include(c => c.Project)
                 .Include(c => c.Payment)
                 .Include(c => c.Reviews)
                 .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error retrieving contracts", ex);
-            }
         }
 
         public async Task<Contracts?> GetContractByIdAsync(int contractId)
         {
-            try
-            {
-                var contract = await _context.Contracts
+            return await _context.Contracts
                 .Include(c => c.Freelancer)
                 .Include(c => c.Client)
                 .Include(c => c.Project)
                 .Include(c => c.Payment)
                 .Include(c => c.Reviews)
                 .FirstOrDefaultAsync(c => c.ContractId == contractId);
-
-                if (contract == null)
-                    throw new KeyNotFoundException("Contract not found");
-
-                return contract;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error retrieving contract with ID {contractId}", ex);
-            }
         }
 
-        public async Task<Contracts> CreateContractAsync(Contracts contract)
+        public async Task<Contracts?> CreateContractAsync(Contracts contract)
         {
-            try
+            var client = await _context.Users.FindAsync(contract.ClientId);
+            var freelancer = await _context.Users.FindAsync(contract.FreelancerId);
+            if (client == null || freelancer == null)
             {
-                _context.Contracts.Add(contract);
-                await _context.SaveChangesAsync();
-                return contract;
+                return null;
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Error creating contract", ex);
-            }
+
+            _context.Contracts.Add(contract);
+            await _context.SaveChangesAsync();
+            return contract;
         }
 
         public async Task<Contracts?> UpdateContractAsync(int contractId, Contracts contract)
@@ -112,6 +93,16 @@ namespace FreelanceMarketplace.Services
             {
                 throw new Exception($"Error deleting contract with ID {contractId}", ex);
             }
+        }
+
+        public async Task UpdateContractStatusAsync(int contractId, string newStatus)
+        {
+            var contract = await _context.Contracts.FindAsync(contractId);
+            if (contract == null)
+                throw new KeyNotFoundException("Contract not found.");
+
+            contract.Status = newStatus;
+            await _context.SaveChangesAsync();
         }
     }
 

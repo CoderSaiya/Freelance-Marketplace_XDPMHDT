@@ -56,6 +56,20 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
                     return await applyService.DeleteApplyAsync(applyId);
                 })
             }.AuthorizeWith("Admin"));
+
+            AddField(new FieldType
+            {
+                Name = "acceptApply",
+                Type = typeof(BooleanGraphType),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "applyId" }
+                ),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    var applyId = context.GetArgument<int>("applyId");
+                    return await applyService.AcceptApply(applyId);
+                })
+            }.AuthorizeWith("Client"));
         }
     }
 }

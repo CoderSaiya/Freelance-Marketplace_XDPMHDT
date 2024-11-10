@@ -39,7 +39,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                         return await userService.GetUserByUsernameAsync(username);
                     }
                 })
-            }.AuthorizeWith("Admin"));
+            }.AuthorizeWith("Admin", "Client", "Freelancer"));
 
             AddField(new FieldType
             {
