@@ -9,6 +9,7 @@ import { WalletType } from '../types/WalletType';
 import { CategoryType } from '../types/CategoryType';
 import { User, UserProfileInput, UserProfileType } from '../types/UserType';
 import { Contract } from '@/types/ContractType';
+import { NotificationType } from '@/types/NotificationType';
 
 interface GraphQLError {
   message: string;
@@ -520,7 +521,48 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    notificationsByUser: builder.query<ResponseType<{ notificationsByUser: NotificationType[] }>, number>({
+      query: (userId) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query getNotificationsByUser($userId: Int!) {
+              notificationsByUser(userId: $userId) {
+                id  
+                senderId
+                receiverId
+                message
+                createdAt
+                isRead
+                sender {
+                  username
+                }
+                receiver {
+                  username
+                }
+              }
+            }
+          `,
+          variables: { userId },
+        },
+      }),
+    }),
+    markNotificationAsRead: builder.mutation<ResponseType<{ markNotificationAsRead: boolean }>, number>({
+      query: (id) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            mutation MarkNotificationAsRead($id: Int!) {
+              markNotificationAsRead(id: $id)
+            }
+          `,
+          variables: { id },
+        },
+      }),
+    }),
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery, useGetApplyByFreelancerQuery, useProjectByIdQuery, useProjectByClientQuery, useGetAppliesQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useAcceptApplyMutation, useGetWalletQuery, useUpdateWalletBalanceMutation, useGetCategoryQuery, useUserByIdQuery, useUserByUsernameQuery, useUpdateUserProfileMutation, useUpdateURLFileContractMutation, useContractByProjectIdMutation } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useGetApplyByFreelancerQuery, useProjectByIdQuery, useProjectByClientQuery, useGetAppliesQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useAcceptApplyMutation, useGetWalletQuery, useUpdateWalletBalanceMutation, useGetCategoryQuery, useUserByIdQuery, useUserByUsernameQuery, useUpdateUserProfileMutation, useUpdateURLFileContractMutation, useContractByProjectIdMutation, useNotificationsByUserQuery, useMarkNotificationAsReadMutation } = graphqlApi;

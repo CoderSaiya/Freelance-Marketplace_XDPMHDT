@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { startSignalRConnection } from "../../services/signalRService";
+import {
+  createHubConnection,
+  sendHubMessage,
+  stopHubConnection,
+} from "../../services/signalRService";
 import {
   useGetChatHistoryQuery,
   useSendMessageMutation,
@@ -7,38 +11,27 @@ import {
 import { SendOutlined } from "@ant-design/icons";
 import { ChatMessage } from "../../types/ChatMessage";
 import { ChatWindowProps } from "../../types/chat";
-import { jwtDecode } from "jwt-decode";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 const ChatWindow: React.FC<ChatWindowProps> = ({ recipient }) => {
   const [message, setMessage] = useState("");
 
-  const token = localStorage.getItem("access_token");
-
-  const decodedToken: any = jwtDecode(token);
-  const userId =
-    decodedToken[
-      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-    ];
-  const username =
-    decodedToken["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+  const userId = useSelector((state: RootState) => state.auth.userId);
+  const username = useSelector((state: RootState) => state.auth.username);
 
   const [sendMessage] = useSendMessageMutation();
   const {
     data: messages,
     refetch: refetchChatHistory,
-    error,
     isLoading,
   } = useGetChatHistoryQuery({ user1: username, user2: recipient });
 
-  const handelSend = async () => {
+  const handleSend = async () => {
     if (message.trim() === "") return;
 
     try {
-      await sendMessage({
-        sender: username,
-        recipient: recipient,
-        message,
-      }).unwrap();
+      await sendMessage({ sender: username, recipient, message }).unwrap();
       setMessage("");
       refetchChatHistory();
     } catch (error) {
@@ -47,14 +40,26 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipient }) => {
   };
 
   useEffect(() => {
-    startSignalRConnection((user, message) => {
-      refetchChatHistory();
-    });
-  }, []);
+    const handleReceiveMessage = (
+      event: string,
+      user: string,
+      message: string
+    ) => {
+      if (event === "ReceiveMessage") {
+        refetchChatHistory();
+      }
+    };
+
+    createHubConnection("chatHub", handleReceiveMessage);
+
+    return () => {
+      stopHubConnection("chatHub");
+    };
+  }, [refetchChatHistory]);
 
   return (
     <div className="flex-1 flex flex-col h-full relative">
-      {/* Container for messages */}
+      {/* Messages container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2 items-end max-h-[70%]">
         {isLoading ? (
           <p>Loading...</p>
@@ -74,7 +79,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipient }) => {
         )}
       </div>
 
-      {/* Chat input at the bottom */}
+      {/* Chat input */}
       <div className="flex absolute bottom-0 left-0 right-0 px-4 bg-white border-t border-gray-300 mb-40">
         <input
           type="text"
@@ -83,7 +88,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ recipient }) => {
           placeholder="Type a message"
           className="w-full p-2 border rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
         />
-        <div onClick={handelSend} className="cursor-pointer">
+        <div onClick={handleSend} className="cursor-pointer">
           <SendOutlined />
         </div>
       </div>

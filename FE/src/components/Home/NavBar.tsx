@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BellOutlined } from "@ant-design/icons";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import AddFundsModal from "./AddFundsModal";
 import { useGetWalletQuery } from "../../apis/graphqlApi";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import Notification from "./Notification";
 
 const stripePromise = loadStripe(
   "pk_test_51PtpAPGH56JC4HtH4uJvwovRnTiKX8M3vFocyHUrIeQ2bSVyRUVvo60vwJs7852MEvvLhsurDHdmOeMWxbmhtdUi00kZhuJ5GN"
@@ -90,7 +90,7 @@ const Navbar: React.FC = () => {
           </>
         ) : (
           <>
-            <BellOutlined style={{ fontSize: 25 }} />
+            <Notification />
             <div
               className="relative"
               onMouseEnter={handleMouseEnter}
