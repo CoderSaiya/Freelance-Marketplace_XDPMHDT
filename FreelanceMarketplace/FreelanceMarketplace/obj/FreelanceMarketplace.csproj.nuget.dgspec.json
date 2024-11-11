@@ -80,6 +80,10 @@
               "target": "Package",
               "version": "[6.0.33, )"
             },
+            "Microsoft.EntityFrameworkCore.InMemory": {
+              "target": "Package",
+              "version": "[6.0.33, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[6.0.33, )"
@@ -98,6 +102,10 @@
               "target": "Package",
               "version": "[4.8.0, )"
             },
+            "Moq.AutoMock": {
+              "target": "Package",
+              "version": "[3.5.0, )"
+            },
             "Stripe.net": {
               "target": "Package",
               "version": "[47.0.0, )"
@@ -109,6 +117,10 @@
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[8.1.0, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.9.2, )"
             }
           },
           "imports": [

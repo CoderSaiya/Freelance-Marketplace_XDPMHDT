@@ -41,7 +41,7 @@ namespace FreelanceMarketplace.Services
                 var review = await _context.Reviews
                     .Include(c => c.User)
                     .Include(c => c.Contract)
-                    .FirstOrDefaultAsync();
+                    .FirstOrDefaultAsync(c=>c.ReviewId == reviewId);
 
                 if (review == null)
                     throw new KeyNotFoundException("Review not found");
