@@ -42,7 +42,7 @@ namespace FreelanceMarketplace.Tests
         public async Task CreateNotificationAsync_ShouldAddNotificationToDatabase()
         {
             // Arrange
-            var notification = new Notification { UserId = 1, Message = "New notification" };
+            var notification = new Notification { SenderId = 1, Message = "New notification" };
 
             // Act
             var result = await _service.CreateNotificationAsync(notification);
@@ -59,7 +59,7 @@ namespace FreelanceMarketplace.Tests
         public async Task GetNotificationByIdAsync_ShouldReturnNotification()
         {
             // Arrange
-            var notification = new Notification { Id = 1, UserId = 1, Message = "Test message" };
+            var notification = new Notification { Id = 1, SenderId = 1, Message = "Test message" };
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
 
@@ -78,8 +78,8 @@ namespace FreelanceMarketplace.Tests
             // Arrange
             var notifications = new List<Notification>
             {
-                new Notification { Id = 1, UserId = 1, Message = "Notification 1" },
-                new Notification { Id = 2, UserId = 1, Message = "Notification 2" }
+                new Notification { Id = 1, SenderId = 1, Message = "Notification 1" },
+                new Notification { Id = 2, SenderId = 1, Message = "Notification 2" }
             };
             _context.Notifications.AddRange(notifications);
             await _context.SaveChangesAsync();
@@ -97,7 +97,7 @@ namespace FreelanceMarketplace.Tests
         public async Task UpdateNotificationAsync_ShouldModifyNotification()
         {
             // Arrange
-            var notification = new Notification { Id = 1, UserId = 1, Message = "Old Message" };
+            var notification = new Notification { Id = 1, SenderId = 1, Message = "Old Message" };
             _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
 
