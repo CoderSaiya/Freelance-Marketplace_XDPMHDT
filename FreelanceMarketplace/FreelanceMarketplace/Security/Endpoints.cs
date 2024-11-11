@@ -13,7 +13,9 @@
             "/api/auth/google-response",
             "/graphql",
             "/chathub/negotiate",
-            "/chathub"
+            "/chathub",
+            "/notificationhub",
+            "/notificationhub/negotiate",
         };
 
         public static readonly string[] AdminEndpoints =

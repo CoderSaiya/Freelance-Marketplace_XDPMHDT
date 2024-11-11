@@ -36,7 +36,7 @@ namespace FreelanceMarketplace.Services
                 // Gửi thông báo thành công
                 await _notificationService.CreateNotificationAsync(new Notification
                 {
-                    UserId = payment.UserId,
+                    SenderId = payment.UserId,
                     Message = "Payment successful.",
                     CreatedAt = DateTime.UtcNow
                 });
@@ -48,7 +48,7 @@ namespace FreelanceMarketplace.Services
                 // Gửi thông báo thất bại
                 await _notificationService.CreateNotificationAsync(new Notification
                 {
-                    UserId = payment.UserId,
+                    SenderId = payment.UserId,
                     Message = "Payment failed: " + ex.Message,
                     CreatedAt = DateTime.UtcNow
                 });
@@ -80,7 +80,7 @@ namespace FreelanceMarketplace.Services
                 // Gửi thông báo hoàn tiền thành công
                 await _notificationService.CreateNotificationAsync(new Notification
                 {
-                    UserId = payment.UserId,
+                    SenderId = payment.UserId,
                     Message = $"Payment of {payment.Amount} has been refunded.",
                     CreatedAt = DateTime.UtcNow
                 });

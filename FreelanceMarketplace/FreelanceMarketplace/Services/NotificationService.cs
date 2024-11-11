@@ -26,7 +26,7 @@ namespace FreelanceMarketplace.Services
             await _context.SaveChangesAsync();
 
             // Send real-time notification
-            await _hubContext.Clients.User(notification.UserId.ToString()).SendAsync("ReceiveNotification", notification.Message);
+            await _hubContext.Clients.User(notification.SenderId.ToString()).SendAsync("ReceiveNotification", notification.Message);
 
             return notification;
         }
@@ -38,7 +38,12 @@ namespace FreelanceMarketplace.Services
 
         public async Task<IEnumerable<Notification>> GetNotificationsByUserIdAsync(int userId)
         {
-            return await _context.Notifications.Where(n => n.UserId == userId).ToListAsync();
+            return await _context.Notifications
+                .Include(s => s.Sender)
+                .Include(r => r.Receiver)
+                .Where(n => n.ReceiverId == userId)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<Notification> UpdateNotificationAsync(Notification notification)

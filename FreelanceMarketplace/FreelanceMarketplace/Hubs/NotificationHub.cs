@@ -25,14 +25,16 @@ namespace FreelanceMarketplace.Hubs
         /// <summary>
         /// Sends a notification to a specific user
         /// </summary>
-        public async Task SendNotification(string recipientUsername, string message)
+        public async Task SendNotification(string senderUsername, string recipientUsername, string message)
         {
             var recipient = _userService.GetUserByUsername(recipientUsername);
-            if (recipient == null) return;
+            var sender = _userService.GetUserByUsername(senderUsername);
+            if (recipient == null || sender == null) return;
 
             var notification = new Notification
             {
-                UserId = recipient.Id,
+                SenderId = sender.Id,
+                ReceiverId = recipient.Id,
                 Message = message,
                 CreatedAt = DateTime.UtcNow,
                 IsRead = false
@@ -47,16 +49,18 @@ namespace FreelanceMarketplace.Hubs
                     id = notification.Id,
                     message = notification.Message,
                     createdAt = notification.CreatedAt,
+                    sender = sender,
+                    recipient = recipient,
                     isRead = notification.IsRead
                 });
         }
 
         /// Sends a notification to multiple users
-        public async Task SendNotificationToMany(List<string> recipientUsernames, string message)
+        public async Task SendNotificationToMany(string senderUsername, List<string> recipientUsernames, string message)
         {
-            foreach (var username in recipientUsernames)
+            foreach (var recipient in recipientUsernames)
             {
-                await SendNotification(username, message);
+                await SendNotification(senderUsername, recipient, message);
             }
         }
 
@@ -72,7 +76,7 @@ namespace FreelanceMarketplace.Hubs
             _context.Notifications.Update(notification);
             await _context.SaveChangesAsync();
 
-            await Clients.User(notification.UserId.ToString())
+            await Clients.User(notification.SenderId.ToString())
                 .SendAsync("NotificationRead", notificationId);
         }
 
@@ -83,7 +87,7 @@ namespace FreelanceMarketplace.Hubs
             if (user == null) return new List<Notification>();
 
             return await _context.Notifications
-                .Where(n => n.UserId == user.Id && n.IsRead == false)
+                .Where(n => n.SenderId == user.Id && n.IsRead == false)
                 .OrderByDescending(n => n.CreatedAt)
                 .ToListAsync();
         }

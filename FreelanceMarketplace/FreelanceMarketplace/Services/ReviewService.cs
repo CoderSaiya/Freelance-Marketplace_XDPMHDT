@@ -62,7 +62,7 @@ namespace FreelanceMarketplace.Services
                 await _context.SaveChangesAsync();
                 await _notificationService.CreateNotificationAsync(new Notification
                 {
-                    UserId = review.UserId,
+                    SenderId = review.UserId,
                     Message = $"You have received a new review {review.Rating} ({GetRatingStatus(review.Rating)}",
                     CreatedAt = DateTime.UtcNow
                 });
@@ -93,7 +93,7 @@ namespace FreelanceMarketplace.Services
                 await _context.SaveChangesAsync();
                 await _notificationService.CreateNotificationAsync(new Notification
                 {
-                    UserId = review.UserId,
+                    SenderId = review.UserId,
                     Message = $"Review have been updated {review.Rating} ({GetRatingStatus(review.Rating)}",
                     CreatedAt = DateTime.UtcNow
                 });

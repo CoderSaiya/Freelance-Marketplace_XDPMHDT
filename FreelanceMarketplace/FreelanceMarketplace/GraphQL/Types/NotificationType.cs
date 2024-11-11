@@ -8,10 +8,14 @@ namespace FreelanceMarketplace.GraphQL.Types
         public NotificationType()
         {
             Field(x => x.Id);
+            Field(x => x.SenderId);
+            Field(x => x.ReceiverId);
             Field(x => x.Message);
             Field(x => x.CreatedAt);
             Field(x => x.IsRead);
-            Field(x => x.UserId);
+
+            Field<UserType>("sender");
+            Field<UserType>("receiver");
         }
     }
 }

@@ -22,7 +22,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                     var id = context.GetArgument<int>("id");
                     return await notificationService.GetNotificationByIdAsync(id);
                 })
-            }.AuthorizeWith("Admin", "Freelancer", "Client")); // Allow all authenticated users since ownership check should be done in service
+            }.AuthorizeWith("Admin")); // Allow all authenticated users since ownership check should be done in service
 
             // Notifications by user - Only the owner (Client/Freelancer) or Admin should see them
             AddField(new FieldType

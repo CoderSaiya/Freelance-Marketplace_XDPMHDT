@@ -164,6 +164,18 @@ namespace FreelanceMarketplace.Data
                 .WithOne(u => u.Wallet)
                 .HasForeignKey<Wallet>(w => w.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(c => c.Sender)
+                .WithMany(u => u.SenderNotification)
+                .HasForeignKey(c => c.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(c => c.Receiver)
+                .WithMany(u => u.RecipientNotification)
+                .HasForeignKey(c => c.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

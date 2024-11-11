@@ -246,6 +246,7 @@ app.UseEndpoints(endpoints =>
 {
     endpoints.MapHub<ChatHub>("/chathub");
     endpoints.MapHub<VideoCallHub>("/videocallhub");
+    endpoints.MapHub<NotificationHub>("/notificationhub");
     endpoints.MapControllers();
     endpoints.MapMethods("/api/Auth/signin-google", new[] { "OPTIONS" }, context =>
     {

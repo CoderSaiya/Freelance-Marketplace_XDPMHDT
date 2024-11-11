@@ -1,6 +1,8 @@
 ﻿using FreelanceMarketplace.Data;
+using FreelanceMarketplace.Hubs;
 using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Services.Interfaces;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace FreelanceMarketplace.Services
@@ -8,10 +10,12 @@ namespace FreelanceMarketplace.Services
     public class ProjectService : IProjectService
     {
         private readonly AppDbContext _context;
+        private readonly IHubContext<NotificationHub> _notificationHubContext;
 
-        public ProjectService(AppDbContext context)
+        public ProjectService(AppDbContext context, IHubContext<NotificationHub> notificationHubContext)
         {
             _context = context;
+            _notificationHubContext = notificationHubContext;
         }
 
         public async Task<List<Project>> GetAllProjectsAsync()
@@ -85,8 +89,39 @@ namespace FreelanceMarketplace.Services
         {
             try
             {
+                Users admin = _context.Users.FirstOrDefault(u => u.Username == "admin");
+                Users recipient = _context.Users.FirstOrDefault(u => u.Id == project.UserId);
+                if (admin == null || recipient == null)
+                {
+                    throw new Exception("Admin or user not found.");
+                }
+                var message = "A new project has been successfully created!";
+
                 _context.Projects.Add(project);
+
+                Notification notification = new Notification
+                {
+                    SenderId = admin.Id,
+                    ReceiverId = recipient.Id,
+                    Message = message,
+                };
+
+                _context.Notifications.Add(notification);
+
                 await _context.SaveChangesAsync();
+
+                await _notificationHubContext.Clients.User(recipient.Id.ToString())
+                    .SendAsync("ReceiveNotification", new
+                    {
+                        id = notification.Id,
+                        message = notification.Message,
+                        createdAt = notification.CreatedAt,
+                        sender = admin.Username,
+                        recipient = recipient.Username,
+                        isRead = notification.IsRead
+                    });
+
+
                 return project;
             }
             catch (Exception ex)

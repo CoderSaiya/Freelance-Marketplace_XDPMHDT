@@ -31,5 +31,7 @@ namespace FreelanceMarketplace.Models
         public ICollection<Img> UploadedImages { get; set; } = new List<Img>();
         public Wallet? Wallet { get; set; }
         public ICollection<Project> Projects { get; set; } = new List<Project>();
+        public ICollection<Notification> SenderNotification { get; set; } = new List<Notification>();
+        public ICollection<Notification> RecipientNotification { get; set; } = new List<Notification>();
     }
 }
