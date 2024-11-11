@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\admin\\Documents\\WorkSpace\\ProjectNET\\git\\BE_XDPMHDT\\FreelanceMarketplace\\FreelanceMarketplace\\FreelanceMarketplace.csproj": {}
+    "E:\\xdhdt\\New folder\\BE_XDPMHDT\\FreelanceMarketplace\\FreelanceMarketplace\\FreelanceMarketplace.csproj": {}
   },
   "projects": {
-    "C:\\Users\\admin\\Documents\\WorkSpace\\ProjectNET\\git\\BE_XDPMHDT\\FreelanceMarketplace\\FreelanceMarketplace\\FreelanceMarketplace.csproj": {
+    "E:\\xdhdt\\New folder\\BE_XDPMHDT\\FreelanceMarketplace\\FreelanceMarketplace\\FreelanceMarketplace.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\admin\\Documents\\WorkSpace\\ProjectNET\\git\\BE_XDPMHDT\\FreelanceMarketplace\\FreelanceMarketplace\\FreelanceMarketplace.csproj",
+        "projectUniqueName": "E:\\xdhdt\\New folder\\BE_XDPMHDT\\FreelanceMarketplace\\FreelanceMarketplace\\FreelanceMarketplace.csproj",
         "projectName": "FreelanceMarketplace",
-        "projectPath": "C:\\Users\\admin\\Documents\\WorkSpace\\ProjectNET\\git\\BE_XDPMHDT\\FreelanceMarketplace\\FreelanceMarketplace\\FreelanceMarketplace.csproj",
-        "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\admin\\Documents\\WorkSpace\\ProjectNET\\git\\BE_XDPMHDT\\FreelanceMarketplace\\FreelanceMarketplace\\obj\\",
+        "projectPath": "E:\\xdhdt\\New folder\\BE_XDPMHDT\\FreelanceMarketplace\\FreelanceMarketplace\\FreelanceMarketplace.csproj",
+        "packagesPath": "C:\\Users\\ASUS\\.nuget\\packages\\",
+        "outputPath": "E:\\xdhdt\\New folder\\BE_XDPMHDT\\FreelanceMarketplace\\FreelanceMarketplace\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ASUS\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -80,6 +80,10 @@
               "target": "Package",
               "version": "[6.0.33, )"
             },
+            "Microsoft.EntityFrameworkCore.InMemory": {
+              "target": "Package",
+              "version": "[6.0.33, )"
+            },
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[6.0.33, )"
@@ -98,6 +102,10 @@
               "target": "Package",
               "version": "[4.8.0, )"
             },
+            "Moq.AutoMock": {
+              "target": "Package",
+              "version": "[3.5.0, )"
+            },
             "Stripe.net": {
               "target": "Package",
               "version": "[47.0.0, )"
@@ -109,6 +117,10 @@
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
               "version": "[8.1.0, )"
+            },
+            "xunit": {
+              "target": "Package",
+              "version": "[2.9.2, )"
             }
           },
           "imports": [
@@ -130,7 +142,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.103\\RuntimeIdentifierGraph.json"
         }
       }
     }
