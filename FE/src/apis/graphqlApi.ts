@@ -294,6 +294,11 @@ export const graphqlApi = createApi({
                 createAt
                 freelancer {
                   username
+                  email
+                  userProfile {
+                    rating
+                    phone
+                  }
                 }
                 project {
                   projectName

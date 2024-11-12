@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
 import {
   useAcceptApplyMutation,
   useContractByProjectIdMutation,
@@ -7,8 +6,7 @@ import {
   useProjectByClientQuery,
   useUpdateURLFileContractMutation,
 } from "../../../apis/graphqlApi";
-import { RootState } from "../../../store/store";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,33 +14,23 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Calendar,
-  Clock,
-  DollarSign,
-  Briefcase,
-  CheckCircle,
-  XCircle,
-  Users,
-  Star,
-  Mail,
-  Phone,
-  Upload,
-  Download,
-  FileCheck,
-  FileX,
-  Check,
-} from "lucide-react";
+import { Briefcase, Download, FileCheck, FileX, Check } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApplyType } from "@/types/ApplyType";
 import { notification } from "antd";
 import { Label } from "@/components/ui/label";
 import { useUploadImgMutation } from "@/apis/restfulApi";
 import { ProjectType } from "@/types/ProjectType";
+import ProjectCard from "../ProjectCard";
+import ProjectApplicantsDialog from "../ProjectApplicantsDialog";
+import UploadDialog from "../UploadDialog";
+import ApplicantCard from "../ApplicantCard";
 
-const ProjectManagementTab: React.FC<{ userId: number, role: string }> = ({ userId, role }) => {
+const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
+  userId,
+  role,
+}) => {
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
   const [selectedApply, setSelectedApply] = useState<ApplyType | null>(null);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -133,9 +121,9 @@ const ProjectManagementTab: React.FC<{ userId: number, role: string }> = ({ user
               <Download className="w-4 h-4" />
               Download Project Files
             </Button>
-            
+
             <Button className="gap-2 bg-green-500">
-              <Check className="w-5 h-5"/>
+              <Check className="w-5 h-5" />
               Complete
             </Button>
           </div>
@@ -330,70 +318,13 @@ const ProjectManagementTab: React.FC<{ userId: number, role: string }> = ({ user
 
           <div className="grid gap-6">
             {projects?.map((project) => (
-              <Card
-                key={project.projectId}
-                className="hover:shadow-lg transition-shadow duration-300 cursor-pointer"
-                onClick={() => handleProjectClick(project)}
-              >
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-xl mb-2">
-                        {project.projectName}
-                      </CardTitle>
-                      <Badge className={getProjectStatusColor(project.status)}>
-                        {project.status}
-                      </Badge>
-                    </div>
-                    <div className="flex gap-4">
-                      <p className="flex items-center gap-2 text-blue-600">
-                        <Users className="w-5 h-5" />
-                        {project.applies?.length || 0} Applicants
-                      </p>
-                      <p className="flex items-center gap-2 text-green-600 font-semibold">
-                        <DollarSign className="w-5 h-5" />
-                        {project.budget}
-                      </p>
-                    </div>
-                  </div>
-                </CardHeader>
-
-                <CardContent>
-                  <div className="mb-4">
-                    <p className="text-gray-700">
-                      {project.projectDescription}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Calendar className="w-5 h-5" />
-                      Posted: {formatDate(project.createAt)}
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Clock className="w-5 h-5" />
-                      Duration:{" "}
-                      {calculateDuration(
-                        project.deadline,
-                        project.createAt
-                      )}{" "}
-                      days
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Briefcase className="w-5 h-5" />
-                      {project.category?.categoryName}
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex gap-2">
-                    {project.skillRequire?.split(",").map((skill, index) => (
-                      <Badge key={index} variant="outline">
-                        {skill.trim()}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <ProjectCard
+                project={project}
+                onClick={handleProjectClick}
+                onStatusColor={getProjectStatusColor}
+                formatDate={formatDate}
+                calculateDuration={calculateDuration}
+              />
             ))}
 
             {projects?.length === 0 && (
@@ -436,99 +367,15 @@ const ProjectManagementTab: React.FC<{ userId: number, role: string }> = ({ user
           )}
 
           {selectedProject && !projectStatusDialog && (
-            <Dialog open onOpenChange={() => setSelectedProject(null)}>
-              <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Project Applicants</DialogTitle>
-                </DialogHeader>
-
-                <div className="space-y-4">
-                  {projects
-                    ?.find((p) => p.projectId === selectedProject)
-                    ?.applies?.map((apply) => (
-                      <Card
-                        key={apply.applyId}
-                        className="hover:shadow-md transition-shadow"
-                      >
-                        <CardContent className="p-6">
-                          <div className="flex gap-4">
-                            <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-xl font-bold text-gray-600">
-                              {apply.freelancer.username?.charAt(0)}
-                            </div>
-
-                            <div className="flex-1">
-                              <div className="flex justify-between items-start">
-                                <div>
-                                  <h3 className="text-lg font-semibold">
-                                    {apply.freelancer.username}
-                                  </h3>
-                                  <p className="text-gray-600">abc</p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <Badge
-                                    className={getStatusColor(apply.status)}
-                                  >
-                                    {apply.status}
-                                  </Badge>
-                                  {apply.status === "Pending" && (
-                                    <div className="flex gap-2">
-                                      <Button
-                                        size="sm"
-                                        className="bg-green-500 hover:bg-green-600"
-                                        onClick={() =>
-                                          handleAcceptApply(apply.applyId)
-                                        }
-                                      >
-                                        Accept
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="destructive"
-                                        onClick={() =>
-                                          handleRejectApply(apply.applyId)
-                                        }
-                                      >
-                                        Reject
-                                      </Button>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-
-                              <div className="grid grid-cols-2 gap-2 mt-4">
-                                <div className="flex items-center gap-2 text-gray-600">
-                                  <Calendar className="w-4 h-4" />
-                                  Applied: {formatDate(apply.createAt)}
-                                </div>
-                                <div className="flex items-center gap-2 text-gray-600">
-                                  <Star className="w-4 h-4" />
-                                  Rating: {apply.freelancer.userProfile.rating}
-                                  /5
-                                </div>
-                                <div className="flex items-center gap-2 text-gray-600">
-                                  <Mail className="w-4 h-4" />
-                                  {apply.freelancer.email}
-                                </div>
-                                <div className="flex items-center gap-2 text-gray-600">
-                                  <Phone className="w-4 h-4" />
-                                  {apply.freelancer.userProfile.phone || "N/A"}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-
-                  {!projects?.find((p) => p.projectId === selectedProject)
-                    ?.applies?.length && (
-                    <div className="text-center py-8 text-gray-500">
-                      <p>No applicants yet for this project.</p>
-                    </div>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
+            <ProjectApplicantsDialog
+              onSelectProject={setSelectedProject}
+              selectedProject={selectedProject}
+              projects={projects}
+              onStatusColor={getStatusColor}
+              onAccept={handleAcceptApply}
+              onReject={handleRejectApply}
+              formatDate={formatDate}
+            />
           )}
         </div>
       ) : (
@@ -542,56 +389,12 @@ const ProjectManagementTab: React.FC<{ userId: number, role: string }> = ({ user
 
           <div className="grid gap-6">
             {applies?.map((apply: ApplyType) => (
-              <Card
-                key={apply.applyId}
-                className="hover:shadow-lg transition-shadow duration-300 cursor-pointer"
-                onClick={() => handleCardClick(apply)}
-              >
-                {/* Existing card content */}
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-xl mb-2">
-                        {apply.project.projectName}
-                      </CardTitle>
-                      <Badge className={getStatusColor(apply.status)}>
-                        {apply.status}
-                      </Badge>
-                    </div>
-                    <div className="text-right">
-                      <p className="flex items-center gap-2 text-green-600 font-semibold">
-                        <DollarSign className="w-5 h-5" />
-                        {apply.project.budget}
-                      </p>
-                    </div>
-                  </div>
-                </CardHeader>
-
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Calendar className="w-5 h-5" />
-                      Applied on: {formatDate(apply.createAt)}
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Clock className="w-5 h-5" />
-                      Duration: {apply.duration} days
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Briefcase className="w-5 h-5" />
-                      Category: {apply.project.category?.categoryName}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {apply.status === "Accepted" ? (
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                      ) : apply.status === "Rejected" ? (
-                        <XCircle className="w-5 h-5 text-red-500" />
-                      ) : null}
-                      {apply.status}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <ApplicantCard
+                apply={apply}
+                onClick={handleCardClick}
+                statusColor={getStatusColor}
+                formatDate={formatDate}
+              />
             ))}
 
             {applies?.length === 0 && (
@@ -612,59 +415,14 @@ const ProjectManagementTab: React.FC<{ userId: number, role: string }> = ({ user
       )}
 
       {/* Upload Dialog */}
-      <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Upload Project Files</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="project-file">Project ZIP File</Label>
-              <div className="flex items-center gap-2">
-                <input
-                  id="project-file"
-                  type="file"
-                  accept=".zip"
-                  className="w-full"
-                  onChange={handleFileChange}
-                />
-              </div>
-              {selectedFile && (
-                <p className="text-sm text-gray-500">
-                  Selected: {selectedFile.name}
-                </p>
-              )}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => setUploadDialogOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              onClick={handleUploadSubmit}
-              disabled={!selectedFile || isUploading}
-              className="gap-2"
-            >
-              {isUploading ? (
-                <>
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4" />
-                  Upload Project
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <UploadDialog
+        onUploadOpen={uploadDialogOpen}
+        setOpen={setUploadDialogOpen}
+        onFileChange={handleFileChange}
+        selectedFile={selectedFile}
+        onSubmit={handleUploadSubmit}
+        isUploading={isUploading}
+      />
     </div>
   );
 };
