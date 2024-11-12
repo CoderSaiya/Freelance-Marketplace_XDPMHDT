@@ -25,6 +25,19 @@ const Notification: React.FC = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  const updateNotifications = (notification: NotificationItem) => {
+    setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+    setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
+  };
+
+  useEffect(() => {
+    createHubConnection('notificationHub', updateNotifications);
+
+    return () => {
+      stopHubConnection("notificationHub");
+    };
+  }, []);
+
   useEffect(() => {
     const transformedNotifications: NotificationItem[] =
       data?.data.notificationsByUser?.map((notification) => ({
@@ -38,26 +51,6 @@ const Notification: React.FC = () => {
     setNotifications(transformedNotifications);
     setUnreadCount(transformedNotifications.filter((n) => !n.isRead).length);
   }, [data?.data.notificationsByUser]);
-
-  useEffect(() => {
-    const handleReceiveNotification = (
-      event: string,
-      notification: NotificationItem
-    ) => {
-      setNotifications((prevNotifications) => [
-        notification,
-        ...prevNotifications,
-      ]);
-      setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
-      refetch();
-    };
-
-    createHubConnection("notificationHub", handleReceiveNotification);
-
-    return () => {
-      stopHubConnection("notificationHub");
-    };
-  }, [refetch]);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);

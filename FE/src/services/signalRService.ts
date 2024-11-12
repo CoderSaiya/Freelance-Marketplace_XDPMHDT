@@ -19,6 +19,9 @@ export const createHubConnection = (hubName: string, onReceiveMessage: (event: s
 
   // Add event listener for receiving messages
   connection.on('ReceiveMessage', (...args) => onReceiveMessage('ReceiveMessage', ...args));
+  connection.on("ReceiveNotification", (message) => {
+    alert(message); // Display the notification or handle it as needed
+  });
 
   connection.start()
     .then(() => console.log(`${hubName} Hub connected`))
