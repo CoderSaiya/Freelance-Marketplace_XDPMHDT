@@ -2,6 +2,7 @@ export interface RouteType {
   path: string;
   component: React.FC;
   layout?: React.FC<{ children: React.ReactNode }>;
+  role?: string;
 }
 
 export interface BreadcrumbItem {
@@ -32,6 +33,7 @@ export interface ProfileHeaderProps {
   };
   userId: number;
   username: string;
+  activeTab: string;
 }
 
 export interface TabsProps {

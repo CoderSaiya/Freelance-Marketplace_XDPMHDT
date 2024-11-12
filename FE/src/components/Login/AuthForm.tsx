@@ -19,6 +19,7 @@ interface AuthFormProps {
   handleSubmit: (e: React.FormEvent) => void;
   handleGoogleLogin: () => void;
   toggleAuthMode: () => void;
+  isSuccess: boolean;
 }
 
 export const AuthForm: React.FC<AuthFormProps> = ({
@@ -34,6 +35,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   handleSubmit,
   handleGoogleLogin,
   toggleAuthMode,
+  isSuccess,
 }) => {
   const navigate = useNavigate();
   const toggleHome = () => {
@@ -127,6 +129,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           isLogin={isLogin}
           onSubmit={handleSubmit}
           onGoogleLogin={handleGoogleLogin}
+          isSuccess = {isSuccess}
         />
       </form>
 

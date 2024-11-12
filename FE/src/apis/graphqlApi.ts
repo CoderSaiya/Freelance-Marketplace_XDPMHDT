@@ -465,6 +465,7 @@ export const graphqlApi = createApi({
                   gender
                   location
                 }
+                role
               }
             }
           `,

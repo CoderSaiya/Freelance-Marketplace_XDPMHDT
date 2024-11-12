@@ -42,7 +42,7 @@ import { Label } from "@/components/ui/label";
 import { useUploadImgMutation } from "@/apis/restfulApi";
 import { ProjectType } from "@/types/ProjectType";
 
-const ProjectManagementTab: React.FC<{ role: string }> = ({ role }) => {
+const ProjectManagementTab: React.FC<{ userId: number, role: string }> = ({ userId, role }) => {
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
   const [selectedApply, setSelectedApply] = useState<ApplyType | null>(null);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -56,15 +56,14 @@ const ProjectManagementTab: React.FC<{ role: string }> = ({ role }) => {
     content: null,
     loading: false,
   });
-
-  const userId = useSelector((state: RootState) => state.auth.userId);
   const { data: freelancerData, isLoading: isFreelancerLoading } =
-    useGetApplyByFreelancerQuery(Number(userId));
+    useGetApplyByFreelancerQuery(userId);
   const {
     data: clientData,
     isLoading: isClientLoading,
     refetch,
-  } = useProjectByClientQuery(Number(userId));
+  } = useProjectByClientQuery(userId);
+
   const [contractByProjectId] = useContractByProjectIdMutation();
 
   const [acceptApply] = useAcceptApplyMutation();

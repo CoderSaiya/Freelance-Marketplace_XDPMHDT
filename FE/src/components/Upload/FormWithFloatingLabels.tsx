@@ -8,7 +8,6 @@ interface FormProps {
   budget: string;
   deadline: string;
   skillRequire: string;
-  status: string;
   categoryId: number;
   categories: CategoryType[];
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
@@ -21,7 +20,6 @@ const FormWithFloatingLabels: React.FC<FormProps> = ({
   budget,
   deadline,
   skillRequire,
-  status,
   categoryId,
   categories,
   onChange,
@@ -62,12 +60,6 @@ const FormWithFloatingLabels: React.FC<FormProps> = ({
         value={skillRequire}
         onChange={onChange}
         name="skillRequire"
-      />
-      <FloatingLabelInput
-        label="Status"
-        value={status}
-        onChange={onChange}
-        name="status"
       />
       <div className="flex flex-col">
         <select

@@ -1,14 +1,24 @@
+import { useSelector } from "react-redux";
 import { useUpdateUserProfileMutation } from "../../apis/graphqlApi";
 import { ProfileHeaderProps } from "../../types";
+import { RootState } from "@/store/store";
+import { useNavigate } from "react-router-dom";
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   isEditing,
   setIsEditing,
   contactInfo,
   userId,
-  username
+  username,
+  activeTab,
 }) => {
+  const me = useSelector((state: RootState) => state.auth.username);
   const [updateUserProfile] = useUpdateUserProfileMutation();
+  const navigate = useNavigate();
+
+  const handleAddProject = () => {
+    navigate("/upload")
+  }
 
   const handleSave = async () => {
     try {
@@ -54,15 +64,25 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <button className="bg-blue-500 text-white px-4 py-2 rounded-md shadow">
           Contacts
         </button>
-        <button className="bg-gray-100 text-black px-4 py-2 rounded-md shadow">
+        <button className="bg-red-400 text-white px-4 py-2 rounded-md shadow">
           Report user
         </button>
-        <button
-          className="bg-green-500 text-white px-4 py-2 rounded-md shadow"
-          onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
-        >
-          {isEditing ? "Save" : "Edit"}
-        </button>
+        {activeTab === "About" && username === me && (
+          <>
+            <button
+              className="bg-green-500 text-white px-4 py-2 rounded-md shadow"
+              onClick={() => (isEditing ? handleSave() : setIsEditing(true))}
+            >
+              {isEditing ? "Save" : "Edit"}
+            </button>
+          </>
+        )}
+
+        {activeTab === "Projects" && (
+          <button className="bg-green-500 text-white px-4 py-2 rounded-md shadow" onClick={handleAddProject}>
+            Add project
+          </button>
+        )}
       </div>
     </div>
   );

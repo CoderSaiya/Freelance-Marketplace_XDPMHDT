@@ -33,8 +33,6 @@ const Form: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  
-
   useEffect(() => {
     if (!role && !isLogin) {
       navigate("/welcome");
@@ -135,7 +133,12 @@ const Form: React.FC = () => {
             "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
           ];
 
-        dispatch(setUser({ userId, username: userName }));
+        const role =
+          decodedToken[
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+          ];
+
+        dispatch(setUser({ userId: userId, username: userName, role: role }));
 
         localStorage.setItem("access_token", accessToken);
         localStorage.setItem("refresh", refreshToken);
@@ -231,6 +234,7 @@ const Form: React.FC = () => {
                 handleSubmit={isLogin ? handleLogin : handleSignup}
                 handleGoogleLogin={handleLoginGoogle}
                 toggleAuthMode={() => setIsLogin(!isLogin)}
+                isSuccess={isSuccess}
               />
             </div>
 

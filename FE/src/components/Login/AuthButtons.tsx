@@ -1,15 +1,18 @@
+import { BallTriangle } from "@agney/react-loading";
 import { motion } from "framer-motion";
 
 interface AuthButtonsProps {
   isLogin: boolean;
   onSubmit: (e: React.FormEvent) => void;
   onGoogleLogin: () => void;
+  isSuccess: boolean;
 }
 
 export const AuthButtons: React.FC<AuthButtonsProps> = ({
   isLogin,
   onSubmit,
   onGoogleLogin,
+  isSuccess,
 }) => {
   return (
     <motion.div
@@ -18,14 +21,17 @@ export const AuthButtons: React.FC<AuthButtonsProps> = ({
       transition={{ delay: 0.7 }}
       className="space-y-4 pt-2"
     >
-      <button
-        type="button"
-        onClick={onSubmit}
-        className="w-full py-3 rounded-xl bg-white text-purple-600 font-semibold hover:bg-white/90 transform hover:scale-[1.02] transition-all duration-200"
-      >
-        {isLogin ? "Sign in" : "Sign up"}
-      </button>
-
+      {isSuccess ? (
+        <BallTriangle width="50"></BallTriangle>
+      ) : (
+        <button
+          type="button"
+          onClick={onSubmit}
+          className="w-full py-3 rounded-xl bg-white text-purple-600 font-semibold hover:bg-white/90 transform hover:scale-[1.02] transition-all duration-200"
+        >
+          {isLogin ? "Sign in" : "Sign up"}
+        </button>
+      )}
       <button
         type="button"
         onClick={onGoogleLogin}

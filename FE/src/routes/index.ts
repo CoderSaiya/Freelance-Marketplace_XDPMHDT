@@ -49,6 +49,7 @@ const privateRoute: RouteType[] = [
   {
     path: "/upload",
     component: Upload,
+    role: "Client",
   },
 
   {
