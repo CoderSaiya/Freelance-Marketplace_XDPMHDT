@@ -105,7 +105,7 @@ const Navbar: React.FC = () => {
                 />
 
                 <div className="flex flex-col items-start">
-                  <h2 className="text-base">Username</h2>
+                  <h2 className="text-base">{data?.data.getWallet.user.username}</h2>
                   <span className="text-sm">
                     ${data?.data.getWallet.balance} USD
                   </span>

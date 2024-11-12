@@ -379,7 +379,7 @@ export const graphqlApi = createApi({
                 walletId
                 balance
                 user {
-                  id
+                  username
                 }
               }
             }
