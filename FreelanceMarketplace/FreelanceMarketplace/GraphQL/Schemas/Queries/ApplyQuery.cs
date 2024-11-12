@@ -4,6 +4,8 @@ using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
 using FreelanceMarketplace.GraphQL.Authorization;
+using FreelanceMarketplace.Services;
+using FreelanceMarketplace.Models;
 
 namespace FreelanceMarketplace.GraphQL.Schemas.Queries
 {
@@ -58,7 +60,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                         return await applyService.GetApplyByFreelancerIdAsync(freelancerId);
                     }
                 })
-            }.AuthorizeWith("Freelancer", "Admin"));
+            }.AuthorizeWith("Freelancer", "Admin", "Client"));
 
             AddField(new FieldType
             {
