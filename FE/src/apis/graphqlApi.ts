@@ -519,11 +519,26 @@ export const graphqlApi = createApi({
           query: `
             mutation GetContractByProjectId($projectId: Int!) {
               contractByProjectId(projectId: $projectId) {
+                contractId
                 filePath
               }
             }
           `,
           variables: { projectId },
+        },
+      }),
+    }),
+    finishedProject: builder.mutation<ResponseType<{ finishedProject: boolean }>, number>({
+      query: (contractId) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            mutation FinishedProject($contractId: Int!) {
+              finishedProject(contractId: $contractId)
+            }
+          `,
+          variables: { contractId },
         },
       }),
     }),
@@ -571,4 +586,4 @@ export const graphqlApi = createApi({
   }),
 });
 
-export const { useCreateProjectMutation, useGetProjectQuery, useGetApplyByFreelancerQuery, useProjectByIdQuery, useProjectByClientQuery, useGetAppliesQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useAcceptApplyMutation, useGetWalletQuery, useUpdateWalletBalanceMutation, useGetCategoryQuery, useUserByIdQuery, useUserByUsernameQuery, useUpdateUserProfileMutation, useUpdateURLFileContractMutation, useContractByProjectIdMutation, useNotificationsByUserQuery, useMarkNotificationAsReadMutation } = graphqlApi;
+export const { useCreateProjectMutation, useGetProjectQuery, useGetApplyByFreelancerQuery, useProjectByIdQuery, useProjectByClientQuery, useGetAppliesQuery, useCreateApplyMutation, useHasAppliedForProjectQuery, useAcceptApplyMutation, useGetWalletQuery, useUpdateWalletBalanceMutation, useGetCategoryQuery, useUserByIdQuery, useUserByUsernameQuery, useUpdateUserProfileMutation, useUpdateURLFileContractMutation, useContractByProjectIdMutation, useFinishedProjectMutation, useNotificationsByUserQuery, useMarkNotificationAsReadMutation } = graphqlApi;

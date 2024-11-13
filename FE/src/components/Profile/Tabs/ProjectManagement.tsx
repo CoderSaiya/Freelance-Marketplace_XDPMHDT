@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   useAcceptApplyMutation,
   useContractByProjectIdMutation,
+  useFinishedProjectMutation,
   useGetApplyByFreelancerQuery,
   useProjectByClientQuery,
   useUpdateURLFileContractMutation,
@@ -65,6 +66,7 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
   const [acceptApply] = useAcceptApplyMutation();
   const [uploadFileZip] = useUploadImgMutation();
   const [updateURLFileContract] = useUpdateURLFileContractMutation();
+  const [finishProject] = useFinishedProjectMutation();
 
   const applies = freelancerData?.data.applyByFreelancerId;
   const projects = clientData?.data.projectByClient;
@@ -120,6 +122,31 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
     }
   };
 
+  const handleFinishProject = async (contractId: number) => {
+    try {
+      const { data } = await finishProject(contractId).unwrap();
+
+      if (data.finishedProject) {
+        notification.success({
+          message: "Successs!!",
+        });
+
+        setSelectedProject(null);
+        refetch();
+      }else {
+        notification.error({
+          message: "Not found contract or project",
+        });
+      }
+
+      // setFileStatus(false);
+    } catch (error) {
+      notification.error({
+        message: "Failed: " + error,
+      });
+    }
+  };
+
   const fetchFileStatus = async (project: ProjectType) => {
     setFileStatus({ content: null, loading: true });
     try {
@@ -171,7 +198,14 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
               Download Project Files
             </Button>
 
-            <Button className="gap-2 bg-green-500">
+            <Button
+              className="gap-2 bg-green-500"
+              onClick={() =>
+                handleFinishProject(
+                  response.data.contractByProjectId.contractId
+                )
+              }
+            >
               <Check className="w-5 h-5" />
               Complete
             </Button>
@@ -208,11 +242,11 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
 
   const getProjectStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case "open":
+      case "active":
         return "bg-green-100 text-green-800";
-      case "in progress":
+      case "processing":
         return "bg-blue-100 text-blue-800";
-      case "completed":
+      case "finished":
         return "bg-purple-100 text-purple-800";
       case "cancelled":
         return "bg-red-100 text-red-800";
