@@ -137,6 +137,24 @@ namespace FreelanceMarketplace.Services
             contract.Status = newStatus;
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> FinishedProject(int contractId)
+        {
+            var contract = await _context.Contracts.FindAsync(contractId);
+            if (contract == null)
+                return false;
+
+            contract.Status = "Finished";
+            contract.EndDate = DateTime.Now;
+
+            var project = await _context.Projects.FirstOrDefaultAsync(p => p.ProjectId == contract.ProjectId);
+            if (project == null)
+                return false;
+            project.Status = "Finished";
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 
 }

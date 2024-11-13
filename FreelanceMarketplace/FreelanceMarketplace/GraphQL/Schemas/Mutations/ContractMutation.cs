@@ -88,6 +88,20 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
                     return await contractService.GetContractByProject(projectId);
                 })
             }.AuthorizeWith("Admin", "Client", "Freelancer"));
+
+            AddField(new FieldType
+            {
+                Name = "finishedProject",
+                Type = typeof(BooleanGraphType),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "contractId" }
+                ),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    int contractId = context.GetArgument<int>("contractId");
+                    return await contractService.FinishedProject(contractId);
+                })
+            }.AuthorizeWith("Admin", "Client"));
         }
     }
 }

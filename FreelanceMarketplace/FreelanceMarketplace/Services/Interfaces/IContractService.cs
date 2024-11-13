@@ -11,5 +11,6 @@ namespace FreelanceMarketplace.Services.Interfaces
         Task<Contracts?> UpdateContractAsync(int contractId, Contracts contract);
         Task<Contracts> UpdateURLFileContractAsync(int freelanceId, int projectId, string url);
         Task<bool> DeleteContractAsync(int contractId);
+        Task<bool> FinishedProject(int contractId);
     }
 }
