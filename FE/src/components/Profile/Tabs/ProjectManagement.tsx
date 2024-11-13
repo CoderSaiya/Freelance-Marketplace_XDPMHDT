@@ -19,13 +19,13 @@ import { Briefcase, Download, FileCheck, FileX, Check } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApplyType } from "@/types/ApplyType";
 import { notification } from "antd";
-import { Label } from "@/components/ui/label";
 import { useUploadImgMutation } from "@/apis/restfulApi";
 import { ProjectType } from "@/types/ProjectType";
 import ProjectCard from "../ProjectCard";
 import ProjectApplicantsDialog from "../ProjectApplicantsDialog";
 import UploadDialog from "../UploadDialog";
 import ApplicantCard from "../ApplicantCard";
+import RatingDialog from "../RatingDialog";
 
 const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
   userId,
@@ -44,6 +44,14 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
     content: null,
     loading: false,
   });
+  const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
+  const [userToRate, setUserToRate] = useState<{
+    name: string;
+    role: string;
+    projectTitle: string;
+    userId: number;
+  } | null>(null);
+
   const { data: freelancerData, isLoading: isFreelancerLoading } =
     useGetApplyByFreelancerQuery(userId);
   const {
@@ -62,12 +70,53 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
   const projects = clientData?.data.projectByClient;
 
   const handleProjectClick = async (project: ProjectType) => {
-    if (project.status.toLowerCase() === "processing") {
+    if (project.status.toLowerCase() === "finished") {
+      const acceptedApply = project.applies?.find(
+        (apply: ApplyType) => apply.status === "Accepted"
+      );
+
+      if (acceptedApply) {
+        if (role === "Client") {
+          setUserToRate({
+            name: acceptedApply.freelancer.username,
+            role: "Freelancer",
+            projectTitle: project.projectName,
+            userId: acceptedApply.freelancer.id,
+          });
+        } else {
+          setUserToRate({
+            name: String(project.users?.username),
+            role: "Client",
+            projectTitle: project.projectName,
+            userId: Number(project.users?.id),
+          });
+        }
+        setRatingDialogOpen(true);
+      }
+    } else if (project.status.toLowerCase() === "processing") {
       setSelectedProject(project.projectId);
       setProjectStatusDialog(true);
       await fetchFileStatus(project);
     } else {
       setSelectedProject(project.projectId);
+    }
+  };
+
+  const handleRatingSubmit = async (rating: number, review: string) => {
+    if (!userToRate) return;
+
+    try {
+      //call graphql to submit
+
+      notification.success({
+        message: "Rating Submitted",
+        description: "Thank you for your feedback!",
+      });
+    } catch (error) {
+      notification.error({
+        message: "Failed to submit rating: " + error,
+        description: "Please try again later.",
+      });
     }
   };
 
@@ -423,6 +472,18 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
         onSubmit={handleUploadSubmit}
         isUploading={isUploading}
       />
+
+      {userToRate && (
+        <RatingDialog
+          isOpen={ratingDialogOpen}
+          onClose={() => {
+            setRatingDialogOpen(false);
+            setUserToRate(null);
+          }}
+          onSubmit={handleRatingSubmit}
+          userToRate={userToRate}
+        />
+      )}
     </div>
   );
 };
