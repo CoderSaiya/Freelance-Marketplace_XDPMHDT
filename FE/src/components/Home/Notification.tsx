@@ -1,9 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { BellOutlined, CheckCircleOutlined } from "@ant-design/icons";
-import {
-  createHubConnection,
-  stopHubConnection,
-} from "@/services/signalRService";
 import { Card } from "@/components/ui/card";
 import {
   TooltipProvider,
@@ -14,9 +10,16 @@ import {
 import { Avatar } from "@/components/ui/avatar";
 import { formatDistanceToNow } from "date-fns";
 import { NotificationItem } from "@/types/NotificationType";
-import { useNotificationsByUserQuery, useMarkNotificationAsReadMutation } from "@/apis/graphqlApi";
+import {
+  useNotificationsByUserQuery,
+  useMarkNotificationAsReadMutation,
+} from "@/apis/graphqlApi";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import {
+  createHubConnection,
+  stopHubConnection,
+} from "@/services/notificationService";
 
 const Notification: React.FC = () => {
   const userId = useSelector((state: RootState) => state.auth.userId);
@@ -25,18 +28,16 @@ const Notification: React.FC = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  const updateNotifications = (notification: NotificationItem) => {
-    setNotifications((prevNotifications) => [notification, ...prevNotifications]);
-    setUnreadCount((prevUnreadCount) => prevUnreadCount + 1);
-  };
-
   useEffect(() => {
-    createHubConnection('notificationHub', updateNotifications);
-
-    return () => {
-      stopHubConnection("notificationHub");
+    const handleNotification = (notification: NotificationItem) => {
+      setNotifications((prev) => [notification, ...prev]);
+      setUnreadCount((prev) => prev + 1);
     };
-  }, []);
+
+    createHubConnection("notificationhub", handleNotification);
+
+    return () => stopHubConnection();
+  }, [userId]);
 
   useEffect(() => {
     const transformedNotifications: NotificationItem[] =
@@ -45,7 +46,7 @@ const Notification: React.FC = () => {
         sender: notification.sender.username,
         recipient: notification.receiver.username,
         message: notification.message,
-        createAt: notification.createdAt,
+        createdAt: notification.createdAt,
         isRead: notification.isRead,
       })) || [];
     setNotifications(transformedNotifications);
@@ -123,13 +124,13 @@ const Notification: React.FC = () => {
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <span className="text-gray-400 text-sm">
-                                {formatDistanceToNow(notification.createAt, {
+                                {formatDistanceToNow(notification.createdAt, {
                                   addSuffix: true,
                                 })}
                               </span>
                             </TooltipTrigger>
                             <TooltipContent>
-                              {new Date(notification.createAt).toLocaleString()}
+                              {new Date(notification.createdAt).toLocaleString()}
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>

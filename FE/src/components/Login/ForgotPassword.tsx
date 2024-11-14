@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  MailOutlined,
-  CheckCircleOutlined,
-  ArrowLeftOutlined,
-} from "@ant-design/icons";
+import { MailOutlined, ArrowLeftOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   onForgot: (status: boolean) => void;
@@ -13,6 +10,8 @@ interface Props {
 const ForgotPassword: React.FC<Props> = ({ onForgot }) => {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,7 +36,10 @@ const ForgotPassword: React.FC<Props> = ({ onForgot }) => {
           </button>
 
           <div className="mb-8">
-            <div className="flex items-center mb-8">
+            <div
+              className="flex items-center mb-8 cursor-pointer"
+              onClick={() => navigate("/")}
+            >
               <img src="/img/logo.png" alt="Logo" className="w-12 h-12" />
               <h1 className="ml-4 text-2xl font-bold text-white">
                 Freelance Marketplace
@@ -75,7 +77,7 @@ const ForgotPassword: React.FC<Props> = ({ onForgot }) => {
               </div>
               <button
                 type="submit"
-                className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium transition-all duration-200 transform hover:scale-105"
+                className="w-full py-3 rounded-xl bg-white text-purple-600 font-semibold hover:bg-white/90 transform hover:scale-[1.02] transition-all duration-200"
               >
                 Send Reset Instructions
               </button>
