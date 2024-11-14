@@ -47,9 +47,10 @@ const FilterPage = () => {
       name: project.projectName,
       price: project.budget,
       description: project.projectDescription,
+      image: project.imageUrls[0],
       owner: {
         name: project.users.username,
-        avatar: project.imageUrls[0], // Use the first image as avatar
+        avatar: project.users.userProfile.avatar,
       },
       category: project.category.categoryName,
       categoryId: project.category.categoryId,

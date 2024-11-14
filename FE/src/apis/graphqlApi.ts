@@ -167,6 +167,10 @@ export const graphqlApi = createApi({
                 users {
                   id
                   username
+                  userProfile {
+                    avatar
+                    rating
+                  }
                 }
               }
             }

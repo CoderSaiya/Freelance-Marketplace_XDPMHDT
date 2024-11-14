@@ -46,6 +46,7 @@ export interface ProjectWithImage {
     skillRequire: string;
     status: string;
     createAt: Date;
+    avatar: string;
     category: CategoryType;
     imageUrls: string[];
     users: User;

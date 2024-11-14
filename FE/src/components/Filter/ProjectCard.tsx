@@ -14,6 +14,7 @@ interface ProjectCardProps {
     name: string;
     price: number;
     description: string;
+    image: string;
     owner: {
       name: string;
       avatar: string;
@@ -56,7 +57,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
           </div>
         </div>
         <img
-          src={project.owner.avatar}
+          src={project.image}
           alt={project.name}
           className="w-full h-48 object-cover rounded-lg"
         />
