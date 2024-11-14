@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useGetCategoryQuery, useGetProjectQuery } from "../../apis/graphqlApi";
 import ProjectCard from "./ProjectCard";
-import FilterColumn from "./FilterColumn"; // Import the new component
-import Breadcrumb from "../Public/Breadcrumb";
+import FilterColumn from "./FilterColumn";
+import { Card } from "../ui/card";
 
 const calculateDeadline = (days: number): string => {
   const currentDate = new Date();
@@ -22,11 +22,6 @@ const FilterPage = () => {
     priceRange: [0, 1000],
     deliveryTime: "Anytime",
   });
-
-  const breadcrumbItems = [
-    { name: "Home", link: "/" },
-    { name: "Projects", link: "" },
-  ];
 
   const { data: categoryData } = useGetCategoryQuery();
   const categories = categoryData?.data.categories;
@@ -123,10 +118,7 @@ const FilterPage = () => {
   if (error) return <div>Error fetching projects</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 flex">
-      {/* Breadcrumb */}
-      <Breadcrumb items={breadcrumbItems} />
-
+    <div className="min-h-screen bg-background p-8">
       {/* Filter Column */}
       <FilterColumn
         filters={filters}
@@ -135,23 +127,27 @@ const FilterPage = () => {
         categories={categories || []}
       />
 
-      {/* Project List */}
-      <div className="ml-[270px] w-full grid grid-cols-3 gap-6">
+      {/* Project Grid */}
+      <div className="ml-[300px]">
         {filteredProjects.length > 0 ? (
-          filteredProjects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              truncateDescription={(description: string) => {
-                const maxLength = 60;
-                return description.length > maxLength
-                  ? `${description.substring(0, maxLength)}...`
-                  : description;
-              }}
-            />
-          ))
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProjects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                truncateDescription={(description: string) => {
+                  const maxLength = 60;
+                  return description.length > maxLength
+                    ? `${description.substring(0, maxLength)}...`
+                    : description;
+                }}
+              />
+            ))}
+          </div>
         ) : (
-          <p>No projects found.</p>
+          <Card className="p-8 text-center">
+            <p className="text-muted-foreground">No projects found matching your criteria.</p>
+          </Card>
         )}
       </div>
     </div>
