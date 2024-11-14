@@ -28,6 +28,7 @@ namespace FreelanceMarketplace.Services
                     .Include(p => p.Contract)
                     .Include(p => p.Images)
                     .Include(p => p.Users)
+                        .ThenInclude(u => u.UserProfile)
                     .ToListAsync();
             }
             catch (Exception ex)

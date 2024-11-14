@@ -15,7 +15,7 @@ namespace FreelanceMarketplace.Models
         public string? Location { get; set; }
         public string? Bio { get; set; }
         public string? Skill { get; set; }
-        public string? Avatar { get; set; }
+        public string? Avatar { get; set; } = "img/logo.png";
         public string? Industry { get; set; }
         [Required]
         public int UserId { get; set; }
