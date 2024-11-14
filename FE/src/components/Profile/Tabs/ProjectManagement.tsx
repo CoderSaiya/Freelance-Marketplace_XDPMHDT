@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import {
   useAcceptApplyMutation,
+  useCheckReviewedMutation,
   useContractByProjectIdMutation,
+  useCreateReviewMutation,
   useFinishedProjectMutation,
   useGetApplyByFreelancerQuery,
   useProjectByClientQuery,
@@ -27,11 +29,13 @@ import ProjectApplicantsDialog from "../ProjectApplicantsDialog";
 import UploadDialog from "../UploadDialog";
 import ApplicantCard from "../ApplicantCard";
 import RatingDialog from "../RatingDialog";
+import { ReviewInput } from "@/types/ReviewType";
 
 const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
   userId,
   role,
 }) => {
+  const [currentProject, setCurrentProject] = useState<number | null>(null);
   const [selectedProject, setSelectedProject] = useState<number | null>(null);
   const [selectedApply, setSelectedApply] = useState<ApplyType | null>(null);
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -67,12 +71,27 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
   const [uploadFileZip] = useUploadImgMutation();
   const [updateURLFileContract] = useUpdateURLFileContractMutation();
   const [finishProject] = useFinishedProjectMutation();
+  const [createReview] = useCreateReviewMutation();
+  const [checkReviewed] = useCheckReviewedMutation();
 
   const applies = freelancerData?.data.applyByFreelancerId;
   const projects = clientData?.data.projectByClient;
 
   const handleProjectClick = async (project: ProjectType) => {
+    setCurrentProject(project.projectId);
     if (project.status.toLowerCase() === "finished") {
+      const response = await checkReviewed({
+        projectId: project.projectId,
+        userId: userId,
+      }).unwrap();
+
+      if (response.data.checkReviewed) {
+        notification.info({
+          message: "you have rated !!",
+        });
+        return;
+      }
+
       const acceptedApply = project.applies?.find(
         (apply: ApplyType) => apply.status === "Accepted"
       );
@@ -109,11 +128,38 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
 
     try {
       //call graphql to submit
+      console.log(selectedApply);
+      console.log(currentProject);
+      const response =
+        role === "Client"
+          ? await contractByProjectId(Number(currentProject)).unwrap()
+          : await contractByProjectId(
+              Number(selectedApply?.projectId)
+            ).unwrap();
+
+      const formData = new FormData();
+      // formData.append("userId",userId.toString());
+      // formData.append("contractId",response?.data.contractByProjectId.contractId.toString());
+      // formData.append("rating",rating.toString());
+      // formData.append("feedback",review);
+
+      const rate = {
+        userId: userId,
+        contractId: response?.data.contractByProjectId.contractId,
+        rating: rating,
+        feedback: review,
+      };
+      console.log(rate);
+
+      await createReview({ review: rate }).unwrap();
 
       notification.success({
         message: "Rating Submitted",
         description: "Thank you for your feedback!",
       });
+
+      setSelectedProject(null);
+      refetch();
     } catch (error) {
       notification.error({
         message: "Failed to submit rating: " + error,
@@ -133,7 +179,7 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
 
         setSelectedProject(null);
         refetch();
-      }else {
+      } else {
         notification.error({
           message: "Not found contract or project",
         });
@@ -357,6 +403,18 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
   const handleCardClick = (apply: ApplyType) => {
     if (role !== "Client" && apply.status === "Accepted") {
       setSelectedApply(apply);
+      if (apply.project.status.toLowerCase() === "finished") {
+        setUserToRate({
+          name: String(apply.project.users?.username),
+          role: "Client",
+          projectTitle: apply.project.projectName,
+          userId: Number(apply.project.users?.id),
+        });
+
+        setRatingDialogOpen(true);
+        console.log(ratingDialogOpen);
+        return;
+      }
       setUploadDialogOpen(true);
     }
   };
@@ -365,9 +423,7 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
     return (
       <div className="space-y-4">
         <Skeleton className="h-8 w-64" />
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-48 w-full" />
-        ))}
+        {[1, 2, 3].map((i) => 1)}
       </div>
     );
   }
