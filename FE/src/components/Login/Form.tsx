@@ -14,6 +14,7 @@ import { RegisterReq } from "@/types";
 import { AuthLayout } from "./AuthLayout";
 import { AuthForm } from "./AuthForm";
 import { ImageSide } from "./ImageSide";
+import ForgotPassword from "./ForgotPassword";
 
 const Form: React.FC = () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -26,6 +27,8 @@ const Form: React.FC = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [isShowPass, setIsShowPass] = useState(false);
+  const [forgotStatus, setForgotStatus] = useState(false);
+
   const [loginUser] = useLoginUserMutation();
   const [registerUser] = useRegisterUserMutation();
   const [loginGoogle, { data, error, isSuccess }] = useLoginGoogleMutation();
@@ -220,26 +223,33 @@ const Form: React.FC = () => {
             transition={transition}
           >
             {/* Content Side */}
-            <div className="w-1/2 h-full p-12 flex flex-col justify-center">
-              <AuthForm
-                isLogin={isLogin}
-                username={username}
-                password={password}
-                email={email}
-                isShowPass={isShowPass}
-                setEmail={setEmail}
-                setUsername={setUsername}
-                setPassword={setPassword}
-                setIsShowPass={setIsShowPass}
-                handleSubmit={isLogin ? handleLogin : handleSignup}
-                handleGoogleLogin={handleLoginGoogle}
-                toggleAuthMode={() => setIsLogin(!isLogin)}
-                isSuccess={isSuccess}
-              />
-            </div>
+            {!forgotStatus ? (
+              <>
+                <div className="w-1/2 h-full p-12 flex flex-col justify-center">
+                  <AuthForm
+                    isLogin={isLogin}
+                    username={username}
+                    password={password}
+                    email={email}
+                    isShowPass={isShowPass}
+                    setEmail={setEmail}
+                    setUsername={setUsername}
+                    setPassword={setPassword}
+                    setIsShowPass={setIsShowPass}
+                    handleSubmit={isLogin ? handleLogin : handleSignup}
+                    handleGoogleLogin={handleLoginGoogle}
+                    toggleAuthMode={() => setIsLogin(!isLogin)}
+                    isSuccess={isSuccess}
+                    onFogot={setForgotStatus}
+                  />
+                </div>
 
-            {/* Image Side */}
-            <ImageSide />
+                {/* Image Side */}
+                <ImageSide />
+              </>
+            ) : (
+              <ForgotPassword onForgot={setForgotStatus} />
+            )}
           </motion.div>
         </AnimatePresence>
       </div>

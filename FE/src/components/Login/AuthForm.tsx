@@ -20,6 +20,7 @@ interface AuthFormProps {
   handleGoogleLogin: () => void;
   toggleAuthMode: () => void;
   isSuccess: boolean;
+  onFogot: (status: boolean) => void;
 }
 
 export const AuthForm: React.FC<AuthFormProps> = ({
@@ -36,6 +37,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   handleGoogleLogin,
   toggleAuthMode,
   isSuccess,
+  onFogot
 }) => {
   const navigate = useNavigate();
   const toggleHome = () => {
@@ -118,7 +120,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
         </motion.div>
 
         {isLogin && (
-          <div className="flex justify-end">
+          <div className="flex justify-end" onClick={() => onFogot(true)}>
             <a href="#" className="text-white/80 hover:text-white text-sm">
               Forgot your password?
             </a>
