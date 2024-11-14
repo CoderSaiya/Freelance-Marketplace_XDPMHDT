@@ -48,5 +48,5 @@ export interface ProjectWithImage {
     createAt: Date;
     category: CategoryType;
     imageUrls: string[];
-    user: User;
+    users: User;
 }

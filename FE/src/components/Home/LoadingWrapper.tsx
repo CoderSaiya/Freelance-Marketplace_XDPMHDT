@@ -6,7 +6,7 @@ const LoadingWrapper: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
 
-  const excludedPaths = ["/dashboard", "welcome"];
+  const excludedPaths = ["/dashboard", "/welcome", "/login"];
 
   useEffect(() => {
     if (!excludedPaths.includes(location.pathname)) {
