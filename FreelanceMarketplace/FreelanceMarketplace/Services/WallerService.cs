@@ -16,12 +16,13 @@ namespace FreelanceMarketplace.Services
 
         public async Task<Wallet> GetWalletByUserIdAsync(int userId)
         {
-            return await _context.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
+            return await _context.Wallets.Include(u => u.User).FirstOrDefaultAsync(w => w.UserId == userId);
         }
 
         public async Task<Wallet> UpdateWalletBalanceAsync(int userId, decimal amount)
         {
-            var wallet = await _context.Wallets.FindAsync(userId);
+            var wallet = await _context.Wallets
+                .FirstOrDefaultAsync(w => w.UserId == userId);
             if (wallet != null)
             {
                 wallet.Balance = (wallet.Balance ?? 0) + amount;

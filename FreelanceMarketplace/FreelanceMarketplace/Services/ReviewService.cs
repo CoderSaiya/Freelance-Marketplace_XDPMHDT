@@ -1,21 +1,24 @@
 ﻿using FreelanceMarketplace.Data;
+using FreelanceMarketplace.Hubs;
 using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Services.Interfaces;
-using Google.Apis.Drive.v3.Data;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Cms;
 using System.Linq.Expressions;
+using static GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged;
 
 namespace FreelanceMarketplace.Services
 {
     public class ReviewService : IReviewService
     {
         private readonly AppDbContext _context;
-        private readonly INotificationService _notificationService;
+        private readonly IHubContext<NotificationHub> _notificationHubContext;
 
-        public ReviewService(AppDbContext context, INotificationService notificationService)
+        public ReviewService(AppDbContext context, IHubContext<NotificationHub> notificationHub)
         {
             _context = context;
-            _notificationService = notificationService;
+            _notificationHubContext = notificationHub;
         }
 
         public async Task<List<Review>> GetAllReviewsAsync()
@@ -41,7 +44,7 @@ namespace FreelanceMarketplace.Services
                 var review = await _context.Reviews
                     .Include(c => c.User)
                     .Include(c => c.Contract)
-                    .FirstOrDefaultAsync(c=>c.ReviewId == reviewId);
+                    .FirstOrDefaultAsync(c => c.ReviewId == reviewId);
 
                 if (review == null)
                     throw new KeyNotFoundException("Review not found");
@@ -58,14 +61,39 @@ namespace FreelanceMarketplace.Services
         {
             try
             {
-                _context.Reviews.Add(review);
-                await _context.SaveChangesAsync();
-                await _notificationService.CreateNotificationAsync(new Notification
+                Users admin = _context.Users.FirstOrDefault(u => u.Username == "admin");
+                Users recipient = _context.Users.FirstOrDefault(u => u.Id == review.UserId);
+                if (admin == null || recipient == null)
                 {
-                    SenderId = review.UserId,
-                    Message = $"You have received a new review {review.Rating} ({GetRatingStatus(review.Rating)}",
-                    CreatedAt = DateTime.UtcNow
-                });
+                    throw new Exception("Admin or user not found.");
+                }
+                var message = $"You has new review!!";
+
+                _context.Reviews.Add(review);
+
+                Notification notification = new Notification
+                {
+                    SenderId = admin.Id,
+                    ReceiverId = recipient.Id,
+                    Message = message,
+                };
+
+                _context.Notifications.Add(notification);
+
+                await _context.SaveChangesAsync();
+
+                await _notificationHubContext.Clients.User(recipient.Id.ToString())
+                    .SendAsync("ReceiveNotification", new
+                    {
+                        id = notification.Id,
+                        message = notification.Message,
+                        createdAt = notification.CreatedAt,
+                        sender = admin.Username,
+                        recipient = recipient.Username,
+                        isRead = notification.IsRead
+                    });
+
+                await _context.SaveChangesAsync();
                 return review;
             }
             catch (Exception ex)
@@ -74,37 +102,52 @@ namespace FreelanceMarketplace.Services
             }
         }
 
-        public async Task<Review?> UpdateReviewAsync(int reviewId, Review review)
-        {
-            try
-            {
-                var existingReview = await _context.Reviews.FindAsync(review.ReviewId);
-                if (existingReview == null)
-                {
-                    throw new KeyNotFoundException("Review not found");
-                }
+        //public async Task<Review?> UpdateReviewAsync(int reviewId, Review review)
+        //{
+        //    try
+        //    {
+        //        Users admin = _context.Users.FirstOrDefault(u => u.Username == "admin");
 
-                existingReview.UserId = review.UserId;
-                existingReview.ContractId = review.ContractId;
-                existingReview.Rating = review.Rating;
-                existingReview.Feedback = review.Feedback;
+        //        if (admin == null)
+        //        {
+        //            throw new Exception("Admin is on vacation =))");
+        //        }
 
-                _context.Reviews.Update(existingReview);
-                await _context.SaveChangesAsync();
-                await _notificationService.CreateNotificationAsync(new Notification
-                {
-                    SenderId = review.UserId,
-                    Message = $"Review have been updated {review.Rating} ({GetRatingStatus(review.Rating)}",
-                    CreatedAt = DateTime.UtcNow
-                });
 
-                return existingReview;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error updating review", ex);
-            }
-        }
+        //        var existingReview = await _context.Reviews.FindAsync(review.ReviewId);
+        //        if (existingReview == null)
+        //        {
+        //            throw new KeyNotFoundException("Review not found");
+        //        }
+
+        //        existingReview.UserId = review.UserId;
+        //        existingReview.ContractId = review.ContractId;
+        //        existingReview.Rating = review.Rating;
+        //        existingReview.Feedback = review.Feedback;
+
+        //        _context.Reviews.Update(existingReview);
+        //        await _context.SaveChangesAsync();
+
+        //        await _notificationHubContext.Clients.User(recipient.Id.ToString())
+        //            .SendAsync("ReceiveNotification", new
+        //            {
+        //                id = notification.Id,
+        //                message = notification.Message,
+        //                createdAt = notification.CreatedAt,
+        //                sender = admin.Username,
+        //                recipient = recipient.Username,
+        //                isRead = notification.IsRead
+        //            });
+
+        //        await _context.SaveChangesAsync();
+
+        //        return existingReview;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("Error updating review", ex);
+        //    }
+        //}
 
         public async Task<bool> DeleteReviewAsync(int reviewId)
         {
@@ -125,14 +168,14 @@ namespace FreelanceMarketplace.Services
             }
         }
 
-        //public async Task<List<Users>> GetUsersRankedByRatingAsync()
-        //{
-        //    var rankUsers = await _context.Users
-        //        .Include(u => u.Reviews) // Include reviews for calculating average rating
-        //        .OrderByDescending(u => u.Reviews.Average(r => r.Rating)) // Order by average rating descending
-        //        .ToListAsync();
-        //    return rankUsers;
-        //}
+        public async Task<bool> CheckReviewed(int projectId, int userId)
+        {
+            var reviewExists = await _context.Reviews
+                .AnyAsync(r => r.Contract.ProjectId == projectId && r.UserId == userId);
+
+            return reviewExists;
+        }
+
         public async Task<List<Review>> GetReviewsSortedByRatingAsync(bool ascending = false)
         {
             try
@@ -170,9 +213,5 @@ namespace FreelanceMarketplace.Services
                 return "Kém";
             }
         }
-
-
     }
-
-
 }

@@ -14,7 +14,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
         {
             AddField(new FieldType
             {
-                Name = "review",
+                Name = "reviews",
                 Type = typeof(ListGraphType<ReviewType>),
                 Resolver = new FuncFieldResolver<object>(async context =>
                 {
@@ -45,8 +45,8 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                 Name = "reviewsSortedByRating",
                 Type = typeof(ListGraphType<ReviewType>),
                 Arguments = new QueryArguments(
-                new QueryArgument<BooleanGraphType> { Name = "ascending", Description = "Sort in ascending order" }
-    ),
+                    new QueryArgument<BooleanGraphType> { Name = "ascending", Description = "Sort in ascending order" }
+                ),
                 Resolver = new FuncFieldResolver<object>(async context =>
                 {
                     bool ascending = context.GetArgument<bool>("ascending", false);  // Mặc định là sắp xếp giảm dần
@@ -55,7 +55,6 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                     return await reviewService.GetReviewsSortedByRatingAsync(ascending);
                 })
             }.AuthorizeWith("Admin", "Client", "Freelancer"));
-
         }
     }
 }

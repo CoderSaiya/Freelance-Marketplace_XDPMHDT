@@ -10,25 +10,18 @@ namespace FreelanceMarketplace.Models
         public int ReviewId { get; set; }
 
         [Required]
-        [ForeignKey("UserId")]
         public int UserId { get; set; }
 
         [Required]
-        [ForeignKey("ContractId")]
-        public  int ContractId { get; set; }
+        public int ContractId { get; set; }
         [Required]
         public int Rating { get; set; }
         public String? Feedback { get; set; }
 
-        public Users? User { get; set; }    
+        [ForeignKey("UserId")]
+        public Users? User { get; set; }
 
+        [ForeignKey("ContractId")]
         public Contracts? Contract { get; set; }
-
-
-        
-
-
-
-
     }
 }

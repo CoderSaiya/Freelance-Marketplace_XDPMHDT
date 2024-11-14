@@ -11,7 +11,7 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
 {
     public class ReviewMutation : ObjectGraphType
     {
-        public ReviewMutation(IReviewService reviewService ) 
+        public ReviewMutation(IReviewService reviewService)
         {
             AddField(new FieldType
             {
@@ -22,26 +22,33 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
             ),
                 Resolver = new FuncFieldResolver<object>(async context =>
                 {
-                    var input = context.GetArgument<Review>("review");
-                    return await reviewService.CreateReviewAsync(input);
+                    var input = context.GetArgument<Dictionary<string, object>>("review");
+                    var review = new Review
+                    {
+                        UserId = Convert.ToInt32(input["userId"]),
+                        ContractId = Convert.ToInt32(input["contractId"]),
+                        Rating = Convert.ToInt32(input["rating"]),
+                        Feedback = input["feedback"].ToString(),
+                    };
+                    return await reviewService.CreateReviewAsync(review);
                 })
-            }.AuthorizeWith("Client", "Admin"));
+            }.AuthorizeWith("Client", "Freelancer"));
 
-            AddField(new FieldType
-            {
-                Name = "updateReview",
-                Type = typeof(ReviewType),
-                Arguments = new QueryArguments(
-                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "reviewId" },
-                    new QueryArgument<NonNullGraphType<ReviewInputType>> { Name = "review" }
-                ),
-                Resolver = new FuncFieldResolver<object>(async context =>
-                {
-                    var reviewId = context.GetArgument<int>("reviewId");
-                    var input = context.GetArgument<Review>("Review");
-                    return await reviewService.UpdateReviewAsync(reviewId, input);
-                })
-            }.AuthorizeWith("Admin","Client"));
+            //AddField(new FieldType
+            //{
+            //    Name = "updateReview",
+            //    Type = typeof(ReviewType),
+            //    Arguments = new QueryArguments(
+            //        new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "reviewId" },
+            //        new QueryArgument<NonNullGraphType<ReviewInputType>> { Name = "review" }
+            //    ),
+            //    Resolver = new FuncFieldResolver<object>(async context =>
+            //    {
+            //        var reviewId = context.GetArgument<int>("reviewId");
+            //        var input = context.GetArgument<Review>("Review");
+            //        return await reviewService.UpdateReviewAsync(reviewId, input);
+            //    })
+            //}.AuthorizeWith("Admin", "Client"));
 
             AddField(new FieldType
             {
@@ -56,7 +63,22 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
                     return await reviewService.DeleteReviewAsync(reviewId);
                 })
             }.AuthorizeWith("Admin", "Client"));
+
+            AddField(new FieldType
+            {
+                Name = "checkReviewed",
+                Type = typeof(BooleanGraphType),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "projectId" },
+                    new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "userId" }
+                ),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    var projectId = context.GetArgument<int>("projectId");
+                    var userId = context.GetArgument<int>("userId");
+                    return await reviewService.CheckReviewed(projectId, userId);
+                })
+            }.AuthorizeWith("Freelancer", "Client"));
         }
     }
 }
-

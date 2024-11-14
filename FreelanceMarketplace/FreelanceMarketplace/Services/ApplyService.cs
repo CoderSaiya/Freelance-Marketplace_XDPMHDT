@@ -37,7 +37,9 @@ namespace FreelanceMarketplace.Services
             {
                 return await _context.Applies
                     .Include(a => a.Freelancer)
+                        .ThenInclude(f => f.UserProfile)
                     .Include(a => a.Client)
+                        .ThenInclude(f => f.UserProfile)
                     .Include(a => a.Project)
                     .ToListAsync();
             }
@@ -53,8 +55,11 @@ namespace FreelanceMarketplace.Services
             {
                 return await _context.Applies
                     .Include(a => a.Freelancer)
+                        .ThenInclude(f => f.UserProfile)
                     .Include(a => a.Client)
+                        .ThenInclude(f => f.UserProfile)
                     .Include(a => a.Project)
+                        .ThenInclude(p => p.Users)
                     .Where(a => a.FreelancerId == freelancerId)
                     .ToListAsync();
             }
