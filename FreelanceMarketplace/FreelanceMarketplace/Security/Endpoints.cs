@@ -12,10 +12,7 @@
             "/api/auth/signin-google",
             "/api/auth/google-response",
             "/graphql",
-            "/chathub/negotiate",
-            "/chathub",
-            "/notificationhub",
-            "/notificationhub/negotiate",
+
         };
 
         public static readonly string[] AdminEndpoints =
@@ -30,7 +27,11 @@
             "/api/chat/send",
             "/api/chat/history",
             "/api/stripe/create-payment-intent",
-            "/api/stripe/webhook"
+            "/api/stripe/webhook",
+            "/notificationhub",
+            "/notificationhub/negotiate",
+            "/chathub/negotiate",
+            "/chathub",
         };
 
         public static readonly string[] ClientEndpoints =
@@ -38,8 +39,11 @@
             "/api/chat/send",
             "/api/chat/history",
             "/api/stripe/create-payment-intent",
-            "/api/stripe/webhook"
-
+            "/api/stripe/webhook",
+            "/notificationhub",
+            "/notificationhub/negotiate",
+            "/chathub/negotiate",
+            "/chathub",
         };
     }
 }

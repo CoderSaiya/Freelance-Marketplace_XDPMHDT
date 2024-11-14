@@ -111,16 +111,19 @@ namespace FreelanceMarketplace.Services
 
                 await _context.SaveChangesAsync();
 
-                await _notificationHubContext.Clients.User(recipient.Id.ToString())
-                    .SendAsync("ReceiveNotification", new
+                var connectionId = NotificationHub.GetConnectionId(recipient.Username);
+                if (connectionId != null)
+                {
+                    await _notificationHubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", new
                     {
                         id = notification.Id,
                         message = notification.Message,
-                        createdAt = notification.CreatedAt,
+                        createdAt = notification.CreatedAt?.ToString("o") ?? "Invalid Date",
                         sender = admin.Username,
                         recipient = recipient.Username,
                         isRead = notification.IsRead
                     });
+                }
 
 
                 return project;

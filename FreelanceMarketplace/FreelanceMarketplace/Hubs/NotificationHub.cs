@@ -11,6 +11,7 @@ namespace FreelanceMarketplace.Hubs
         private readonly INotificationService _notificationService;
         private readonly IUserService _userService;
         private readonly AppDbContext _context;
+        private static readonly Dictionary<string, string> _userConnections = new();
 
         public NotificationHub(
             INotificationService notificationService,
@@ -25,34 +26,34 @@ namespace FreelanceMarketplace.Hubs
         /// <summary>
         /// Sends a notification to a specific user
         /// </summary>
-        public async Task SendNotification(string senderUsername, string recipientUsername, string message)
+        public async Task SendNotification(string sender, string recipientId, string message)
         {
-            var recipient = _userService.GetUserByUsername(recipientUsername);
-            var sender = _userService.GetUserByUsername(senderUsername);
-            if (recipient == null || sender == null) return;
+            var senderId = _userService.GetUserByUsername(sender).Id;
+            if (senderId == null || string.IsNullOrEmpty(recipientId)) return;
 
             var notification = new Notification
             {
-                SenderId = sender.Id,
-                ReceiverId = recipient.Id,
+                SenderId = senderId,
+                ReceiverId = int.Parse(recipientId),
                 Message = message,
-                CreatedAt = DateTime.UtcNow,
-                IsRead = false
+                CreatedAt = DateTime.UtcNow
             };
 
-            await _context.Notifications.AddAsync(notification);
+            _context.Notifications.Add(notification);
             await _context.SaveChangesAsync();
 
-            await Clients.User(recipient.Id.ToString())
-                .SendAsync("ReceiveNotification", new
+            // Notify only the specific recipient
+            if (_userConnections.TryGetValue(recipientId, out var recipientConnectionId))
+            {
+                await Clients.Client(recipientConnectionId).SendAsync("ReceiveNotification", new
                 {
                     id = notification.Id,
                     message = notification.Message,
                     createdAt = notification.CreatedAt,
                     sender = sender,
-                    recipient = recipient,
                     isRead = notification.IsRead
                 });
+            }
         }
 
         /// Sends a notification to multiple users
@@ -92,26 +93,37 @@ namespace FreelanceMarketplace.Hubs
                 .ToListAsync();
         }
 
-        /// Handles client connection
-        public override async Task OnConnectedAsync()
+        private string IdentityName
         {
-            var userIdClaim = Context.User?.FindFirst("sub")?.Value;
-            if (!string.IsNullOrEmpty(userIdClaim))
+            get { return Context.User.Identity.Name; }
+        }
+
+        /// Handles client connection
+        public override Task OnConnectedAsync()
+        {
+            var userId = Context.User.Identity.Name;
+            Console.WriteLine("Userid is " + userId);
+            if (userId != null)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, $"User_{userIdClaim}");
+                _userConnections[userId] = Context.ConnectionId;
             }
-            await base.OnConnectedAsync();
+            return base.OnConnectedAsync();
         }
 
         /// Handles client disconnection
-        public override async Task OnDisconnectedAsync(Exception? exception)
+        public override Task OnDisconnectedAsync(Exception? exception)
         {
-            var userIdClaim = Context.User?.FindFirst("sub")?.Value;
-            if (!string.IsNullOrEmpty(userIdClaim))
+            var userId = Context.User?.Identity?.Name;
+            if (userId != null)
             {
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"User_{userIdClaim}");
+                _userConnections.Remove(userId);
             }
-            await base.OnDisconnectedAsync(exception);
+            return base.OnDisconnectedAsync(exception);
+        }
+
+        public static string? GetConnectionId(string username)
+        {
+            return _userConnections.TryGetValue(username, out var connectionId) ? connectionId : null;
         }
     }
 }

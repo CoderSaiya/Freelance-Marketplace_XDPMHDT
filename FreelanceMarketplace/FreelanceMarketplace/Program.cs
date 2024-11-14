@@ -16,7 +16,8 @@ using FreelanceMarketplace.GraphQL.Schemas;
 using GraphQL;
 using GraphQL.Types;
 using FreelanceMarketplace.Models.DTOs;
-
+using Microsoft.AspNetCore.SignalR;
+using FreelanceMarketplace.Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,7 @@ builder.Services.AddAuthentication(options =>
         {
             var accessToken = context.Request.Query["access_token"];
             var path = context.HttpContext.Request.Path;
-            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chathub"))
+            if ((!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chathub")) || (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/notificationhub")))
             {
                 context.Token = accessToken;
             }
@@ -92,6 +93,8 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("ClientOnly", policy => policy.RequireRole("Client"));
     options.AddPolicy("Public", policy => policy.RequireAssertion(context => true));
 });
+
+builder.Services.AddSingleton<IUserIdProvider, IdentityProvider>();
 
 // Register services
 builder.Services.AddScoped<IAuthService, AuthService>();
