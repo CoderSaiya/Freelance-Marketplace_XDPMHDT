@@ -9,7 +9,7 @@ import { RouteType } from "../types";
 import Chat from "../pages/Chat";
 import NoLayout from "@/layouts/NoLayout";
 import WelcomePage from "@/pages/Welcome";
-
+import AdminDashboard from "@/pages/Admin";
 const publicRoute: RouteType[] = [
   {
     path: "/",
@@ -61,7 +61,13 @@ const privateRoute: RouteType[] = [
     path: "/chat",
     component: Chat,
     layout: NoLayout,
-  }
+  },
+
+  {
+    path: "/admin",
+    component: AdminDashboard,
+    layout: NoLayout,
+  },
 ];
 
 export { privateRoute, publicRoute };

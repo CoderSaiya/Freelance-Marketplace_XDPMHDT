@@ -15,3 +15,11 @@ export interface ChatWindowProps {
     selectedConversation: Conversation | null;
     toggleDetails: () => void;
 }
+
+export interface ChatItem {
+    id: number;
+    sender: string;
+    recipeient: string;
+    message?: string;
+    Timestamp: string;
+}

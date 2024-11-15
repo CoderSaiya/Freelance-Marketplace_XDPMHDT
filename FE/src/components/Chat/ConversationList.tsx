@@ -4,12 +4,17 @@ import { Clock, MessageSquare } from "lucide-react";
 import { ScrollArea } from "../ui/scroll-area";
 import { Card, CardContent } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { useNavigate } from "react-router-dom";
 
 const ConversationList: React.FC<ConversationListProps> = ({
   conversations,
   selectedConversation,
   onSelectConversation,
 }) => {
+  const navigate = useNavigate();
+  const handleHome = () => {
+    navigate("/");
+  }
   return (
     // <div className="w-1/4 h-full border-r p-4 overflow-y-auto">
     //   <div className="mb-4">
@@ -44,6 +49,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
     <div className="w-80 border-r bg-white">
       <div className="p-4 border-b">
         <div className="flex items-center gap-2">
+          <img src="img/logo.png" width="40" className="cursor-pointer" onClick={handleHome}/>
           <MessageSquare className="h-5 w-5" />
           <h2 className="font-semibold">Messages</h2>
         </div>

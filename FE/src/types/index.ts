@@ -93,3 +93,16 @@ export interface RegisterReq {
   email: string;
   role: string;
 }
+
+export interface Project {
+  title: string;
+  budget: string;
+  progress: number;
+  status: "active" | "completed";
+  dueDate: string;
+}
+
+export interface Revenue {
+  month: string;
+  revenue: number;
+}

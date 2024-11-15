@@ -8,14 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Menu, MessageSquare, Send } from "lucide-react";
 import {
   createHubConnection,
-  sendHubMessage,
   stopHubConnection,
-} from "../../services/signalRService";
+} from "@/services/notificationService";
 import {
   useGetChatHistoryQuery,
   useSendMessageMutation,
 } from "../../apis/restfulApi";
-import { ChatWindowProps } from "../../types/chat";
+import { ChatItem, ChatWindowProps } from "../../types/chat";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
@@ -48,15 +47,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   };
 
   useEffect(() => {
-    const handleReceiveMessage = (event: string, user: string, message: string) => {
-      if (event === "ReceiveMessage") {
-        refetchChatHistory();
-      }
+    const handleNotification = (chat: ChatItem) => {
+      alert(chat.message);
     };
 
-    createHubConnection("chatHub", handleReceiveMessage);
-    return () => stopHubConnection("chatHub");
-  }, [refetchChatHistory]);
+    createHubConnection("notificationhub", handleNotification);
+
+    return () => stopHubConnection();
+  }, [userId]);
 
   if (!selectedConversation) {
     return (
