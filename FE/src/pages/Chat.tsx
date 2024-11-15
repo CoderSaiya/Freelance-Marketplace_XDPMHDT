@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { FaBars } from "react-icons/fa";
 import ConversationList from "../components/Chat/ConversationList";
 import ChatWindow from "../components/Chat/ChatWindow";
 import DetailsPanel from "../components/Chat/DetailsPanel";
@@ -7,7 +6,7 @@ import { Conversation } from "../types/chat";
 
 const Chat: React.FC = () => {
   const [showDetails, setShowDetails] = useState(false);
-  const [selectedConversation, setSelectedConversation] =
+  const [selectedConversation, setSelectedConversation] = 
     useState<Conversation | null>(null);
 
   const conversations: Conversation[] = [
@@ -23,32 +22,18 @@ const Chat: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-slate-50">
       <ConversationList
+        selectedConversation={selectedConversation}
         conversations={conversations}
         onSelectConversation={handleSelectConversation}
       />
-      <div className="flex-1 flex flex-col border-l border-r relative">
-        <header className="flex justify-between items-center p-4 border-b">
-          <h2>
-            {selectedConversation
-              ? selectedConversation.name
-              : "Select a conversation"}
-          </h2>
-          <div className="flex items-center">
-            <span className="text-green-500">Online</span>
-            <FaBars onClick={toggleDetails} className="ml-4 cursor-pointer" />
-          </div>
-        </header>
-        {selectedConversation ? (
-          <ChatWindow recipient={selectedConversation.name} />
-        ) : (
-          <div className="flex-1 flex items-center justify-center">
-            Please select a conversation
-          </div>
-        )}
-      </div>
-      <DetailsPanel show={showDetails} onClose={toggleDetails} />
+      <ChatWindow 
+        recipient={selectedConversation?.name || ""} 
+        selectedConversation={selectedConversation}
+        toggleDetails={toggleDetails}
+      />
+      <DetailsPanel show={showDetails} onClose={toggleDetails} selectedConversation={selectedConversation} />
     </div>
   );
 };

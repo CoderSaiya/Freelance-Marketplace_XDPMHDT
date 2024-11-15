@@ -7,8 +7,11 @@ export interface Conversation {
 export interface ConversationListProps {
     conversations: Conversation[];
     onSelectConversation: (conversation: Conversation) => void;
+    selectedConversation: Conversation | null
 }
 
 export interface ChatWindowProps {
     recipient: string;
+    selectedConversation: Conversation | null;
+    toggleDetails: () => void;
 }

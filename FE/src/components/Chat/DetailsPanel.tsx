@@ -1,34 +1,78 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React from "react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { User2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Conversation } from "@/types/chat";
 
 interface DetailsPanelProps {
   show: boolean;
   onClose: () => void;
+  selectedConversation: Conversation | null;
 }
 
-const DetailsPanel: React.FC<DetailsPanelProps> = ({ show, onClose }) => {
+const DetailsPanel: React.FC<DetailsPanelProps> = ({
+  show,
+  onClose,
+  selectedConversation,
+}) => {
   return (
-    <motion.div
-      initial={{ x: '100%' }}
-      animate={{ x: show ? 0 : '100%' }}
-      transition={{ type: 'spring', stiffness: 300 }}
-      className="fixed top-0 right-0 w-1/3 h-full bg-white shadow-lg p-4 z-10"
-    >
-      <button onClick={onClose} className="text-blue-500">
-        Hide Details
-      </button>
-      <div className="mt-4">
-        <h3>Trip details</h3>
-        <img
-          src="https://via.placeholder.com/150"
-          alt="Apartment"
-          className="w-full h-48 object-cover rounded-lg"
-        />
-        <h4>Apartment in Siena</h4>
-        <p>4-6 guests · Entire Home · 5 beds · 3 bath</p>
-        <p>Apr 12-16, 2023 night - $600 total</p>
-      </div>
-    </motion.div>
+    <Sheet open={show} onOpenChange={onClose}>
+      <SheetContent className="w-[400px] sm:w-[540px]">
+        <SheetHeader>
+          <SheetTitle>Conversation Details</SheetTitle>
+        </SheetHeader>
+        <div className="mt-6">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex flex-col items-center gap-4">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage
+                    src={
+                      selectedConversation
+                        ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedConversation.name}`
+                        : undefined
+                    }
+                  />
+                  <AvatarFallback>
+                    <User2 className="h-12 w-12" />
+                  </AvatarFallback>
+                </Avatar>
+                <div className="text-center">
+                  <h3 className="text-xl font-semibold">
+                    {selectedConversation?.name || "No conversation selected"}
+                  </h3>
+                  <Badge variant="success" className="mt-2">
+                    Online
+                  </Badge>
+                  <p className="text-sm text-slate-500 mt-2">
+                    Last active: {selectedConversation?.lastMessageTime || "N/A"}
+                  </p>
+                </div>
+              </div>
+
+              <Separator className="my-6" />
+
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-sm font-medium mb-2">Contact Info</h4>
+                  <p className="text-sm text-slate-500">
+                    Email: {selectedConversation?.name.toLowerCase()}@example.com
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 };
 

@@ -60,6 +60,7 @@ const privateRoute: RouteType[] = [
   {
     path: "/chat",
     component: Chat,
+    layout: NoLayout,
   }
 ];
 
