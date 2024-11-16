@@ -1,3 +1,4 @@
+import { useGetProjectQuery } from "@/apis/graphqlApi";
 import AnalyticsContent from "@/components/Admin/AnalytsContent";
 import ContractContent from "@/components/Admin/ContractContent";
 import DashboardContent from "@/components/Admin/DashboardContent";
@@ -35,6 +36,7 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
+import { format } from "date-fns";
 
 const revenueData: Revenue[] = [
   { month: "Jan", revenue: 4000 },
@@ -45,46 +47,77 @@ const revenueData: Revenue[] = [
   { month: "Jun", revenue: 5500 },
 ];
 
-const projectData: Project[] = [
-  {
-    title: "Website E-commerce",
-    budget: "$5,000",
-    progress: 75,
-    status: "active",
-    dueDate: "2024-12-01",
-  },
-  {
-    title: "Mobile App Development",
-    budget: "$12,000",
-    progress: 30,
-    status: "active",
-    dueDate: "2024-12-15",
-  },
-  {
-    title: "Brand Design",
-    budget: "$3,000",
-    progress: 100,
-    status: "completed",
-    dueDate: "2024-11-30",
-  },
-];
-
 const AdminDashboard: React.FC = () => {
   const [currentTab, setCurrentTab] = useState("dashboard");
 
+  const { data } = useGetProjectQuery();
+
+  const projects = data?.data.projects || [];
+
+  const getProgress = (status: string) => {
+    let progress = 0;
+    switch (status.toLowerCase()) {
+      case "active":
+        progress = 0;
+        break;
+      case "processing":
+        progress = 50;
+        break;
+      case "finished":
+        progress = 100;
+        break;
+    }
+    return progress;
+  };
+
+  const projectData: Project[] = projects.map((project) => ({
+    title: project.projectName || "N/A",
+    budget: project.budget ? `$${project.budget}` : "N/A",
+    progress: getProgress(project.status) || 0,
+    status: project.status || "unknown",
+    dueDate: format(new Date(project.deadline), "dd/MM/yyyy"),
+  }));
+
   const menuItems = [
-    { icon: <LayoutDashboard className="h-5 w-5" />, title: "Dashboard", id: "dashboard" },
-    { icon: <FolderKanban className="h-5 w-5" />, title: "Projects", id: "projects", badge: 8 },
+    {
+      icon: <LayoutDashboard className="h-5 w-5" />,
+      title: "Dashboard",
+      id: "dashboard",
+    },
+    {
+      icon: <FolderKanban className="h-5 w-5" />,
+      title: "Projects",
+      id: "projects",
+      badge: 8,
+    },
     { icon: <Users className="h-5 w-5" />, title: "Users", id: "users" },
-    { icon: <BarChart2 className="h-5 w-5" />, title: "Analytics", id: "analytics" },
-    { icon: <FileText className="h-5 w-5" />, title: "Contracts", id: "contracts", badge: 3 },
-    { icon: <Settings className="h-5 w-5" />, title: "Settings", id: "settings" },
+    {
+      icon: <BarChart2 className="h-5 w-5" />,
+      title: "Analytics",
+      id: "analytics",
+    },
+    {
+      icon: <FileText className="h-5 w-5" />,
+      title: "Contracts",
+      id: "contracts",
+      badge: 3,
+    },
+    {
+      icon: <Settings className="h-5 w-5" />,
+      title: "Settings",
+      id: "settings",
+    },
   ];
 
   const renderContent = () => {
     switch (currentTab) {
       case "dashboard":
-        return <DashboardContent projectData={projectData} revenueData={revenueData} />;
+        return (
+          <DashboardContent
+            projectData={projectData}
+            revenueData={revenueData}
+          />
+        );
       case "projects":
         return <ProjectsContent projectData={projectData} />;
       case "users":
@@ -96,7 +129,12 @@ const AdminDashboard: React.FC = () => {
       case "settings":
         return <SettingsContent />;
       default:
-        return <DashboardContent projectData={projectData} revenueData={revenueData} />;
+        return (
+          <DashboardContent
+            projectData={projectData}
+            revenueData={revenueData}
+          />
+        );
     }
   };
 
@@ -147,29 +185,35 @@ const AdminDashboard: React.FC = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                <img src="/api/placeholder/32/32" alt="Avatar" className="rounded-full" />
+                <img
+                  src="/api/placeholder/32/32"
+                  alt="Avatar"
+                  className="rounded-full"
+                />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
               <DropdownMenuLabel className="font-normal">
                 <div className="flex flex-col space-y-1">
                   <p className="text-sm font-medium">Admin User</p>
-                  <p className="text-xs text-muted-foreground">admin@example.com</p>
+                  <p className="text-xs text-muted-foreground">
+                    admin@example.com
+                  </p>
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <User className="mr-2 h-4 w-4" />
-                Hồ sơ
+                Profile
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <Settings className="mr-2 h-4 w-4" />
-                Cài đặt
+                Setting
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="text-red-600">
                 <LogOut className="mr-2 h-4 w-4" />
-                Đăng xuất
+                Log out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

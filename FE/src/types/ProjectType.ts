@@ -1,5 +1,6 @@
 import { ApplyType } from "./ApplyType";
 import { CategoryType } from "./CategoryType";
+import { Contract } from "./ContractType";
 import { User } from "./UserType";
 
 export interface ProjectResponseType<T> {
@@ -13,11 +14,12 @@ export interface ProjectType {
     budget: number;
     deadline: string;
     skillRequire: string;
-    status: string;
+    status: "active" | "completed" | "processing";
     createAt: string;
     users?: User;
     category?: CategoryType;
-    applies: ApplyType[]
+    applies: ApplyType[];
+    contract: Contract;
 }
 
 export interface ProjectInput {

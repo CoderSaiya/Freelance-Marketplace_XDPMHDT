@@ -1,3 +1,5 @@
+import { ProjectType } from "./ProjectType";
+
 export type User = {
     id: number;
     username: string;
@@ -6,7 +8,10 @@ export type User = {
     role: string;
     isEmailConfirmed: boolean;
     createAt: string;
+    status: string;
     userProfile: UserProfileType;
+    projects?: ProjectType[];
+    earning?: number;
 }
 
 export interface UserProfileType {

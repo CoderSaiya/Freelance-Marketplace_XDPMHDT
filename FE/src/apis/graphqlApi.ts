@@ -436,6 +436,33 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    getUsers: builder.query<ResponseType<{ users: User[] }>, void>({
+      query: () => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query {
+              users {
+                id
+                username
+                role
+                status
+                email
+                projects {
+                  projectId
+                  budget
+                }
+                userProfile {
+                  phone
+                  skill
+                }
+              }
+            }
+          `,
+        },
+      }),
+    }), 
     userById: builder.query<ResponseType<{ userById: User }>, number>({
       query: (userId) => ({
         url: 'graphql',
@@ -447,6 +474,7 @@ export const graphqlApi = createApi({
                 id
                 username
                 email
+                status
                 userProfile {
                   rating
                   company
@@ -641,6 +669,7 @@ export const { useCreateProjectMutation,
   useGetWalletQuery,
   useUpdateWalletBalanceMutation,
   useGetCategoryQuery,
+  useGetUsersQuery,
   useUserByIdQuery,
   useUserByUsernameQuery,
   useUpdateUserProfileMutation,
