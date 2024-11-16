@@ -1,3 +1,6 @@
+import { ProjectType } from "./ProjectType";
+import { User } from "./UserType";
+
 export interface Contract {
     contractId: number;
     projectId: number;
@@ -8,4 +11,7 @@ export interface Contract {
     startDate: string;
     endDate: string;
     filePath: string;
+    project: ProjectType;
+    freelancer: User;
+    client: User;
 }

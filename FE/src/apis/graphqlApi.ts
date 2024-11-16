@@ -551,6 +551,32 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    getContracts: builder.query<ResponseType<{ contracts: Contract[] }>, void>({
+      query: () => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query {
+              contracts {
+                contractId
+                paymentAmount
+                status
+                project {
+                  projectName
+                }
+                freelancer {
+                  username
+                }
+                client {
+                  username
+                }
+              }
+            }
+          `,
+        },
+      }),
+    }),
     updateURLFileContract: builder.mutation<ResponseType<{ updateURLFileContract: Contract }>, { freelanceId: number; projectId: number; url: string }>({
       query: ({ freelanceId, projectId, url }) => ({
         url: 'graphql',
@@ -777,6 +803,7 @@ export const { useCreateProjectMutation,
   useUserByIdQuery,
   useUserByUsernameQuery,
   useUpdateUserProfileMutation,
+  useGetContractsQuery,
   useUpdateURLFileContractMutation,
   useContractByProjectIdMutation,
   useFinishedProjectMutation,
