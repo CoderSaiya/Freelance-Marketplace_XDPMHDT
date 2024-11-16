@@ -1,4 +1,5 @@
 ﻿using FreelanceMarketplace.Models;
+using FreelanceMarketplace.Models.DTOs;
 
 namespace FreelanceMarketplace.Services.Interfaces
 {
@@ -15,6 +16,7 @@ namespace FreelanceMarketplace.Services.Interfaces
         Task<List<Project>> GetProjectsWithPagingAndSortingAsync(int page = 1, int pageSize = 10, string sortBy = "ProjectName", bool isAscending = true);
         Task<List<Project>> GetProjectsWithPagingAsync(int page = 1, int pageSize = 10);
         Task<List<Project>> GetProjectsWithSortingAsync(string sortBy = "ProjectName", bool isAscending = true);
+        Task<List<ProjectWithImageDto>> GetAllProjectsWithImageAsync();
 
     }
 }

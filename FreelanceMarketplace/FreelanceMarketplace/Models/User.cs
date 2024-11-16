@@ -21,6 +21,7 @@ namespace FreelanceMarketplace.Models
         public string? Role { get; set; } = "Client";
         public bool IsEmailConfirmed { get; set; } = false;
         public string? EmailConfirmationToken { get; set; }
+        public string Status { get; set; } = "Active";
         public DateTime CreateAt { get; set; } = DateTime.Now;
         public ICollection<RefreshTokens> RefreshTokens { get; set; } = new List<RefreshTokens>();
         public ICollection<Contracts> FreelancerContracts { get; set; } = new List<Contracts>();

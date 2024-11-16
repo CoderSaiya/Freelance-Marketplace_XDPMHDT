@@ -62,7 +62,6 @@ namespace FreelanceMarketplace.Services
                 Gender = null,
                 Bio = null,
                 Skill = null,
-                Avatar = null,
                 Industry = null,
                 Status = "Active"
             };
@@ -78,6 +77,28 @@ namespace FreelanceMarketplace.Services
             <a href='{confirmationLink}'>Confirm email</a>";
 
             await _emailService.SendEmailAsync(user.Email, "Xác nhận đăng ký tài khoản", emailBody);
+
+            return true;
+        }
+
+        public async Task<bool> ForgotPassword(string mail)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == mail);
+            if (user == null) return false;
+
+            user.EmailConfirmationToken = Guid.NewGuid().ToString();
+
+            await _context.SaveChangesAsync();
+
+            var link = $"http://localhost:5173/forgotpass?userId={user.Id}&token={user.EmailConfirmationToken}";
+
+            var emailBody = $@"
+            <h2>Change password</h2>
+            <p>Hi, {user.Username}</p>
+            <p>Please click the link below to change your password:</p>
+            <a href='{link}'>Click here to change password</a>";
+
+            await _emailService.SendEmailAsync(user.Email, "Change password", emailBody);
 
             return true;
         }
@@ -194,7 +215,7 @@ namespace FreelanceMarketplace.Services
 
         public List<Users> GetUsers()
         {
-            return _context.Users.ToList();
+            return _context.Users.Include(u => u.UserProfile).Include(u => u.Projects).ToList();
         }
 
         public bool DeleteUserById(int userId)

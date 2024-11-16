@@ -1,6 +1,7 @@
 ﻿using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Hubs;
 using FreelanceMarketplace.Models;
+using FreelanceMarketplace.Models.DTOs;
 using FreelanceMarketplace.Services.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -310,6 +311,32 @@ namespace FreelanceMarketplace.Services
             catch (Exception ex)
             {
                 throw new Exception("Error retrieving projects with sorting", ex);
+            }
+        }
+
+        public async Task<List<ProjectWithImageDto>> GetAllProjectsWithImageAsync()
+        {
+            try
+            {
+                return await _context.Projects
+                    .Include(p => p.Images)
+                    .Select(p => new ProjectWithImageDto
+                    {
+                        ProjectId = p.ProjectId,
+                        ProjectName = p.ProjectName,
+                        ProjectDescription = p.ProjectDescription,
+                        Budget = p.Budget,
+                        Deadline = p.Deadline,
+                        SkillRequire = p.SkillRequire,
+                        Status = p.Status,
+                        CategoryId = p.CategoryId,
+                        ImageUrls = p.Images.Select(i => i.ImageUrl).ToList()
+                    })
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving projects with images", ex);
             }
         }
 
