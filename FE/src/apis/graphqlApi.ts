@@ -4,7 +4,7 @@ import { setTokens, logout } from '../features/authSlice';
 import { ProjectType, ProjectWithImage } from '../types/ProjectType';
 import { restfulApi } from './restfulApi'
 import { ApplyInput, ApplyType } from '../types/ApplyType';
-import { ResponseType } from '../types';
+import { ResponseType, Revenue, StatisticsType } from '../types';
 import { WalletType } from '../types/WalletType';
 import { CategoryType } from '../types/CategoryType';
 import { User, UserProfileInput, UserProfileType } from '../types/UserType';
@@ -671,6 +671,60 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    getRevenue: builder.query<ResponseType<{ monthlyRevenue: Revenue[] }>, void>({
+      query: () => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query {
+              monthlyRevenue {
+                month
+                revenue
+              }
+            }
+          `,
+        },
+      }),
+    }),
+    getStatistics: builder.query<ResponseType<{ statistics: StatisticsType }>, void>({
+      query: () => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query {
+              statistics {
+                revenueStatistics {
+                  today
+                  thisWeek
+                  thisMonth
+                  thisYear
+                }
+                projectStatistics {
+                  today
+                  thisWeek
+                  thisMonth
+                  thisYear
+                }
+                freelancerStatistics {
+                  today
+                  thisWeek
+                  thisMonth
+                  thisYear
+                }
+                contractStatistics {
+                  today
+                  thisWeek
+                  thisMonth
+                  thisYear
+                }
+              }
+            }
+          `,
+        },
+      }),
+    }),
   }),
 });
 
@@ -696,4 +750,6 @@ export const { useCreateProjectMutation,
   useNotificationsByUserQuery,
   useMarkNotificationAsReadMutation,
   useCreateReviewMutation,
-  useCheckReviewedMutation } = graphqlApi;
+  useCheckReviewedMutation,
+  useGetRevenueQuery,
+  useGetStatisticsQuery } = graphqlApi;

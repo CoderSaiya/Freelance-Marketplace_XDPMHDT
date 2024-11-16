@@ -108,3 +108,17 @@ export interface Revenue {
   month: string;
   revenue: number;
 }
+
+export interface GlobalDashboard {
+  today: number;
+  thisWeek: number;
+  thisMonth: number;
+  thisYear: number;
+}
+
+export interface StatisticsType {
+  revenueStatistics: GlobalDashboard
+  projectStatistics: GlobalDashboard
+  freelancerStatistics: GlobalDashboard
+  contractStatistics: GlobalDashboard
+}

@@ -1,4 +1,4 @@
-import { useGetProjectQuery } from "@/apis/graphqlApi";
+import { useGetProjectQuery, useGetRevenueQuery } from "@/apis/graphqlApi";
 import AnalyticsContent from "@/components/Admin/AnalytsContent";
 import ContractContent from "@/components/Admin/ContractContent";
 import DashboardContent from "@/components/Admin/DashboardContent";
@@ -22,7 +22,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Project, Revenue } from "@/types";
+import { Project } from "@/types";
 import {
   BarChart2,
   Bell,
@@ -38,20 +38,13 @@ import {
 import { useState } from "react";
 import { format } from "date-fns";
 
-const revenueData: Revenue[] = [
-  { month: "Jan", revenue: 4000 },
-  { month: "Feb", revenue: 3000 },
-  { month: "Mar", revenue: 5000 },
-  { month: "Apr", revenue: 4500 },
-  { month: "May", revenue: 6000 },
-  { month: "Jun", revenue: 5500 },
-];
-
 const AdminDashboard: React.FC = () => {
   const [currentTab, setCurrentTab] = useState("dashboard");
 
   const { data } = useGetProjectQuery();
+  const { data: revenueData } = useGetRevenueQuery();
 
+  const revenues = revenueData?.data.monthlyRevenue || [];
   const projects = data?.data.projects || [];
 
   const getProgress = (status: string) => {
@@ -115,7 +108,7 @@ const AdminDashboard: React.FC = () => {
         return (
           <DashboardContent
             projectData={projectData}
-            revenueData={revenueData}
+            revenueData={revenues}
           />
         );
       case "projects":
@@ -123,7 +116,7 @@ const AdminDashboard: React.FC = () => {
       case "users":
         return <UsersContent />;
       case "analytics":
-        return <AnalyticsContent revenueData={revenueData} />;
+        return <AnalyticsContent revenueData={revenues} />;
       case "contracts":
         return <ContractContent />;
       case "settings":
@@ -132,7 +125,7 @@ const AdminDashboard: React.FC = () => {
         return (
           <DashboardContent
             projectData={projectData}
-            revenueData={revenueData}
+            revenueData={revenues}
           />
         );
     }
