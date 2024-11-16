@@ -10,12 +10,16 @@ import ClientInfo from "./ClientInfo";
 import SimilarProjects from "./SimilarProjects";
 import Breadcrumb from "../Public/Breadcrumb";
 
-const ProjectDetailPage: React.FC<ProjectType> = (props) => {
+const ProjectDetailPage: React.FC<ProjectType> = (props, refech) => {
+  const tagsString = props.skillRequire;
+  const tagsArray = tagsString.split(",").map((tag) => tag.trim());
+
   const breadcrumbItems = [
     { name: "Home", link: "/" },
     { name: "Projects", link: "/filter" },
     { name: props.projectName, link: "" },
   ];
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen flex flex-col md:flex-row gap-6">
       {/* Left Column */}
@@ -23,33 +27,37 @@ const ProjectDetailPage: React.FC<ProjectType> = (props) => {
         {/* Breadcrumb */}
         <Breadcrumb items={breadcrumbItems} />
 
-        <ProjectHeader projectName={props.projectName} budget={props.budget} />
-        <ProjectDescription description={props.projectDescription} />
-        <ProjectTags
-          tags={[
-            "Tài năng giọng nói",
-            "Dịch vụ âm thanh",
-            "Quảng cáo",
-            "Sản xuất âm thanh",
-            "Tiếp tục truyền thông xã hội",
-          ]}
+        <ProjectHeader
+          projectName={props.projectName}
+          budget={props.budget}
+          status={props.status}
+          createAt={props.createAt}
+          deadline={props.deadline}
         />
-        <ProjectInfo />
+        <ProjectDescription description={props.projectDescription} />
+        <ProjectTags tags={tagsArray} />
+        <ProjectInfo
+          projectId={props.projectId}
+          applies={props.applies}
+          status={String(props.status)}
+        />
         <ApplyAndBenefits
           clientId={Number(props.users?.id)}
           projectId={props.projectId}
+          refechProject={refech}
         />
-        <ApplierList />
+        <ApplierList applies={props.applies}/>
       </div>
 
       {/* Right Column */}
       <div className="md:w-1/4 space-y-6">
         <button className="bg-pink-500 text-white font-semibold w-full p-3 rounded-lg">
-          Đăng một dự án như thế này
+          Post a project like that
         </button>
         <ClientInfo
           username={String(props.users?.username)}
           createAt={String(props.users?.createAt)}
+          rating={Number(props.users?.userProfile.rating)}
         />
         <SimilarProjects />
       </div>

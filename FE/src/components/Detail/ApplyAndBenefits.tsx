@@ -11,9 +11,10 @@ import { notification } from "antd";
 interface Props {
   clientId: number;
   projectId: number;
+  refechProject: () => void;
 }
 
-const ApplyAndBenefits: React.FC<Props> = ({ clientId, projectId }) => {
+const ApplyAndBenefits: React.FC<Props> = ({ clientId, projectId, refechProject }) => {
   const [duration, setDuration] = useState(0);
 
   const [createApply] = useCreateApplyMutation();
@@ -41,9 +42,10 @@ const ApplyAndBenefits: React.FC<Props> = ({ clientId, projectId }) => {
     try {
       await createApply({ apply }).unwrap();
       refetch();
+      refechProject();
       notification.success({
-        message: "Sucessfully apply!!!"
-      })
+        message: "Sucessfully apply!!!",
+      });
     } catch (err) {
       console.error("Error applying:", err);
     }
@@ -80,24 +82,24 @@ const ApplyAndBenefits: React.FC<Props> = ({ clientId, projectId }) => {
       {/* Freelancer Benefits */}
       <div className="bg-gray-50 p-4 rounded-lg md:w-1/2">
         <h3 className="font-semibold text-lg mb-4">
-          Lợi ích của việc đấu thầu trên Freelancer
+          Benefits of Bidding on Freelancer
         </h3>
         <ul className="list-none text-gray-700">
           <li className="flex items-center mb-2">
             <span className="text-green-500 mr-2">✔</span>
-            Thiết lập ngân sách và khung thời gian của bạn
+            Set your time frame
           </li>
           <li className="flex items-center mb-2">
             <span className="text-green-500 mr-2">✔</span>
-            Được trả tiền cho công việc của bạn
+            Get paid for your work
           </li>
           <li className="flex items-center mb-2">
             <span className="text-green-500 mr-2">✔</span>
-            Phác thảo đề xuất của bạn
+            Outline your proposal
           </li>
           <li className="flex items-center">
             <span className="text-green-500 mr-2">✔</span>
-            Đăng ký và đấu thầu công việc là miễn phí
+            Registration and job bidding is free.
           </li>
         </ul>
       </div>

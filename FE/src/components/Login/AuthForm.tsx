@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { EyeOutlined } from "@ant-design/icons";
 import { AuthInput } from "./AuthInput";
@@ -25,11 +25,23 @@ interface AuthFormProps {
 }
 
 const passwordCriteria = {
-  minLength: { check: (pwd: string) => pwd.length >= 8, label: "At least 8 characters" },
-  hasUppercase: { check: (pwd: string) => /[A-Z]/.test(pwd), label: "Uppercase" },
-  hasLowercase: { check: (pwd: string) => /[a-z]/.test(pwd), label: "Lowercase" },
+  minLength: {
+    check: (pwd: string) => pwd.length >= 8,
+    label: "At least 8 characters",
+  },
+  hasUppercase: {
+    check: (pwd: string) => /[A-Z]/.test(pwd),
+    label: "Uppercase",
+  },
+  hasLowercase: {
+    check: (pwd: string) => /[a-z]/.test(pwd),
+    label: "Lowercase",
+  },
   hasNumber: { check: (pwd: string) => /[0-9]/.test(pwd), label: "Number" },
-  hasSpecial: { check: (pwd: string) => /[!@#$%^&*(),.?":{}|<>]/.test(pwd), label: "Special characters" },
+  hasSpecial: {
+    check: (pwd: string) => /[!@#$%^&*(),.?":{}|<>]/.test(pwd),
+    label: "Special characters",
+  },
 };
 
 export const AuthForm: React.FC<AuthFormProps> = ({
@@ -46,18 +58,45 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   handleGoogleLogin,
   toggleAuthMode,
   isSuccess,
-  onFogot
+  onFogot,
 }) => {
+  const [showPasswordStrength, setShowPasswordStrength] = useState(false);
+
   const navigate = useNavigate();
 
   const passwordStrength = useMemo(() => {
-    const checks = Object.values(passwordCriteria).map(criterion => criterion.check(password));
+    const checks = Object.values(passwordCriteria).map((criterion) =>
+      criterion.check(password)
+    );
     const passedChecks = checks.filter(Boolean).length;
-    
-    if (passedChecks <= 1) return { level: "weak", color: "bg-red-500", width: "w-1/4", text: "Yếu" };
-    if (passedChecks <= 3) return { level: "medium", color: "bg-yellow-500", width: "w-1/2", text: "Trung bình" };
-    if (passedChecks <= 4) return { level: "strong", color: "bg-green-500", width: "w-3/4", text: "Mạnh" };
-    return { level: "very-strong", color: "bg-green-600", width: "w-full", text: "Rất mạnh" };
+
+    if (passedChecks <= 1)
+      return {
+        level: "weak",
+        color: "bg-red-500",
+        width: "w-1/4",
+        text: "Week",
+      };
+    if (passedChecks <= 3)
+      return {
+        level: "medium",
+        color: "bg-yellow-500",
+        width: "w-1/2",
+        text: "Medium",
+      };
+    if (passedChecks <= 4)
+      return {
+        level: "strong",
+        color: "bg-green-500",
+        width: "w-3/4",
+        text: "Strong",
+      };
+    return {
+      level: "very-strong",
+      color: "bg-green-600",
+      width: "w-full",
+      text: "Very Strong",
+    };
   }, [password]);
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -78,7 +117,10 @@ export const AuthForm: React.FC<AuthFormProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <div className="flex items-center mb-8 cursor-pointer" onClick={toggleHome}>
+      <div
+        className="flex items-center mb-8 cursor-pointer"
+        onClick={toggleHome}
+      >
         <img src="/img/logo.png" alt="Logo" className="w-12 h-12" />
         <h1 className="ml-4 text-2xl font-bold text-white">
           Freelance Marketplace
@@ -135,6 +177,8 @@ export const AuthForm: React.FC<AuthFormProps> = ({
               className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/50 focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all duration-200"
               placeholder="Enter your password"
               value={password}
+              onFocus={() => setShowPasswordStrength(true)}
+              onBlur={() => setShowPasswordStrength(false)}
               onChange={(e) => setPassword(e.target.value)}
             />
             <button
@@ -147,10 +191,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           </div>
 
           {/* Password Strength Indicator */}
-          {!isLogin && password && (
+          {!isLogin && password && showPasswordStrength && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
               className="mt-4"
             >
               <div className="h-2 bg-white/10 rounded-full overflow-hidden">
@@ -159,29 +204,52 @@ export const AuthForm: React.FC<AuthFormProps> = ({
                 />
               </div>
               <div className="mt-2 flex justify-between items-center">
-                <span className={`text-sm ${passwordStrength.color.replace('bg-', 'text-')}`}>
+                <span
+                  className={`text-sm ${passwordStrength.color.replace(
+                    "bg-",
+                    "text-"
+                  )}`}
+                >
                   Độ mạnh: {passwordStrength.text}
                 </span>
               </div>
 
               {/* Password Requirements */}
               <div className="mt-4 space-y-2">
-                {Object.entries(passwordCriteria).map(([key, { check, label }]) => (
-                  <div key={key} className="flex items-center space-x-2">
-                    <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
-                      check(password) ? 'bg-green-500' : 'bg-white/20'
-                    }`}>
-                      {check(password) && (
-                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
+                {Object.entries(passwordCriteria).map(
+                  ([key, { check, label }]) => (
+                    <div key={key} className="flex items-center space-x-2">
+                      <div
+                        className={`w-4 h-4 rounded-full flex items-center justify-center ${
+                          check(password) ? "bg-green-500" : "bg-white/20"
+                        }`}
+                      >
+                        {check(password) && (
+                          <svg
+                            className="w-3 h-3 text-white"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                        )}
+                      </div>
+                      <span
+                        className={`text-sm ${
+                          check(password) ? "text-white" : "text-white/60"
+                        }`}
+                      >
+                        {label}
+                      </span>
                     </div>
-                    <span className={`text-sm ${check(password) ? 'text-white' : 'text-white/60'}`}>
-                      {label}
-                    </span>
-                  </div>
-                ))}
+                  )
+                )}
               </div>
 
               {/* Warning for weak password */}
@@ -210,7 +278,11 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           onSubmit={handleFormSubmit}
           onGoogleLogin={handleGoogleLogin}
           isSuccess={isSuccess}
-          isDisabled={!isLogin && (passwordStrength.level === "weak" || passwordStrength.level === "medium")}
+          isDisabled={
+            !isLogin &&
+            (passwordStrength.level === "weak" ||
+              passwordStrength.level === "medium")
+          }
         />
       </form>
 

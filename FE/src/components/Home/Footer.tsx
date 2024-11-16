@@ -11,7 +11,7 @@ const Footer = () => {
       <div className="max-w-6xl mx-auto text-center">
         {/* Logo */}
         <div className="mb-6">
-          <img src="img/logo.png" alt="Logo" className="mx-auto h-12" />
+          <img src="/img/logo.png" alt="Logo" className="mx-auto h-12" />
         </div>
 
         {/* Navigation Links */}

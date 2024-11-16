@@ -1,4 +1,5 @@
 import { ProjectType } from "./ProjectType";
+import { ReviewType } from "./ReviewType";
 
 export type User = {
     id: number;
@@ -12,6 +13,7 @@ export type User = {
     userProfile: UserProfileType;
     projects?: ProjectType[];
     earning?: number;
+    reviews: ReviewType[];
 }
 
 export interface UserProfileType {

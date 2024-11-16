@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query/react';
 import { Mutex } from 'async-mutex';
 import { setTokens, logout } from '../features/authSlice';
-import { ProjectImageResponse, ProjectType } from '../types/ProjectType';
+import { ProjectType, ProjectWithImage } from '../types/ProjectType';
 import { restfulApi } from './restfulApi'
 import { ApplyInput, ApplyType } from '../types/ApplyType';
 import { ResponseType } from '../types';
@@ -143,7 +143,7 @@ export const graphqlApi = createApi({
         },
       }),
     }),
-    getProject: builder.query<ProjectImageResponse, void>({
+    getProject: builder.query<ResponseType<{ projects: ProjectWithImage }>, void>({
       query: () => ({
         url: 'graphql',
         method: 'POST',
@@ -203,6 +203,23 @@ export const graphqlApi = createApi({
                   id
                   username
                   createAt
+                  userProfile {
+                    rating
+                  }
+                }
+                applies {
+                  applyId
+                  duration
+                  freelancer {
+                    username
+                    userProfile {
+                      avatar
+                      rating
+                    }
+                    review {
+                      rating
+                    }
+                  }
                 }
               }
             }
@@ -462,7 +479,7 @@ export const graphqlApi = createApi({
           `,
         },
       }),
-    }), 
+    }),
     userById: builder.query<ResponseType<{ userById: User }>, number>({
       query: (userId) => ({
         url: 'graphql',

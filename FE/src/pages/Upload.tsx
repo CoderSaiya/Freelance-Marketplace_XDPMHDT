@@ -66,6 +66,8 @@ const Upload = () => {
           project: formattedData,
         }).unwrap();
 
+        console.log(createResponse);
+
         if (createResponse.data.createProject.projectId) {
           formDataImg.append("userId", userId.toString());
           formDataImg.append(

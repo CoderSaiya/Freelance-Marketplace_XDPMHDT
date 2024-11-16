@@ -17,20 +17,20 @@ const Propose: React.FC = () => {
   if (error) return <div>Error fetching projects</div>;
 
   const projects =
-    data?.data.projects.map((project, index) => ({
+    data?.data?.projects?.map((project, index) => ({
       id: project.projectId || index,
-      name: project.projectName,
-      price: project.budget,
-      description: project.projectDescription,
-      image: project.imageUrls[0],
+      name: project.projectName || "No Title",
+      price: project.budget || 0,
+      description: project.projectDescription || "No Description",
+      image: project.imageUrls?.[0] || "default-image-url.jpg",
       owner: {
-        name: project.users.username,
-        avatar: project.users.userProfile.avatar,
+        name: project.users?.username || "Unknown Owner",
+        avatar: project.users?.userProfile?.avatar || "default-avatar.jpg",
       },
-      category: project.category.categoryName,
-      categoryId: project.category.categoryId,
+      category: project.category?.categoryName || "Uncategorized",
+      categoryId: project.category?.categoryId || 0,
       deadline: calculateDeadline(15), // Adjust as needed
-    })) || []
+    })) || [];
 
   return (
     <div className="max-w-6xl mx-auto p-6">

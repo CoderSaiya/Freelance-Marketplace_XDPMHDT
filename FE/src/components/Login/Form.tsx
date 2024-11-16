@@ -151,9 +151,9 @@ const Form: React.FC = () => {
         message: "Successfully login",
       });
       navigate("/");
-    } catch (error) {
+    } catch {
       notification.error({
-        message: "Failed login",
+        message: "Failed login" ,
       });
       console.error("Login failed:", error);
     }

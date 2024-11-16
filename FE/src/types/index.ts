@@ -79,6 +79,8 @@ export interface DecodedToken {
 
 export interface ResponseType<T> {
   data: T;
+  status?: number;
+  message?: string;
 }
 
 export interface ResponseRestful<T> {
