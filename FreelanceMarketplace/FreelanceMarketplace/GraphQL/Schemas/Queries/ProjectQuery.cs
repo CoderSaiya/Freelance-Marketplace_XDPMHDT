@@ -1,5 +1,6 @@
 ﻿using FreelanceMarketplace.GraphQL.Authorization;
 using FreelanceMarketplace.GraphQL.Types;
+using FreelanceMarketplace.Models.DTOs;
 using FreelanceMarketplace.Services.Interfaces;
 using GraphQL;
 using GraphQL.Resolvers;
@@ -66,6 +67,48 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                         return await projectService.GetPopularProjectsAsync();
                     }
                 });
+
+            AddField(new FieldType
+            {
+                Name = "monthlyRevenue",
+                Type = typeof(ListGraphType<RevenueType>),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var projectService = scope.ServiceProvider.GetRequiredService<IProjectService>();
+                        return await projectService.GetMonthlyRevenueAsync();
+                    }
+                })
+            }).AuthorizeWith("Admin");
+
+            AddField(new FieldType
+            {
+                Name = "statistics",
+                Type = typeof(StatisticsType),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var projectService = scope.ServiceProvider.GetRequiredService<IProjectService>();
+                        return await projectService.GetStatisticsAsync();
+                    }
+                })
+            });
+
+            AddField(new FieldType
+            {
+                Name = "groupedProjectStatusCounts",
+                Type = typeof(ListGraphType<StatusCountType>),
+                Resolver = new FuncFieldResolver<List<StatusCountDto>>(async context =>
+                {
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var projectService = scope.ServiceProvider.GetRequiredService<IProjectService>();
+                        return await projectService.GetGroupedProjectStatusCountsAsync();
+                    }
+                })
+            });
         }
     }
 }

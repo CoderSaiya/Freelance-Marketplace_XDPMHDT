@@ -340,5 +340,150 @@ namespace FreelanceMarketplace.Services
             }
         }
 
+        public async Task<List<RevenueDto>> GetMonthlyRevenueAsync()
+        {
+            var projects = await _context.Projects
+                .Where(p => p.Status == "Finished")
+                .ToListAsync();
+
+            var revenueData = projects
+                .GroupBy(p => p.CreateAt.Month)
+                .Select(g => new RevenueDto
+                {
+                    Month = GetMonthName(g.Key),
+                    Revenue = g.Sum(p => (double)p.Budget)
+                })
+                .OrderBy(r => r.Month)
+                .ToList();
+
+            var allMonths = Enum.GetValues(typeof(Months)).Cast<Months>().ToList();
+            var result = allMonths.Select(m =>
+                revenueData.FirstOrDefault(r => r.Month == m.ToString())
+                ?? new RevenueDto { Month = m.ToString(), Revenue = 0.0 }
+            ).ToList();
+
+            return result;
+        }
+
+        private string GetMonthName(int month)
+        {
+            return new DateTime(2024, month, 1).ToString("MMM");
+        }
+
+        public async Task<object> GetStatisticsAsync()
+        {
+            var today = DateTime.Today;
+            var startOfWeek = today.AddDays(-(int)today.DayOfWeek);
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+            var startOfYear = new DateTime(today.Year, 1, 1);
+
+            var revenueAndProjects = await _context.Projects
+                .Where(p => p.Status == "Finished")
+                .GroupBy(p => 1)
+                .Select(g => new
+                {
+                    TodayRevenue = g.Where(p => p.CreateAt.Date == today).Sum(p => p.Budget),
+                    ThisWeekRevenue = g.Where(p => p.CreateAt >= startOfWeek && p.CreateAt <= today).Sum(p => p.Budget),
+                    ThisMonthRevenue = g.Where(p => p.CreateAt >= startOfMonth && p.CreateAt <= today).Sum(p => p.Budget),
+                    ThisYearRevenue = g.Where(p => p.CreateAt >= startOfYear && p.CreateAt <= today).Sum(p => p.Budget),
+                    TodayProjects = g.Count(p => p.CreateAt.Date == today),
+                    ThisWeekProjects = g.Count(p => p.CreateAt >= startOfWeek && p.CreateAt <= today),
+                    ThisMonthProjects = g.Count(p => p.CreateAt >= startOfMonth && p.CreateAt <= today),
+                    ThisYearProjects = g.Count(p => p.CreateAt >= startOfYear && p.CreateAt <= today)
+                })
+                .FirstOrDefaultAsync();
+
+            var freelancers = await _context.Users
+                .Where(u => u.Role == "Freelancer" && u.Status == "Active")
+                .GroupBy(u => 1)
+                .Select(g => new
+                {
+                    TodayFreelancers = g.Count(u => u.CreateAt.Date == today),
+                    ThisWeekFreelancers = g.Count(u => u.CreateAt >= startOfWeek && u.CreateAt <= today),
+                    ThisMonthFreelancers = g.Count(u => u.CreateAt >= startOfMonth && u.CreateAt <= today),
+                    ThisYearFreelancers = g.Count(u => u.CreateAt >= startOfYear && u.CreateAt <= today)
+                })
+                .FirstOrDefaultAsync();
+
+            var pendingContracts = await _context.Contracts
+                .Where(c => c.Status == "Pending")
+                .GroupBy(c => 1)
+                .Select(g => new
+                {
+                    TodayContracts = g.Count(c => c.ContractDate.Date == today),
+                    ThisWeekContracts = g.Count(c => c.ContractDate >= startOfWeek && c.ContractDate <= today),
+                    ThisMonthContracts = g.Count(c => c.ContractDate >= startOfMonth && c.ContractDate <= today),
+                    ThisYearContracts = g.Count(c => c.ContractDate >= startOfYear && c.ContractDate <= today)
+                })
+                .FirstOrDefaultAsync();
+
+            return new
+            {
+                RevenueStatistics = new
+                {
+                    Today = revenueAndProjects?.TodayRevenue ?? 0,
+                    ThisWeek = revenueAndProjects?.ThisWeekRevenue ?? 0,
+                    ThisMonth = revenueAndProjects?.ThisMonthRevenue ?? 0,
+                    ThisYear = revenueAndProjects?.ThisYearRevenue ?? 0
+                },
+                ProjectStatistics = new
+                {
+                    Today = revenueAndProjects?.TodayProjects ?? 0,
+                    ThisWeek = revenueAndProjects?.ThisWeekProjects ?? 0,
+                    ThisMonth = revenueAndProjects?.ThisMonthProjects ?? 0,
+                    ThisYear = revenueAndProjects?.ThisYearProjects ?? 0
+                },
+                FreelancerStatistics = new
+                {
+                    Today = freelancers?.TodayFreelancers ?? 0,
+                    ThisWeek = freelancers?.ThisWeekFreelancers ?? 0,
+                    ThisMonth = freelancers?.ThisMonthFreelancers ?? 0,
+                    ThisYear = freelancers?.ThisYearFreelancers ?? 0
+                },
+                ContractStatistics = new
+                {
+                    Today = pendingContracts?.TodayContracts ?? 0,
+                    ThisWeek = pendingContracts?.ThisWeekContracts ?? 0,
+                    ThisMonth = pendingContracts?.ThisMonthContracts ?? 0,
+                    ThisYear = pendingContracts?.ThisYearContracts ?? 0
+                }
+            };
+        }
+        public async Task<List<StatusCountDto>> GetGroupedProjectStatusCountsAsync()
+        {
+            try
+            {
+                var totalProjects = await _context.Projects.CountAsync();
+
+                if (totalProjects == 0)
+                    return new List<StatusCountDto>();
+
+                var activeAndProcessingCount = await _context.Projects
+                    .Where(p => p.Status == "Active" || p.Status == "Processing")
+                    .CountAsync();
+
+                var finishedCount = await _context.Projects
+                    .Where(p => p.Status == "Finished")
+                    .CountAsync();
+
+                return new List<StatusCountDto>
+        {
+            new StatusCountDto
+            {
+                Status = "Active + Processing",
+                ProjectCount = activeAndProcessingCount
+            },
+            new StatusCountDto
+            {
+                Status = "Finished",
+                ProjectCount = finishedCount
+            }
+        };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error calculating grouped project status counts", ex);
+            }
+        }
     }
 }

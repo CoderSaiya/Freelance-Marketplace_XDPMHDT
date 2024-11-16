@@ -17,6 +17,9 @@ namespace FreelanceMarketplace.Services.Interfaces
         Task<List<Project>> GetProjectsWithPagingAsync(int page = 1, int pageSize = 10);
         Task<List<Project>> GetProjectsWithSortingAsync(string sortBy = "ProjectName", bool isAscending = true);
         Task<List<ProjectWithImageDto>> GetAllProjectsWithImageAsync();
+        Task<List<RevenueDto>> GetMonthlyRevenueAsync();
+        Task<object> GetStatisticsAsync();
+        Task<List<StatusCountDto>> GetGroupedProjectStatusCountsAsync();
 
     }
 }

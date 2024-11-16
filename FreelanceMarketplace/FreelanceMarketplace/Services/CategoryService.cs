@@ -1,5 +1,6 @@
 ﻿using FreelanceMarketplace.Data;
 using FreelanceMarketplace.Models;
+using FreelanceMarketplace.Models.DTOs;
 using FreelanceMarketplace.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +21,7 @@ namespace FreelanceMarketplace.Services
             {
                 return await _context.Categories
                     .Include(c => c.Projects)
-                    .ToListAsync(); 
+                    .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -33,7 +34,7 @@ namespace FreelanceMarketplace.Services
             try
             {
                 var category = await _context.Categories
-                    .Include(c => c.Projects) 
+                    .Include(c => c.Projects)
                     .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
 
                 if (category == null)
@@ -61,7 +62,7 @@ namespace FreelanceMarketplace.Services
             }
         }
 
-        public async Task<Category> UpdateCategoryAsync(int categoryId, Category Category) 
+        public async Task<Category> UpdateCategoryAsync(int categoryId, Category Category)
         {
             try
             {
@@ -72,9 +73,9 @@ namespace FreelanceMarketplace.Services
                 existingCategory.CategoryName = Category.CategoryName;
                 existingCategory.CategoryDescription = Category.CategoryDescription;
 
-                _context.Categories.Update(existingCategory); 
-                await _context.SaveChangesAsync(); 
-                return existingCategory; 
+                _context.Categories.Update(existingCategory);
+                await _context.SaveChangesAsync();
+                return existingCategory;
             }
             catch (Exception ex)
             {
@@ -87,7 +88,7 @@ namespace FreelanceMarketplace.Services
             try
             {
                 var category = await _context.Categories
-                    .Include(c => c.Projects) 
+                    .Include(c => c.Projects)
                     .FirstOrDefaultAsync(c => c.CategoryId == categoryId);
 
                 if (category == null)
@@ -112,12 +113,12 @@ namespace FreelanceMarketplace.Services
             try
             {
                 var categories = await _context.Categories
-                    .Include(c => c.Projects) 
+                    .Include(c => c.Projects)
                     .ToListAsync();
 
                 // Sắp xếp các danh mục theo số lượng dự án từ cao xuống thấp
                 var sortedCategories = categories
-                    .OrderByDescending(c => c.Projects.Count) 
+                    .OrderByDescending(c => c.Projects.Count)
                     .ToList();
 
                 var sortedProjects = new List<Project>();
@@ -136,5 +137,33 @@ namespace FreelanceMarketplace.Services
             }
         }
 
+        public async Task<List<CategoryPercentageDto>> GetCategoryPercentagesAsync()
+        {
+            try
+            {
+                var totalProjects = await _context.Projects.CountAsync();
+
+                if (totalProjects == 0)
+                    return new List<CategoryPercentageDto>();
+
+                var categories = await _context.Categories
+                    .Include(c => c.Projects)
+                    .Select(c => new CategoryPercentageDto
+                    {
+                        CategoryName = c.CategoryName ?? "Unknown",
+                        ProjectCount = c.Projects.Count,
+                        Percentage = totalProjects > 0
+                            ? Math.Round((double)c.Projects.Count / totalProjects * 100, 2)
+                            : 0
+                    })
+                    .ToListAsync();
+
+                return categories;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error calculating category percentages", ex);
+            }
+        }
     }
 }

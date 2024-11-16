@@ -23,11 +23,22 @@ namespace FreelanceMarketplace.Services
         {
             var wallet = await _context.Wallets
                 .FirstOrDefaultAsync(w => w.UserId == userId);
-            if (wallet != null)
+
+            if (wallet == null)
             {
-                wallet.Balance = (wallet.Balance ?? 0) + amount;
-                await _context.SaveChangesAsync();
+                throw new InvalidOperationException("Wallet not found.");
             }
+
+            var currentBalance = wallet.Balance ?? 0;
+            if (currentBalance + amount < 0)
+            {
+                throw new InvalidOperationException("Insufficient wallet balance.");
+            }
+
+            wallet.Balance = currentBalance + amount;
+
+            await _context.SaveChangesAsync();
+
             return wallet;
         }
     }

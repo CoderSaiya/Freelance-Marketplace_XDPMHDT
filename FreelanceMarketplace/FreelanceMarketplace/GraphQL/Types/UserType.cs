@@ -19,6 +19,7 @@ namespace FreelanceMarketplace.GraphQL.Types
             Field<ListGraphType<RefreshTokenType>>("refreshTokens");
             Field<ListGraphType<ProjectType>>("uploadedImages");
             Field<UserProfileType>("userProfile");
+            Field<ReviewType>("review");
         }
     }
 }

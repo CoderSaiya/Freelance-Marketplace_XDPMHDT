@@ -1,4 +1,5 @@
 ﻿using FreelanceMarketplace.Models;
+using FreelanceMarketplace.Models.DTOs;
 
 namespace FreelanceMarketplace.Services.Interfaces
 {
@@ -10,6 +11,7 @@ namespace FreelanceMarketplace.Services.Interfaces
         Task<Category> UpdateCategoryAsync(int categoryId, Category Category);
         Task<bool> DeleteCategoryAsync(int categoryId);
         Task<List<Project>> GetProjectsSortedByCategoryPriorityAsync();
+        Task<List<CategoryPercentageDto>> GetCategoryPercentagesAsync();
 
     }
 }

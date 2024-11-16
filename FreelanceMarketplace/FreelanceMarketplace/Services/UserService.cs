@@ -215,7 +215,7 @@ namespace FreelanceMarketplace.Services
 
         public List<Users> GetUsers()
         {
-            return _context.Users.Include(u => u.UserProfile).Include(u => u.Projects).ToList();
+            return _context.Users.Include(u => u.UserProfile).Include(u => u.Projects).Include(u => u.Reviews).ToList();
         }
 
         public bool DeleteUserById(int userId)

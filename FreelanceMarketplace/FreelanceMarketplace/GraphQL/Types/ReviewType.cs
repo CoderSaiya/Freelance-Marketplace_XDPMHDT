@@ -11,7 +11,7 @@ namespace FreelanceMarketplace.GraphQL.Types
             Field(r => r.Rating);
             Field(r => r.Feedback);
 
-            //Field<UserType>("user").Resolve(context => context.Source.User);
+            Field<UserType>("users");
             //Field<ContractType>("contract").Resolve(context => context.Source.Contract);
         }
     }

@@ -1,9 +1,9 @@
-﻿using FreelanceMarketplace.GraphQL.Types;
+﻿using FreelanceMarketplace.GraphQL.Authorization;
+using FreelanceMarketplace.GraphQL.Types;
 using FreelanceMarketplace.Services.Interfaces;
 using GraphQL;
 using GraphQL.Resolvers;
 using GraphQL.Types;
-using FreelanceMarketplace.GraphQL.Authorization;
 
 namespace FreelanceMarketplace.GraphQL.Schemas.Queries
 {

@@ -1,7 +1,9 @@
 ﻿using FreelanceMarketplace.GraphQL.Types;
 using FreelanceMarketplace.Services.Interfaces;
 using GraphQL;
+using GraphQL.Resolvers;
 using GraphQL.Types;
+using FreelanceMarketplace.GraphQL.Authorization;
 
 namespace FreelanceMarketplace.GraphQL.Schemas.Queries
 {
@@ -12,12 +14,12 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
             Field<ListGraphType<CategoryType>>("categories")
                   .ResolveAsync(async context =>
                   {
-                    using (var scope = serviceProvider.CreateScope())
-                    {
-                        var categoryService = scope.ServiceProvider.GetRequiredService<ICategoryService>();
+                      using (var scope = serviceProvider.CreateScope())
+                      {
+                          var categoryService = scope.ServiceProvider.GetRequiredService<ICategoryService>();
                           return await categoryService.GetAllCategoriesAsync();
                       }
-                });
+                  });
 
             Field<CategoryType>("categoryById")
                 .Arguments(new QueryArguments(
@@ -43,6 +45,20 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                        return await categoryService.GetProjectsSortedByCategoryPriorityAsync();
                    }
                });
+
+            AddField(new FieldType
+            {
+                Name = "categoryPercentages",
+                Type = typeof(ListGraphType<CategoryPercentageType>),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var categoryService = scope.ServiceProvider.GetRequiredService<ICategoryService>();
+                        return await categoryService.GetCategoryPercentagesAsync();
+                    }
+                })
+            });
         }
     }
 }
