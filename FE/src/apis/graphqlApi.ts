@@ -4,7 +4,7 @@ import { setTokens, logout } from '../features/authSlice';
 import { ProjectType, ProjectWithImage } from '../types/ProjectType';
 import { restfulApi } from './restfulApi'
 import { ApplyInput, ApplyType } from '../types/ApplyType';
-import { ResponseType, Revenue, StatisticsType } from '../types';
+import { CateogoryPercent, ProjectStatusCount, ResponseType, Revenue, StatisticsType } from '../types';
 import { WalletType } from '../types/WalletType';
 import { CategoryType } from '../types/CategoryType';
 import { User, UserProfileInput, UserProfileType } from '../types/UserType';
@@ -725,6 +725,39 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    getPercentCategory: builder.query<ResponseType<{ categoryPercentages: CateogoryPercent[] }>, void>({
+      query: () => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query {
+              categoryPercentages {
+                categoryName
+                projectCount
+                percentage
+              }
+            }
+          `,
+        },
+      }),
+    }),
+    groupedProjectStatusCounts: builder.query<ResponseType<{ groupedProjectStatusCounts: ProjectStatusCount[] }>, void>({
+      query: () => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query {
+              groupedProjectStatusCounts {
+                status
+                projectCount
+              }
+            }
+          `,
+        },
+      }),
+    }),
   }),
 });
 
@@ -752,4 +785,6 @@ export const { useCreateProjectMutation,
   useCreateReviewMutation,
   useCheckReviewedMutation,
   useGetRevenueQuery,
-  useGetStatisticsQuery } = graphqlApi;
+  useGetStatisticsQuery,
+  useGetPercentCategoryQuery,
+  useGroupedProjectStatusCountsQuery } = graphqlApi;

@@ -122,3 +122,14 @@ export interface StatisticsType {
   freelancerStatistics: GlobalDashboard
   contractStatistics: GlobalDashboard
 }
+
+export interface CateogoryPercent {
+  categoryName: string;
+  projectCount: number;
+  percentage: number;
+}
+
+export interface ProjectStatusCount {
+  status: string;
+  projectCount: number;
+}
