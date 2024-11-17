@@ -1,125 +1,152 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AboutTabProps } from "../../../types";
 
 const AboutTab: React.FC<AboutTabProps> = ({ isEditing, contactInfo, setContactInfo }) => {
-  return (
-    <div className="grid grid-cols-3 gap-6">
-      {/* Left Section - Certifications */}
-      <div>
-        <h2 className="text-xl font-bold mb-4">Certifications</h2>
-        <div className="mb-6">
-          <p className="font-semibold">Certified Web Developer</p>
-          <p className="text-sm text-gray-500">Issued by Google</p>
-          <p className="text-sm text-gray-400">Received: May 2022</p>
-          <p className="text-sm text-green-500">Verified</p>
-        </div>
+  const avatarOptions = [
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Aneka",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Bailey",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=Charlie",
+    "https://api.dicebear.com/7.x/avataaars/svg?seed=David"
+  ];
+
+  const renderField = (label: string, value: string, onChange: (value: string) => void, type: string = "text") => {
+    return (
+      <div className="space-y-2">
+        <Label className="text-gray-600">{label}</Label>
+        {isEditing ? (
+          type === "textarea" ? (
+            <Textarea
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              className="resize-none"
+            />
+          ) : (
+            <Input
+              type={type}
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+            />
+          )
+        ) : (
+          <p className="font-medium text-gray-900">{value}</p>
+        )}
       </div>
+    );
+  };
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Left Section - Certifications */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Certifications</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <p className="font-semibold">Certified Web Developer</p>
+              <p className="text-sm text-gray-500">Issued by Google</p>
+              <p className="text-sm text-gray-400">Received: May 2022</p>
+              <div className="flex items-center mt-2 text-green-500 text-sm">
+                <svg
+                  className="w-4 h-4 mr-1"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Verified
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Middle Section - Contact Information */}
-      <div>
-        <h2 className="text-xl font-bold mb-4">Contact Information</h2>
-        <div className="mb-6">
-          <p className="text-gray-600">Phone</p>
-          {isEditing ? (
-            <input
-              className="border px-4 py-2 w-full"
-              value={contactInfo.phone}
-              onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
-            />
-          ) : (
-            <p className="font-semibold">{contactInfo.phone}</p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Contact Information</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {renderField("Phone", contactInfo.phone, (value) => 
+            setContactInfo({ ...contactInfo, phone: value })
           )}
-        </div>
-        <div className="mb-6">
-          <p className="text-gray-600">Address</p>
-          {isEditing ? (
-            <input
-              className="border px-4 py-2 w-full"
-              value={contactInfo.address}
-              onChange={(e) => setContactInfo({ ...contactInfo, address: e.target.value })}
-            />
-          ) : (
-            <p className="font-semibold">{contactInfo.address}</p>
+          {renderField("Address", contactInfo.address, (value) =>
+            setContactInfo({ ...contactInfo, address: value })
           )}
-        </div>
-        <div className="mb-6">
-          <p className="text-gray-600">Email</p>
-          {isEditing ? (
-            <input
-              className="border px-4 py-2 w-full"
-              value={contactInfo.email}
-              onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
-            />
-          ) : (
-            <p className="font-semibold">{contactInfo.email}</p>
+          {renderField("Email", contactInfo.email, (value) =>
+            setContactInfo({ ...contactInfo, email: value }), "email"
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Right Section - Basic Information */}
-      <div>
-        <h2 className="text-xl font-bold mb-4">Basic Information</h2>
-        <div className="mb-6">
-          <p className="text-gray-600">Birthday</p>
-          {isEditing ? (
-            <input
-              type="date"
-              className="border px-4 py-2 w-full"
-              value={contactInfo.birthday}
-              onChange={(e) => setContactInfo({ ...contactInfo, birthday: e.target.value })}
-            />
-          ) : (
-            <p className="font-semibold">{contactInfo.birthday}</p>
+      <Card>
+        <CardHeader>
+          <CardTitle>Basic Information</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {renderField("Birthday", contactInfo.birthday, (value) =>
+            setContactInfo({ ...contactInfo, birthday: value }), "date"
           )}
-        </div>
-        <div className="mb-6">
-          <p className="text-gray-600">Gender</p>
-          {isEditing ? (
-            <input
-              className="border px-4 py-2 w-full"
-              value={contactInfo.gender}
-              onChange={(e) => setContactInfo({ ...contactInfo, gender: e.target.value })}
-            />
-          ) : (
-            <p className="font-semibold">{contactInfo.gender}</p>
+          {renderField("Gender", contactInfo.gender, (value) =>
+            setContactInfo({ ...contactInfo, gender: value })
           )}
-        </div>
-        <div className="mb-6">
-          <p className="text-gray-600">Bio</p>
-          {isEditing ? (
-            <textarea
-              className="border px-4 py-2 w-full"
-              value={contactInfo.bio}
-              onChange={(e) => setContactInfo({ ...contactInfo, bio: e.target.value })}
-            />
-          ) : (
-            <p className="font-semibold">{contactInfo.bio}</p>
+          {renderField("Bio", contactInfo.bio, (value) =>
+            setContactInfo({ ...contactInfo, bio: value }), "textarea"
           )}
-        </div>
-        <div className="mb-6">
-          <p className="text-gray-600">Skill</p>
-          {isEditing ? (
-            <input
-              className="border px-4 py-2 w-full"
-              value={contactInfo.skill}
-              onChange={(e) => setContactInfo({ ...contactInfo, skill: e.target.value })}
-            />
-          ) : (
-            <p className="font-semibold">{contactInfo.skill}</p>
+          {renderField("Skill", contactInfo.skill, (value) =>
+            setContactInfo({ ...contactInfo, skill: value })
           )}
-        </div>
-        <div className="mb-6">
-          <p className="text-gray-600">Avatar URL</p>
-          {isEditing ? (
-            <input
-              className="border px-4 py-2 w-full"
-              value={contactInfo.avatar}
-              onChange={(e) => setContactInfo({ ...contactInfo, avatar: e.target.value })}
-            />
-          ) : (
-            <p className="font-semibold">{contactInfo.avatar}</p>
-          )}
-        </div>
-      </div>
+          
+          <div className="space-y-2">
+            <Label className="text-gray-600">Avatar</Label>
+            {isEditing ? (
+              <div className="space-y-4">
+                <RadioGroup
+                  value={contactInfo.avatar}
+                  onValueChange={(value) => setContactInfo({ ...contactInfo, avatar: value })}
+                  className="grid grid-cols-5 gap-4"
+                >
+                  {avatarOptions.map((url, index) => (
+                    <div key={index} className="flex flex-col items-center space-y-2">
+                      <div className="relative">
+                        <Avatar className="w-16 h-16">
+                          <AvatarImage src={url} alt={`Avatar option ${index + 1}`} />
+                          <AvatarFallback>AV</AvatarFallback>
+                        </Avatar>
+                        <RadioGroupItem
+                          value={url}
+                          id={`avatar-${index}`}
+                          className="absolute bottom-0 right-0"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <Avatar className="w-16 h-16">
+                  <AvatarImage src={contactInfo.avatar} alt="Selected avatar" />
+                  <AvatarFallback>AV</AvatarFallback>
+                </Avatar>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

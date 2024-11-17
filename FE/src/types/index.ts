@@ -34,6 +34,7 @@ export interface ProfileHeaderProps {
   userId: number;
   username: string;
   activeTab: string;
+  refetch: () => void;
 }
 
 export interface TabsProps {
@@ -57,6 +58,7 @@ export interface AboutTabProps {
     avatar: string;
     industry: string;
   };
+  
   setContactInfo: React.Dispatch<React.SetStateAction<{
     phone: string;
     address: string;

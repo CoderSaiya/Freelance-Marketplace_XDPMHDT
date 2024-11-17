@@ -72,7 +72,7 @@ const Profile: React.FC = () => {
       {/* Breadcrumb */}
       <Breadcrumb items={breadcrumbItems} />
 
-      <ProfileHeader isEditing={isEditing} setIsEditing={setIsEditing} contactInfo={contactInfo} userId={Number(userId)} username={username} activeTab={activeTab}/>
+      <ProfileHeader isEditing={isEditing} setIsEditing={setIsEditing} contactInfo={contactInfo} userId={Number(userId)} username={username} activeTab={activeTab} refetch={refetch}/>
       <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
       {/* Content */}
       {renderContent()}

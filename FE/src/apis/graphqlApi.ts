@@ -519,6 +519,7 @@ export const graphqlApi = createApi({
                 username
                 email
                 userProfile {
+                  avatar
                   rating
                   company
                   phone
