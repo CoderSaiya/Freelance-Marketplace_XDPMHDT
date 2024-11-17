@@ -18,8 +18,8 @@ namespace FreelanceMarketplace.Controllers
         [HttpGet]
         public IActionResult GetAllUser()
         {
-            List<Users> users = _userService.GetUsers();
-            if(users == null)
+            List<Users> users = (List<Users>)_userService.GetUsers();
+            if (users == null)
             {
                 return Ok(new Response<List<Users>>
                 {

@@ -32,7 +32,5 @@ namespace FreelanceMarketplace.Models
         public Contracts? Contract { get; set; }
 
         public Users? Users { get; set; }
-
-
     }
 }

@@ -259,24 +259,20 @@ namespace FreelanceMarketplace.Services
             return true;
         }
 
-        public Users GetOrCreateUserFromGoogleToken(string googleEmail)
+        public async Task<Users> GetOrCreateUserFromGoogleTokenAsync(string email)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Email == googleEmail);
-
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
             if (user == null)
             {
                 user = new Users
                 {
-                    Email = googleEmail,
-                    Username = googleEmail,
-                    IsEmailConfirmed = true,
-                    Role = "Client"
+                    Email = email,
+                    Username = email,
+                    Role = "User",
                 };
-
                 _context.Users.Add(user);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
             }
-
             return user;
         }
     }

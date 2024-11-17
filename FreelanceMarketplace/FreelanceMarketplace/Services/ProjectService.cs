@@ -12,11 +12,13 @@ namespace FreelanceMarketplace.Services
     {
         private readonly AppDbContext _context;
         private readonly IHubContext<NotificationHub> _notificationHubContext;
+        private readonly IWalletService _walletService;
 
-        public ProjectService(AppDbContext context, IHubContext<NotificationHub> notificationHubContext)
+        public ProjectService(AppDbContext context, IHubContext<NotificationHub> notificationHubContext , IWalletService walletService)
         {
             _context = context;
             _notificationHubContext = notificationHubContext;
+            _walletService = walletService;
         }
 
         public async Task<List<Project>> GetAllProjectsAsync()
@@ -69,11 +71,18 @@ namespace FreelanceMarketplace.Services
             try
             {
                 var project = await _context.Projects
+                    .AsSplitQuery()
                     .Include(p => p.Category)
                     .Include(p => p.Applies)
+                        .ThenInclude(a => a.Freelancer)
+                            .ThenInclude(f => f.UserProfile)
+                    .Include(p => p.Applies)
+                        .ThenInclude(a => a.Freelancer)
+                            .ThenInclude(f => f.Reviews)
                     .Include(p => p.Contract)
                     .Include(p => p.Images)
                     .Include(p => p.Users)
+                        .ThenInclude(u => u.UserProfile)
                     .FirstOrDefaultAsync(p => p.ProjectId == projectId);
 
                 if (project == null)
@@ -100,6 +109,8 @@ namespace FreelanceMarketplace.Services
                 var message = "A new project has been successfully created!";
 
                 _context.Projects.Add(project);
+
+                await _walletService.UpdateWalletBalanceAsync(recipient.Id, (decimal)-project.Budget);
 
                 Notification notification = new Notification
                 {

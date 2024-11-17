@@ -30,6 +30,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     //options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = "Google";
 })
 .AddJwtBearer(options =>
 {
@@ -68,7 +69,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.ClientId = "838128278169-ug2l134id0g6krlkhiklt8u606iln46u.apps.googleusercontent.com";
     options.ClientSecret = "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";
-    options.CallbackPath = "/auth/callback";
+    options.CallbackPath = "/api/Auth/google-response";
 });
 
 builder.Services.AddControllersWithViews();
@@ -78,7 +79,7 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
     {
-        builder.WithOrigins("http://localhost:5173") // replace with your frontend port
+        builder.WithOrigins("http://localhost:5173", "http://localhost:5174") // replace with your frontend port
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();
@@ -221,6 +222,11 @@ builder.Services.AddGraphQL(b => b
 );
 
 builder.Services.Configure<StripeSetting>(builder.Configuration.GetSection("Stripe"));
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+    options.Secure = CookieSecurePolicy.Always;
+});
 
 var app = builder.Build();
 
@@ -243,6 +249,7 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<RoleMiddleware>();
+app.UseCookiePolicy();
 
 // Use UseEndpoints to map hub and controllers
 app.UseEndpoints(endpoints =>
@@ -254,6 +261,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapMethods("/api/Auth/signin-google", new[] { "OPTIONS" }, context =>
     {
         context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:5173");
+        context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:5174");
         context.Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
         context.Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
         context.Response.StatusCode = 200;

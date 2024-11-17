@@ -40,14 +40,15 @@ public class ChatController : ControllerBase
     {
         if (chatMessage == null) return BadRequest("Message cannot be null");
 
-        var senderId = _userService.GetUserByUsername(chatMessage.Sender)?.Id;
-        var recipientId = _userService.GetUserByUsername(chatMessage.Recipient)?.Id;
-        if (senderId == null || recipientId == null) return BadRequest("Invalid sender or recipient");
+        var sender = await _userService.GetUserByUsername(chatMessage.Sender);
+        var recipient = await _userService.GetUserByUsername(chatMessage.Recipient);
+
+        if (sender == null || recipient == null) return BadRequest("Invalid sender or recipient");
 
         var chatMsg = new ChatMessage
         {
-            SenderId = senderId,
-            RecipientId = recipientId,
+            SenderId = sender.Id,
+            RecipientId = recipient.Id,
             Message = chatMessage.Message,
             Timestamp = DateTime.UtcNow
         };
@@ -55,20 +56,60 @@ public class ChatController : ControllerBase
         _context.ChatMessages.Add(chatMsg);
         await _context.SaveChangesAsync();
 
-        await _chatHub.Clients.User(senderId.ToString()).SendAsync("ReceiveMessage", chatMessage.Sender, chatMessage.Message);
-        await _chatHub.Clients.User(recipientId.ToString()).SendAsync("ReceiveMessage", chatMessage.Sender, chatMessage.Message);
+        // Retrieve connection IDs for both sender and recipient
+        var senderConnection = ChatHub.GetConnectionId(chatMessage.Sender);
+        var recipientConnection = ChatHub.GetConnectionId(chatMessage.Recipient);
 
-        return Ok();
+        // Send message to the sender if they are connected
+        if (senderConnection != null)
+        {
+            await _chatHub.Clients.Client(senderConnection).SendAsync("ReceiveMessage", new
+            {
+                id = chatMsg.Id,
+                sender = chatMessage.Sender,
+                recipient = chatMessage.Recipient,
+                message = chatMessage.Message,
+                timestamp = chatMsg.Timestamp
+            });
+        }
+
+        // Send message to the recipient if they are connected
+        if (recipientConnection != null)
+        {
+            await _chatHub.Clients.Client(recipientConnection).SendAsync("ReceiveMessage", new
+            {
+                id = chatMsg.Id,
+                sender = chatMessage.Sender,
+                recipient = chatMessage.Recipient,
+                message = chatMessage.Message,
+                timestamp = chatMsg.Timestamp
+            });
+        }
+
+        return Ok(new
+        {
+            id = chatMsg.Id,
+            sender = new { username = sender.Username },
+            recipient = new { username = recipient.Username },
+            message = chatMsg.Message,
+            timestamp = chatMsg.Timestamp
+        });
     }
+
 
     [HttpGet("history")]
     public async Task<IActionResult> GetChatHistory(string user1, string user2)
     {
-        var user1Id = _userService.GetUserByUsername(user1)?.Id;
-        var user2Id = _userService.GetUserByUsername(user2)?.Id;
-        if (user1Id == null || user2Id == null) return BadRequest("Invalid users");
+        Console.WriteLine("cmm");
+        var user1Entity = await _userService.GetUserByUsernameAsync(user1);
+        var user2Entity = await _userService.GetUserByUsernameAsync(user2);
+        if (user1Entity == null || user2Entity == null)
+            return BadRequest("Invalid users");
 
         // Fetch messages where either user is sender and the other is recipient
+        var user1Id = user1Entity.Id;
+        var user2Id = user2Entity.Id;
+
         var messages = await _context.ChatMessages
             .Where(m => (m.SenderId == user1Id && m.RecipientId == user2Id) ||
                         (m.SenderId == user2Id && m.RecipientId == user1Id))
@@ -76,5 +117,32 @@ public class ChatController : ControllerBase
             .ToListAsync();
 
         return Ok(messages);
+    }
+
+    [HttpGet("get-conversations/{username}")]
+    public async Task<IActionResult> GetConversations(string username)
+    {
+        var user = await _userService.GetUserByUsername(username);
+        if (user == null)
+            return NotFound("User not found");
+
+        var messages = await _context.ChatMessages
+            .Include(m => m.Sender)
+            .Include(m => m.Recipient)
+            .Where(m => m.Sender.Username == username || m.Recipient.Username == username)
+            .ToListAsync();
+
+        var conversations = messages
+            .GroupBy(m => m.Sender.Username == username ? m.Recipient : m.Sender)
+            .Select(group => new
+            {
+                userId = group.Key.Id,
+                name = group.Key.Username,
+                lastMessage = group.OrderByDescending(m => m.Timestamp).FirstOrDefault()?.Message,
+                lastMessageTime = group.OrderByDescending(m => m.Timestamp).FirstOrDefault()?.Timestamp
+            })
+            .ToList();
+
+        return Ok(conversations);
     }
 }

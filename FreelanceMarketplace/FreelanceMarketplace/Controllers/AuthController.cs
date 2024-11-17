@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using GraphQLParser;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -133,63 +135,35 @@ public class AuthController : Controller
     }
 
     [HttpGet("signin-google")]
-    public IActionResult SignInWithGoogle()
+    public IActionResult SignInWithGoogle(string role = "Client")
     {
-        var redirectUrl = Url.Action("GoogleResponse", "GoogleLogin");
+        var redirectUrl = Url.Action("GoogleResponse", "GoogleLogin", new { role });
         var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
         return Challenge(properties, "Google");
     }
 
-    //[HttpGet("google-response")]
-    //public async Task<IActionResult> GoogleResponse()
-    //{
-    //    var result = await HttpContext.AuthenticateAsync("Google");
-    //    if (result.Succeeded)
-    //    {
-    //        // success
-    //        var claims = result.Principal.Identities.First().Claims;
-    //        _authService.GenerateAccessToken(claims);
-    //    }
-
-    //    return Redirect("http://localhost:5173");
-    //}
-
-    [HttpPost("google-response")]
-    public async Task<IActionResult> GoogleResponse()
+    [Authorize(AuthenticationSchemes = "Google")]
+    [HttpGet("google-response")]
+    public async Task<IActionResult> GoogleResponse(string state)
     {
-        // Authenticate the user via Google
+        string role = state;
         var result = await HttpContext.AuthenticateAsync("Google");
-        Console.WriteLine(result);
-
+        Console.WriteLine("suc: " + result.Succeeded);
         if (result.Succeeded)
         {
-            // Extract claims from Google authentication result
             var claims = result.Principal.Identities.First().Claims.ToList();
-
-            // Check if user exists or create a new user in your database
             var googleEmail = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
-            var user = _userService.GetOrCreateUserFromGoogleToken(googleEmail);
-
+            // Kiểm tra tài khoản đã tồn tại chưa
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == googleEmail);
             if (user != null)
             {
-                // Add custom claims (e.g., user ID and role)
+                claims.Add(new Claim(ClaimTypes.Name, user.Username));
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
                 claims.Add(new Claim(ClaimTypes.Role, user.Role));
 
                 var accessToken = _authService.GenerateAccessToken(claims);
-
                 var refreshToken = _authService.GenerateRefreshToken();
-
                 _userService.SaveRefreshToken(user.Id, refreshToken);
-
-                Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddDays(7)
-                });
-
                 return Ok(new Response<object>
                 {
                     Success = true,
@@ -201,9 +175,49 @@ public class AuthController : Controller
                     }
                 });
             }
+            // Tạo tài khoản mới
+            var regis = new RegisterReq
+            {
+                Username = googleEmail,
+                Password = "123456",
+                Email = googleEmail,
+                Role = role
+            };
+
+            var isSuccess = await _userService.RegisterUserAsync(regis);
+            if (isSuccess)
+            {
+                var userByGoogle = await _context.Users.FirstOrDefaultAsync(u => u.Username == regis.Username);
+
+                claims.Add(new Claim(ClaimTypes.Name, googleEmail));
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, userByGoogle.Id.ToString()));
+                claims.Add(new Claim(ClaimTypes.Role, role));
+
+                var accessToken = _authService.GenerateAccessToken(claims);
+                var refreshToken = _authService.GenerateRefreshToken();
+
+                _userService.SaveRefreshToken(userByGoogle.Id, refreshToken);
+
+                return Ok(new Response<object>
+                {
+                    Success = true,
+                    Message = "Account created and login successful",
+                    Data = new
+                    {
+                        AccessToken = accessToken,
+                        RefreshToken = refreshToken
+                    }
+                });
+            }
+
+            return BadRequest(new Response<string>
+            {
+                Success = false,
+                Message = "Unable to create user.",
+                Data = null
+            });
         }
         var errorDetails = result.Failure?.Message;
-        Console.WriteLine(errorDetails);
         return Unauthorized($"Google authentication failed. {errorDetails}");
     }
 

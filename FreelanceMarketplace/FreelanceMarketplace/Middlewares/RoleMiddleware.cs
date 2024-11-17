@@ -18,10 +18,17 @@ namespace FreelanceMarketplace.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
+            if (context.Request.Path == "/favicon.ico")
+            {
+                await _next(context);
+                return;
+            }
+
             var path = context.Request.Path.Value.ToLower();
             _logger.LogInformation($"Processing request for path: {path}");
 
             Console.WriteLine(Endpoints.PublicEndpoints.Any(e => path.StartsWith(e)));
+
             if (Endpoints.PublicEndpoints.Any(e => path.StartsWith(e)))
             {
                 _logger.LogInformation($"Allowing access to public endpoint: {path}");

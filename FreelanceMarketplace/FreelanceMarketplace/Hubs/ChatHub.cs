@@ -10,6 +10,7 @@ namespace FreelanceMarketplace.Hubs
     {
         private readonly IUserService _userService;
         private readonly AppDbContext _context;
+        private static readonly Dictionary<string, string> _userConnections = new();
         public ChatHub(IUserService userService, AppDbContext context)
         {
             _userService = userService;
@@ -35,6 +36,32 @@ namespace FreelanceMarketplace.Hubs
             // Send message to only involved users
             await Clients.User(senderId.ToString()).SendAsync("ReceiveMessage", sender, message);
             await Clients.User(recipientId.ToString()).SendAsync("ReceiveMessage", sender, message);
+        }
+
+        public override Task OnConnectedAsync()
+        {
+            var userId = Context.User.Identity.Name;
+            Console.WriteLine("Userid is " + userId);
+            if (userId != null)
+            {
+                _userConnections[userId] = Context.ConnectionId;
+            }
+            return base.OnConnectedAsync();
+        }
+
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            var userId = Context.User?.Identity?.Name;
+            if (userId != null)
+            {
+                _userConnections.Remove(userId);
+            }
+            return base.OnDisconnectedAsync(exception);
+        }
+
+        public static string? GetConnectionId(string username)
+        {
+            return _userConnections.TryGetValue(username, out var connectionId) ? connectionId : null;
         }
 
     }

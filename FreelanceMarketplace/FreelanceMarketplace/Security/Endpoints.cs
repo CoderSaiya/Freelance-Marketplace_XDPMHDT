@@ -12,14 +12,19 @@
             "/api/auth/signin-google",
             "/api/auth/google-response",
             "/graphql",
+            "/api/chat/history",
+            "/api/chat/send",
+            "/chathub/negotiate",
+            "/chathub",
+            "/notificationhub",
+            "/notificationhub/negotiate",
+            "/api/chat/get-conversations"
 
         };
 
         public static readonly string[] AdminEndpoints =
         {
-            "/api/chat/send",
-            "/api/user",
-            "/api/chat/history",
+            "/api/user"
         };
 
         public static readonly string[] FreelancerEndpoints =
@@ -28,10 +33,6 @@
             "/api/chat/history",
             "/api/stripe/create-payment-intent",
             "/api/stripe/webhook",
-            "/notificationhub",
-            "/notificationhub/negotiate",
-            "/chathub/negotiate",
-            "/chathub",
         };
 
         public static readonly string[] ClientEndpoints =
@@ -40,10 +41,6 @@
             "/api/chat/history",
             "/api/stripe/create-payment-intent",
             "/api/stripe/webhook",
-            "/notificationhub",
-            "/notificationhub/negotiate",
-            "/chathub/negotiate",
-            "/chathub",
         };
     }
 }
