@@ -86,19 +86,50 @@ namespace FreelanceMarketplace.Services
             var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == mail);
             if (user == null) return false;
 
-            user.EmailConfirmationToken = Guid.NewGuid().ToString();
+            var random = new Random();
+            var confirmationCode = random.Next(1000, 9999).ToString();
+
+            user.EmailConfirmationToken = confirmationCode;
 
             await _context.SaveChangesAsync();
 
-            var link = $"http://localhost:5173/forgotpass?userId={user.Id}&token={user.EmailConfirmationToken}";
+            var code = $"{confirmationCode}";
 
             var emailBody = $@"
             <h2>Change password</h2>
             <p>Hi, {user.Username}</p>
-            <p>Please click the link below to change your password:</p>
-            <a href='{link}'>Click here to change password</a>";
+            <p>Here is the code, enter it on the verification page to proceed to the next step: <b>{code}</b></p>";
 
             await _emailService.SendEmailAsync(user.Email, "Change password", emailBody);
+
+            return true;
+        }
+
+        public async Task<bool> VerifyCode(string email, string code)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email && u.EmailConfirmationToken == code);
+            if (user == null)
+            {
+                return false;
+            }
+
+            user.IsEmailConfirmed = true;
+            user.EmailConfirmationToken = null;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> ChangePass(string email, string newPass)
+        {
+            var user = await _context.Users.SingleOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                return false;
+            }
+
+            user.PasswordHash = _passwordHasher.HashPassword(user, newPass);
+            await _context.SaveChangesAsync();
 
             return true;
         }
