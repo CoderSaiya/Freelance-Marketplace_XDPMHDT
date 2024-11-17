@@ -6,7 +6,7 @@ const WelcomePage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleRoleSelection = (role: string) => {
-    navigate(`/login?role=${role}&isRegister=true`);
+    navigate(`/login?state=${role}&isRegister=true`);
   };
 
   return (

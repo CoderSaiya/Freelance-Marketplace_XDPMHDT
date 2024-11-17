@@ -7,16 +7,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Menu, MessageSquare, Send } from "lucide-react";
 import {
-  createHubConnection,
-  stopHubConnection,
-} from "@/services/notificationService";
-import {
   useGetChatHistoryQuery,
   useSendMessageMutation,
 } from "../../apis/restfulApi";
 import { ChatItem, ChatWindowProps } from "../../types/chat";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { createHubConnection, stopHubConnection } from "@/services/chatService";
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
   recipient,
@@ -24,46 +21,97 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   toggleDetails,
 }) => {
   const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState<ChatItem[]>([]); // Local state for messages
   const userId = useSelector((state: RootState) => state.auth.userId);
   const username = useSelector((state: RootState) => state.auth.username);
 
   const [sendMessage] = useSendMessageMutation();
   const {
-    data: messages,
+    data: initialMessages,
     refetch: refetchChatHistory,
     isLoading,
   } = useGetChatHistoryQuery({ user1: username, user2: recipient });
+
+  useEffect(() => {
+    if (initialMessages) {
+      setMessages(
+        initialMessages
+          .filter(
+            (msg) => msg && msg.id && msg.sender && msg.recipient && msg.message
+          )
+          .map((msg) => ({
+            id: msg.id,
+            sender: msg.sender.username || "Unknown",
+            recipient: msg.recipient.username || "Unknown",
+            message: msg.message,
+            timestamp: new Date(msg.timestamp),
+          }))
+      );
+    }
+  }, [initialMessages]);
 
   const handleSend = async () => {
     if (message.trim() === "") return;
 
     try {
-      await sendMessage({ sender: username, recipient, message }).unwrap();
+      const newMessage = await sendMessage({
+        sender: username,
+        recipient: recipient,
+        message: message,
+      }).unwrap();
+
+      if (!newMessage || !newMessage.sender || !newMessage.recipient) {
+        console.error("Received an invalid message from the API:", newMessage);
+        return;
+      }
+
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: newMessage.id,
+          sender: newMessage.sender.username || "Unknown",
+          recipient: newMessage.recipient.username || "Unknown",
+          message: newMessage.message,
+          timestamp: newMessage.timestamp,
+        },
+      ]);
       setMessage("");
-      refetchChatHistory();
     } catch (error) {
       console.error("Error sending message:", error);
     }
   };
 
   useEffect(() => {
-    const handleNotification = (chat: ChatItem) => {
-      alert(chat.message);
+    const handleNotification = (chat: any) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          id: chat.id || new Date().getTime().toString(),
+          sender: chat.sender,
+          recipient: recipient,
+          message: chat.message,
+          timestamp: new Date(chat.timestamp),
+        },
+      ]);
     };
-
-    createHubConnection("notificationhub", handleNotification);
-
+  
+    createHubConnection("chatHub", handleNotification);
+  
     return () => stopHubConnection();
-  }, [userId]);
+  }, [recipient]);
 
   if (!selectedConversation) {
     return (
       <div className="flex-1 flex items-center justify-center flex-col gap-4 text-slate-500">
         <MessageSquare className="h-12 w-12" />
-        <p className="text-lg font-medium">Please select a conversation to start messaging</p>
+        <p className="text-lg font-medium">
+          Please select a conversation to start messaging
+        </p>
       </div>
     );
   }
+
+  console.log(initialMessages);
 
   return (
     <div className="flex-1 flex flex-col bg-white">
@@ -80,7 +128,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             </Avatar>
             <div>
               <h2 className="font-semibold">{selectedConversation.name}</h2>
-              <Badge variant="success" className="mt-1">Online</Badge>
+              <Badge variant="success" className="mt-1">
+                Online
+              </Badge>
             </div>
           </div>
           <Button variant="ghost" size="icon" onClick={toggleDetails}>
@@ -93,7 +143,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         <div className="space-y-4">
           {messages?.map((msg, index) => (
             <Card
-              key={index}
+              key={msg.id || index}
               className={`max-w-[80%] ${
                 msg.sender === username ? "ml-auto" : "mr-auto"
               }`}
@@ -105,7 +155,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                       src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${msg.sender}`}
                     />
                     <AvatarFallback>
-                      {msg.sender.substring(0, 2).toUpperCase()}
+                      {typeof msg.sender === "string"
+                        ? msg.sender.substring(0, 2).toUpperCase()
+                        : "NA"}
                     </AvatarFallback>
                   </Avatar>
                   <div>

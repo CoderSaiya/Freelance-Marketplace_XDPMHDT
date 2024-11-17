@@ -133,3 +133,9 @@ export interface ProjectStatusCount {
   status: string;
   projectCount: number;
 }
+
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  Redirect?: string;
+}

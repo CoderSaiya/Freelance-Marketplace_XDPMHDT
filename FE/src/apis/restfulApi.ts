@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError 
 import { Mutex } from 'async-mutex';
 import { setTokens, logout } from '@/features/authSlice';
 import { ChatMessage } from '@/types/ChatMessage';
-import { RegisterReq, ResponseRestful } from '@/types';
+import { AuthResponse, RegisterReq, ResponseRestful, ResponseType } from '@/types';
 
 interface GoogleSignInResponse {
   url: string;
@@ -128,11 +128,10 @@ export const restfulApi = createApi({
     // googleCallback: builder.query<void, string>({
     //   query: (code) => `Auth/google-response?code=${code}`,
     // }),
-    loginGoogle: builder.mutation<void, void>({
-      query: (googleResponseCode) => ({
-        url: 'Auth/google-response', // Endpoint to exchange Google token
-        method: 'POST',
-        body: { code: googleResponseCode }, // Include the Google response code in the body
+    loginGoogle: builder.mutation<ResponseType<AuthResponse>, string>({
+      query: (role) => ({
+        url: `Auth/signin-google?role=${encodeURIComponent(role)}`,
+        method: 'GET',
       }),
     }),
     refreshToken: builder.mutation<{ data: { accessToken: string; refreshToken: string } }, { accessToken: string | null; refreshToken: string | null }>({
@@ -159,7 +158,7 @@ export const restfulApi = createApi({
     getChatHistory: builder.query<ChatMessage[], { user1: string; user2: string }>({
       query: ({ user1, user2 }) => `Chat/history?user1=${user1}&user2=${user2}`,
     }),
-    sendMessage: builder.mutation<void, { sender: string; recipient: string; message: string }>({
+    sendMessage: builder.mutation<ChatMessage, { sender: string; recipient: string; message: string }>({
       query: ({ sender, recipient, message }) => ({
         url: 'Chat/send',
         method: 'POST',
@@ -172,8 +171,20 @@ export const restfulApi = createApi({
         method: 'POST',
         body: { amount, userId }
       })
-    })
+    }),
+    getConversations: builder.query({
+      query: (username) => `chat/get-conversations/${username}`,
+    }),
   }),
 });
 
-export const { useLoginUserMutation, useRegisterUserMutation, useLoginGoogleMutation, useUploadImgMutation, useSendMessageMutation, useSendAllMutation, useGetChatHistoryQuery, useStripePaymentMutation } = restfulApi;
+export const {  
+  useLoginUserMutation, 
+  useRegisterUserMutation, 
+  useLoginGoogleMutation,
+  useUploadImgMutation,
+  useSendMessageMutation, 
+  useSendAllMutation,
+  useGetChatHistoryQuery,
+  useStripePaymentMutation,
+  useGetConversationsQuery, } = restfulApi;

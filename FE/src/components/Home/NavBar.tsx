@@ -90,7 +90,7 @@ const Navbar: React.FC = () => {
           </>
         ) : (
           <>
-            <Notification />
+            <Notification refetchWallet={refetch}/>
             <div
               className="relative"
               onMouseEnter={handleMouseEnter}
