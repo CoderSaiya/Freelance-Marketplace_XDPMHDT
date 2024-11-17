@@ -30,7 +30,7 @@ const Form: React.FC = () => {
   const [forgotStatus, setForgotStatus] = useState(false);
 
   const [loginUser] = useLoginUserMutation();
-  const [registerUser] = useRegisterUserMutation();
+  const [registerUser, {isLoading}] = useRegisterUserMutation();
   const [loginGoogle, { data, error, isSuccess }] = useLoginGoogleMutation();
 
   const navigate = useNavigate();
@@ -241,6 +241,7 @@ const Form: React.FC = () => {
                     toggleAuthMode={() => setIsLogin(!isLogin)}
                     isSuccess={isSuccess}
                     onFogot={setForgotStatus}
+                    isSignupLoad={isLoading}
                   />
                 </div>
 

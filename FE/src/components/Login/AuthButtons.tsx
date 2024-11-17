@@ -1,6 +1,6 @@
 import { BallTriangle } from "@agney/react-loading";
 import { motion } from "framer-motion";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 
 interface AuthButtonsProps {
   isLogin: boolean;
@@ -8,6 +8,7 @@ interface AuthButtonsProps {
   onGoogleLogin: () => void;
   isSuccess: boolean;
   isDisabled?: boolean;
+  isSignupLoad: boolean;
 }
 
 export const AuthButtons: React.FC<AuthButtonsProps> = ({
@@ -15,7 +16,8 @@ export const AuthButtons: React.FC<AuthButtonsProps> = ({
   onSubmit,
   onGoogleLogin,
   isSuccess,
-  isDisabled = false
+  isDisabled = false,
+  isSignupLoad,
 }) => {
   return (
     <motion.div
@@ -33,22 +35,31 @@ export const AuthButtons: React.FC<AuthButtonsProps> = ({
           <button
             type="button"
             onClick={onSubmit}
-            disabled={isDisabled}
+            disabled={isSignupLoad}
             className={`w-full py-3 rounded-xl font-semibold transform transition-all duration-200
-              ${isDisabled 
-                ? 'bg-gray-400 text-white/80 cursor-not-allowed' 
-                : 'bg-white text-purple-600 hover:bg-white/90 hover:scale-[1.02]'
+              ${
+                isDisabled
+                  ? "bg-gray-400 text-white/80 cursor-not-allowed"
+                  : "bg-white text-purple-600 hover:bg-white/90 hover:scale-[1.02]"
               }
             `}
           >
             <span className="flex items-center justify-center gap-2">
-              {isDisabled && !isLogin && <AlertCircle className="w-5 h-5" />}
-              {isLogin ? "Sign in" : "Sign up"}
+              {isSignupLoad ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  {isDisabled && !isLogin && (
+                    <AlertCircle className="w-5 h-5" />
+                  )}
+                  {isLogin ? "Sign in" : "Sign up"}
+                </>
+              )}
             </span>
           </button>
-          
+
           {isDisabled && !isLogin && (
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               className="text-red-400 text-sm text-center drop-shadow-[0_0_2px_black] font-bold"
@@ -64,16 +75,17 @@ export const AuthButtons: React.FC<AuthButtonsProps> = ({
         onClick={onGoogleLogin}
         disabled={isSuccess}
         className={`w-full py-3 rounded-xl border font-semibold flex items-center justify-center gap-2 transform transition-all duration-200
-          ${isSuccess
-            ? 'bg-white/5 border-white/10 text-white/50 cursor-not-allowed'
-            : 'bg-white/10 border-white/20 text-white hover:bg-white/20 hover:scale-[1.02]'
+          ${
+            isSuccess
+              ? "bg-white/5 border-white/10 text-white/50 cursor-not-allowed"
+              : "bg-white/10 border-white/20 text-white hover:bg-white/20 hover:scale-[1.02]"
           }
         `}
       >
-        <img 
-          src="/img/google.png" 
-          alt="Google" 
-          className={`w-5 h-5 ${isSuccess ? 'opacity-50' : ''}`}
+        <img
+          src="/img/google.png"
+          alt="Google"
+          className={`w-5 h-5 ${isSuccess ? "opacity-50" : ""}`}
         />
         <span>{isLogin ? "Sign in with Google" : "Sign up with Google"}</span>
       </button>
