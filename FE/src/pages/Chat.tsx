@@ -6,10 +6,12 @@ import { Conversation } from "../types/chat";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useGetConversationsQuery } from "@/apis/restfulApi";
-import { useParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 const Chat: React.FC = () => {
-  const { receiver } = useParams<{ receiver?: string }>();
+  const [searchParams] = useSearchParams();
+  const receiver = searchParams.get("receiver");
+  console.log(receiver);
   const [showDetails, setShowDetails] = useState(false);
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation | null>(null);
@@ -28,12 +30,6 @@ const Chat: React.FC = () => {
       }
     }
   }, [receiver, conversations]);
-
-  // const conversations: Conversation[] = [
-  //   { id: 1, name: "client1", lastMessageTime: "12:01pm" },
-  //   { id: 2, name: "Jane Smith", lastMessageTime: "Yesterday" },
-  //   { id: 3, name: "Johna Scott", lastMessageTime: "05/05/23" },
-  // ];
 
   const toggleDetails = () => setShowDetails((prev) => !prev);
 

@@ -18,7 +18,7 @@ const ClientInfoInfo: React.FC<ClientInfoProp> = ({
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/chat?reveiver=${username}`);
+    navigate(`/chat?receiver=${username}`);
   };
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
