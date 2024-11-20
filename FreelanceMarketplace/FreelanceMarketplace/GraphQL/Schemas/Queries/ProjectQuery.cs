@@ -109,6 +109,24 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Queries
                     }
                 })
             });
+
+            AddField(new FieldType
+            {
+                Name = "getSimilarProjects",
+                Type = typeof(ListGraphType<ProjectType>),
+                Arguments = new QueryArguments(
+                     new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "projectId" }
+                 ),
+                Resolver = new FuncFieldResolver<object>(async context =>
+                {
+                    int projectId = context.GetArgument<int>("projectId");
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        var projectService = scope.ServiceProvider.GetRequiredService<IProjectService>();
+                        return await projectService.GetSimilarProjectsAsync(projectId);
+                    }
+                })
+            });
         }
     }
 }

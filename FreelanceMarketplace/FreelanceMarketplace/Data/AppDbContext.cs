@@ -115,10 +115,16 @@ namespace FreelanceMarketplace.Data
                 .HasForeignKey(p => p.CategoryId);
 
             modelBuilder.Entity<Review>()
-                .HasOne(r => r.User)
-                .WithMany(u => u.Reviews)
-                .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(r => r.Recipient)
+                .WithMany(u => u.RecipientReviews)
+                .HasForeignKey(r => r.RecipientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.Sender)
+                .WithMany(u => u.SenderReviews)
+                .HasForeignKey(r => r.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Review>()
                 .HasOne(r => r.Contract)

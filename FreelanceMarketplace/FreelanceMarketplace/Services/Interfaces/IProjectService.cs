@@ -20,6 +20,7 @@ namespace FreelanceMarketplace.Services.Interfaces
         Task<List<RevenueDto>> GetMonthlyRevenueAsync();
         Task<object> GetStatisticsAsync();
         Task<List<StatusCountDto>> GetGroupedProjectStatusCountsAsync();
+        Task<List<Project>> GetSimilarProjectsAsync(int projectId);
 
     }
 }

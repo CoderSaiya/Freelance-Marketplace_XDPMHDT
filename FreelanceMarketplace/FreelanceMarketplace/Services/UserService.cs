@@ -241,12 +241,12 @@ namespace FreelanceMarketplace.Services
 
         public async Task<Users> GetUserByUsernameAsync(string username)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+            return await _context.Users.Include(u => u.UserProfile).FirstOrDefaultAsync(u => u.Username == username);
         }
 
         public List<Users> GetUsers()
         {
-            return _context.Users.Include(u => u.UserProfile).Include(u => u.Projects).Include(u => u.Reviews).ToList();
+            return _context.Users.Include(u => u.UserProfile).Include(u => u.Projects).Include(u => u.RecipientReviews).ToList();
         }
 
         public bool DeleteUserById(int userId)

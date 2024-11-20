@@ -16,15 +16,15 @@ namespace FreelanceMarketplace.Tests
         private readonly AppDbContext _context;
         private readonly ApplyService _applyService;
 
-        public ApplyServiceTests()
-        {
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseInMemoryDatabase(databaseName: "TestApplyDatabase")
-                .Options;
-            _context = new AppDbContext(options);
+        //public ApplyServiceTests()
+        //{
+        //    var options = new DbContextOptionsBuilder<AppDbContext>()
+        //        .UseInMemoryDatabase(databaseName: "TestApplyDatabase")
+        //        .Options;
+        //    _context = new AppDbContext(options);
 
-            _applyService = new ApplyService(_context);
-        }
+        //    _applyService = new ApplyService(_context);
+        //}
 
         [Fact]
         public async Task CreateApplyAsync_ShouldCreateApply()

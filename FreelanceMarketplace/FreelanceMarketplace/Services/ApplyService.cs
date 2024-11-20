@@ -1,20 +1,26 @@
 ﻿using FreelanceMarketplace.Data;
+using FreelanceMarketplace.Hubs;
 using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Services.Interfaces;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Cms;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged;
 
 namespace FreelanceMarketplace.Services
 {
     public class ApplyService : IApplyService
     {
         private readonly AppDbContext _context;
+        private readonly IHubContext<NotificationHub> _notificationHubContext;
 
-        public ApplyService(AppDbContext context)
+        public ApplyService(AppDbContext context, IHubContext<NotificationHub> hubContext)
         {
             _context = context;
+            _notificationHubContext = hubContext;
         }
 
         public async Task<Apply> CreateApplyAsync(Apply apply)
@@ -156,6 +162,12 @@ namespace FreelanceMarketplace.Services
                 var project = _context.Projects.FirstOrDefault(a => a.ProjectId == existingApply.ProjectId);
                 project.Status = "Processing";
 
+                Users admin = await _context.Users.FirstOrDefaultAsync(u => u.Username == "admin");
+                Users acceptedFreelancer = await _context.Users.FirstOrDefaultAsync(u => u.Id == existingApply.FreelancerId);
+
+                var acceptMessage = "Congratulations your application to project #1 has been accepted!!";
+                var rejectMessage = "Sorry your application to project #1 was rejected!! Please try again later.";
+
                 var newContract = new Contracts
                 {
                     ProjectId = existingApply.ProjectId,
@@ -168,12 +180,63 @@ namespace FreelanceMarketplace.Services
 
                 await _context.Contracts.AddAsync(newContract);
 
+                Notification acceptNotification = new Notification
+                {
+                    SenderId = admin.Id,
+                    ReceiverId = acceptedFreelancer.Id,
+                    Message = acceptMessage,
+                };
+
+                _context.Notifications.Add(acceptNotification);
+
+                await _context.SaveChangesAsync();
+
+                var connectionId = NotificationHub.GetConnectionId(acceptedFreelancer.Username);
+                if (connectionId != null)
+                {
+                    await _notificationHubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", new
+                    {
+                        id = acceptNotification.Id,
+                        message = acceptNotification.Message,
+                        createdAt = acceptNotification.CreatedAt?.ToString("o") ?? "Invalid Date",
+                        sender = admin.Username,
+                        recipient = acceptedFreelancer.Username,
+                        isRead = acceptNotification.IsRead
+                    });
+                }
+
+                Users rejectedFreelancer = new Users();
+
                 var otherApplies = await _context.Applies
                     .Where(a => a.ProjectId == existingApply.ProjectId && a.ApplyId != applyId)
                     .ToListAsync();
 
                 foreach (var apply in otherApplies)
                 {
+                    rejectedFreelancer = await _context.Users.FirstOrDefaultAsync(u => u.Id == apply.FreelancerId);
+
+                    Notification rejectNotification = new Notification
+                    {
+                        SenderId = admin.Id,
+                        ReceiverId = rejectedFreelancer.Id,
+                        Message = rejectMessage,
+                    };
+
+                    _context.Notifications.Add(acceptNotification);
+
+                    var connectionId2 = NotificationHub.GetConnectionId(rejectedFreelancer.Username);
+                    if (connectionId2 != null)
+                    {
+                        await _notificationHubContext.Clients.Client(connectionId2).SendAsync("ReceiveNotification", new
+                        {
+                            id = rejectNotification.Id,
+                            message = rejectNotification.Message,
+                            createdAt = rejectNotification.CreatedAt?.ToString("o") ?? "Invalid Date",
+                            sender = admin.Username,
+                            recipient = rejectedFreelancer.Username,
+                            isRead = rejectNotification.IsRead
+                        });
+                    }
                     apply.Status = "Rejected";
                 }
 

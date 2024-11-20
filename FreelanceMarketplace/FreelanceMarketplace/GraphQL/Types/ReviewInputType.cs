@@ -8,7 +8,8 @@ namespace FreelanceMarketplace.GraphQL.Types
         {
             Name = "ReviewInput";
 
-            Field<NonNullGraphType<IntGraphType>>("userId");
+            Field<NonNullGraphType<IntGraphType>>("senderId");
+            Field<NonNullGraphType<IntGraphType>>("recipientId");
             Field<NonNullGraphType<IntGraphType>>("contractId");
             Field<NonNullGraphType<IntGraphType>>("rating");
             Field<StringGraphType>("feedback");

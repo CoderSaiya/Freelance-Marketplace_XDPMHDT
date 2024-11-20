@@ -25,7 +25,8 @@ namespace FreelanceMarketplace.GraphQL.Schemas.Mutations
                     var input = context.GetArgument<Dictionary<string, object>>("review");
                     var review = new Review
                     {
-                        UserId = Convert.ToInt32(input["userId"]),
+                        SenderId = Convert.ToInt32(input["senderId"]),
+                        RecipientId = Convert.ToInt32(input["recipientId"]),
                         ContractId = Convert.ToInt32(input["contractId"]),
                         Rating = Convert.ToInt32(input["rating"]),
                         Feedback = input["feedback"].ToString(),

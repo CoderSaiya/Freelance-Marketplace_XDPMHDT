@@ -26,7 +26,8 @@ namespace FreelanceMarketplace.Services
             try
             {
                 return await _context.Reviews
-                    .Include(c => c.User)
+                    .Include(c => c.Sender)
+                    .Include(c => c.Recipient)
                     .Include(c => c.Contract)
                     .ToListAsync();
             }
@@ -42,7 +43,8 @@ namespace FreelanceMarketplace.Services
             try
             {
                 var review = await _context.Reviews
-                    .Include(c => c.User)
+                    .Include(c => c.Sender)
+                    .Include(c => c.Recipient)
                     .Include(c => c.Contract)
                     .FirstOrDefaultAsync(c => c.ReviewId == reviewId);
 
@@ -62,8 +64,9 @@ namespace FreelanceMarketplace.Services
             try
             {
                 Users admin = _context.Users.FirstOrDefault(u => u.Username == "admin");
-                Users recipient = _context.Users.FirstOrDefault(u => u.Id == review.UserId);
-                if (admin == null || recipient == null)
+                Users recipient = _context.Users.FirstOrDefault(u => u.Id == review.RecipientId);
+                Users sender = _context.Users.FirstOrDefault(u => u.Id == review.SenderId);
+                if (admin == null || recipient == null || sender == null)
                 {
                     throw new Exception("Admin or user not found.");
                 }
@@ -82,16 +85,35 @@ namespace FreelanceMarketplace.Services
 
                 await _context.SaveChangesAsync();
 
-                await _notificationHubContext.Clients.User(recipient.Id.ToString())
-                    .SendAsync("ReceiveNotification", new
+                var connectionId = NotificationHub.GetConnectionId(recipient.Username);
+                if (connectionId != null)
+                {
+                    await _notificationHubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", new
                     {
                         id = notification.Id,
                         message = notification.Message,
-                        createdAt = notification.CreatedAt,
+                        createdAt = notification.CreatedAt?.ToString("o") ?? "Invalid Date",
                         sender = admin.Username,
                         recipient = recipient.Username,
                         isRead = notification.IsRead
                     });
+                }
+
+                Console.WriteLine("recipient ID: " + recipient.Id);
+
+                var newRating = _context.Reviews
+                                .Where(r => r.RecipientId == recipient.Id)
+                                .Select(r => r.Rating)
+                                .DefaultIfEmpty(0)
+                                .Average();
+
+                Console.WriteLine("Rating: " + newRating);
+
+                if (recipient.UserProfile != null)
+                {
+                    recipient.UserProfile.Rating = newRating;
+                    _context.UserProfiles.Update(recipient.UserProfile);
+                }
 
                 await _context.SaveChangesAsync();
                 return review;
@@ -171,7 +193,7 @@ namespace FreelanceMarketplace.Services
         public async Task<bool> CheckReviewed(int projectId, int userId)
         {
             var reviewExists = await _context.Reviews
-                .AnyAsync(r => r.Contract.ProjectId == projectId && r.UserId == userId);
+                .AnyAsync(r => r.Contract.ProjectId == projectId && r.SenderId == userId);
 
             return reviewExists;
         }
@@ -181,7 +203,7 @@ namespace FreelanceMarketplace.Services
             try
             {
                 var query = _context.Reviews
-                    .Include(c => c.User)  // Bao gồm thông tin người dùng đã đánh giá
+                    .Include(c => c.SenderId)  // Bao gồm thông tin người dùng đã đánh giá
                     .Include(c => c.Contract);  // Bao gồm thông tin hợp đồng liên quan
 
                 if (ascending)

@@ -1,17 +1,25 @@
 ﻿using FreelanceMarketplace.Data;
+using FreelanceMarketplace.Hubs;
 using FreelanceMarketplace.Models;
 using FreelanceMarketplace.Services.Interfaces;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Cms;
+using static GraphQL.Validation.Rules.OverlappingFieldsCanBeMerged;
 
 namespace FreelanceMarketplace.Services
 {
     public class ContractService : IContractService
     {
         private readonly AppDbContext _context;
+        private readonly IHubContext<NotificationHub> _notificationHubContext;
+        private readonly IWalletService _walletService;
 
-        public ContractService(AppDbContext context)
+        public ContractService(AppDbContext context, IHubContext<NotificationHub> hubContext, IWalletService walletService)
         {
             _context = context;
+            _walletService = walletService;
+            _notificationHubContext = hubContext;
         }
 
         public async Task<List<Contracts>> GetAllContractsAsync()
@@ -153,6 +161,38 @@ namespace FreelanceMarketplace.Services
             project.Status = "Finished";
 
             await _context.SaveChangesAsync();
+
+            Users freelancer = await _context.Users.FirstOrDefaultAsync(u => u.Id == contract.FreelancerId);
+            Users admin = await _context.Users.FirstOrDefaultAsync(u => u.Username == "admin");
+            var message = $"Project #{project.ProjectId} is completed, you will get paid as soon as possible";
+
+            await _walletService.UpdateWalletBalanceAsync(freelancer.Id, (decimal)project.Budget);
+
+            Notification notification = new Notification
+            {
+                SenderId = admin.Id,
+                ReceiverId = freelancer.Id,
+                Message = message,
+            };
+
+            _context.Notifications.Add(notification);
+
+            await _context.SaveChangesAsync();
+
+            var connectionId = NotificationHub.GetConnectionId(freelancer.Username);
+            if (connectionId != null)
+            {
+                await _notificationHubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", new
+                {
+                    id = notification.Id,
+                    message = notification.Message,
+                    createdAt = notification.CreatedAt?.ToString("o") ?? "Invalid Date",
+                    sender = admin.Username,
+                    recipient = freelancer.Username,
+                    isRead = notification.IsRead
+                });
+            }
+
             return true;
         }
     }

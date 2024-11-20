@@ -5,19 +5,24 @@ using FreelanceMarketplace.Models.DTOs;
 using FreelanceMarketplace.Services.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Cms;
 
 namespace FreelanceMarketplace.Services
 {
     public class ProjectService : IProjectService
     {
         private readonly AppDbContext _context;
+        private readonly IImgService _imgService;
+        private readonly GoogleDriveService _googleDriveService;
         private readonly IHubContext<NotificationHub> _notificationHubContext;
         private readonly IWalletService _walletService;
 
-        public ProjectService(AppDbContext context, IHubContext<NotificationHub> notificationHubContext , IWalletService walletService)
+        public ProjectService(AppDbContext context, IImgService imgService, GoogleDriveService googleDriveService, IHubContext<NotificationHub> notificationHub, IWalletService walletService)
         {
             _context = context;
-            _notificationHubContext = notificationHubContext;
+            _imgService = imgService;
+            _googleDriveService = googleDriveService;
+            _notificationHubContext = notificationHub;
             _walletService = walletService;
         }
 
@@ -78,7 +83,7 @@ namespace FreelanceMarketplace.Services
                             .ThenInclude(f => f.UserProfile)
                     .Include(p => p.Applies)
                         .ThenInclude(a => a.Freelancer)
-                            .ThenInclude(f => f.Reviews)
+                            .ThenInclude(f => f.RecipientReviews)
                     .Include(p => p.Contract)
                     .Include(p => p.Images)
                     .Include(p => p.Users)
@@ -95,6 +100,55 @@ namespace FreelanceMarketplace.Services
                 throw new Exception($"Error retrieving project with ID {projectId}", ex);
             }
         }
+
+        //public async Task<Project> CreateProjectAsync(Project project, IFormFile? imageFile, int userId)
+        //{
+        //    try
+        //    {
+        //        if (imageFile != null)
+        //        {
+        //            // Tạo stream từ IFormFile
+        //            using (var fileStream = imageFile.OpenReadStream())
+        //            {
+        //                var fileName = imageFile.FileName;
+        //                var folderId = "192Dg2_GakCpgOg_gxdGqstnU2ki6pkql";
+        //                var imageUrl = await _googleDriveService.UploadFileToDrive(fileStream, fileName, folderId);
+
+        //                // Kiểm tra nếu ảnh được upload thành công
+        //                if (!string.IsNullOrEmpty(imageUrl))
+        //                {
+        //                    // Tạo đối tượng Img và lưu vào project
+        //                    var img = new Img
+        //                    {
+        //                        ImageName = fileName,
+        //                        ImageUrl = imageUrl,
+        //                        MimeType = imageFile.ContentType,
+        //                        FileSize = imageFile.Length,
+        //                        UploadedDate = DateTime.UtcNow,
+        //                        ProjectId = project.ProjectId,
+        //                        UploadedByUserId = userId
+        //                    };
+
+        //                    // Gắn ảnh vào dự án
+        //                    project.Images.Add(img);
+        //                }
+        //                else
+        //                {
+        //                    throw new Exception("Failed to upload the image to Google Drive.");
+        //                }
+        //            }
+        //        }
+
+        //        _context.Projects.Add(project);
+        //        await _context.SaveChangesAsync();
+
+        //        return project;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("Error creating project", ex);
+        //    }
+        //}
 
         public async Task<Project> CreateProjectAsync(Project project)
         {
@@ -172,7 +226,7 @@ namespace FreelanceMarketplace.Services
                 throw new Exception("Error updating project", ex);
             }
         }
-        public async Task<bool> DeleteProjectAsync(int projectId) 
+        public async Task<bool> DeleteProjectAsync(int projectId)
         {
             try
             {
@@ -182,7 +236,7 @@ namespace FreelanceMarketplace.Services
 
                 _context.Projects.Remove(project);
                 await _context.SaveChangesAsync();
-                return true; 
+                return true;
             }
             catch (Exception ex)
             {
@@ -230,7 +284,7 @@ namespace FreelanceMarketplace.Services
             try
             {
                 var projects = await _context.Projects
-                    .Include(p => p.Applies) 
+                    .Include(p => p.Applies)
                     .ToListAsync();
 
                 // Sắp xếp các dự án dựa trên số lượng apply giảm dần
@@ -246,6 +300,55 @@ namespace FreelanceMarketplace.Services
             }
         }
 
+        public async Task<List<Project>> GetProjectsWithPagingAsync(int page = 1, int pageSize = 10)
+        {
+            try
+            {
+                return await _context.Projects
+                    .Include(p => p.Category)
+                    .Include(p => p.Applies)
+                    .Include(p => p.Contract)
+                    .Include(p => p.Images)
+                    .Include(p => p.Users)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving projects with paging", ex);
+            }
+        }
+
+        public async Task<List<Project>> GetProjectsWithSortingAsync(string sortBy = "ProjectName", bool isAscending = true)
+        {
+            try
+            {
+                var query = _context.Projects
+                    .Include(p => p.Category)
+                    .Include(p => p.Applies)
+                    .Include(p => p.Contract)
+                    .Include(p => p.Images)
+                    .Include(p => p.Users)
+                    .AsQueryable();
+
+                // Apply sorting based on the sortBy parameter
+                query = sortBy switch
+                {
+                    "Budget" => isAscending ? query.OrderBy(p => p.Budget) : query.OrderByDescending(p => p.Budget),
+                    "Deadline" => isAscending ? query.OrderBy(p => p.Deadline) : query.OrderByDescending(p => p.Deadline),
+                    "Status" => isAscending ? query.OrderBy(p => p.Status) : query.OrderByDescending(p => p.Status),
+                    _ => isAscending ? query.OrderBy(p => p.ProjectName) : query.OrderByDescending(p => p.ProjectName)
+                };
+
+                return await query.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving projects with sorting", ex);
+            }
+        }
+
         public async Task<List<Project>> GetProjectsWithPagingAndSortingAsync(int page = 1, int pageSize = 10, string sortBy = "ProjectName", bool isAscending = true)
         {
             try
@@ -255,6 +358,7 @@ namespace FreelanceMarketplace.Services
                     .Include(p => p.Applies)
                     .Include(p => p.Contract)
                     .Include(p => p.Images)
+                    .Include(p => p.Users)
                     .AsQueryable();
 
                 // Apply sorting
@@ -278,52 +382,6 @@ namespace FreelanceMarketplace.Services
             }
         }
 
-        public async Task<List<Project>> GetProjectsWithPagingAsync(int page = 1, int pageSize = 10)
-        {
-            try
-            {
-                return await _context.Projects
-                    .Include(p => p.Category)
-                    .Include(p => p.Applies)
-                    .Include(p => p.Contract)
-                    .Include(p => p.Images)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error retrieving projects with paging", ex);
-            }
-        }
-
-        public async Task<List<Project>> GetProjectsWithSortingAsync(string sortBy = "ProjectName", bool isAscending = true)
-        {
-            try
-            {
-                var query = _context.Projects
-                    .Include(p => p.Category)
-                    .Include(p => p.Applies)
-                    .Include(p => p.Contract)
-                    .Include(p => p.Images)
-                    .AsQueryable();
-
-                // Apply sorting based on the sortBy parameter
-                query = sortBy switch
-                {
-                    "Budget" => isAscending ? query.OrderBy(p => p.Budget) : query.OrderByDescending(p => p.Budget),
-                    "Deadline" => isAscending ? query.OrderBy(p => p.Deadline) : query.OrderByDescending(p => p.Deadline),
-                    "Status" => isAscending ? query.OrderBy(p => p.Status) : query.OrderByDescending(p => p.Status),
-                    _ => isAscending ? query.OrderBy(p => p.ProjectName) : query.OrderByDescending(p => p.ProjectName)
-                };
-
-                return await query.ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("Error retrieving projects with sorting", ex);
-            }
-        }
 
         public async Task<List<ProjectWithImageDto>> GetAllProjectsWithImageAsync()
         {
@@ -496,5 +554,62 @@ namespace FreelanceMarketplace.Services
                 throw new Exception("Error calculating grouped project status counts", ex);
             }
         }
+
+        public async Task<List<Project>> GetSimilarProjectsAsync(int projectId)
+        {
+            try
+            {
+                var project = await _context.Projects
+                    .Include(p => p.Category)
+                    .FirstOrDefaultAsync(p => p.ProjectId == projectId);
+
+                if (project == null)
+                    throw new KeyNotFoundException("Project not found");
+
+                var allProjects = await _context.Projects
+                    .Include(p => p.Category)
+                    .Where(p => p.ProjectId != project.ProjectId)
+                    .ToListAsync();
+
+                var similarProjects = allProjects
+                    .Select(p => new
+                    {
+                        Project = p,
+                        SimilarityScore = CalculateSimilarityScore(project, p)
+                    })
+                    .OrderByDescending(x => x.SimilarityScore)
+                    .Take(3)
+                    .Select(x => x.Project)
+                    .ToList();
+
+                return similarProjects;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error finding similar projects", ex);
+            }
+        }
+
+        private double CalculateSimilarityScore(Project source, Project target)
+        {
+            double score = 0;
+
+            if (source.CategoryId == target.CategoryId)
+                score += 50;
+
+            double budgetDifference = Math.Abs(source.Budget - target.Budget);
+            score += 30 / (1 + budgetDifference);
+
+            if (!string.IsNullOrEmpty(source.SkillRequire) && !string.IsNullOrEmpty(target.SkillRequire))
+            {
+                var commonSkills = source.SkillRequire.Split(',')
+                    .Intersect(target.SkillRequire.Split(','))
+                    .Count();
+                score += commonSkills * 10;
+            }
+
+            return score;
+        }
+
     }
 }
