@@ -22,15 +22,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 }) => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatItem[]>([]); // Local state for messages
-  const userId = useSelector((state: RootState) => state.auth.userId);
   const username = useSelector((state: RootState) => state.auth.username);
 
   const [sendMessage] = useSendMessageMutation();
   const {
     data: initialMessages,
-    refetch: refetchChatHistory,
-    isLoading,
   } = useGetChatHistoryQuery({ user1: username, user2: recipient });
+
+  console.log(initialMessages);
 
   useEffect(() => {
     if (initialMessages) {
@@ -64,17 +63,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         console.error("Received an invalid message from the API:", newMessage);
         return;
       }
-
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        {
-          id: newMessage.id,
-          sender: newMessage.sender.username || "Unknown",
-          recipient: newMessage.recipient.username || "Unknown",
-          message: newMessage.message,
-          timestamp: newMessage.timestamp,
-        },
-      ]);
       setMessage("");
     } catch (error) {
       console.error("Error sending message:", error);

@@ -9,12 +9,13 @@ import { useNavigate } from "react-router-dom";
 import { notification } from "antd";
 import { jwtDecode } from "jwt-decode";
 import { setUser } from "../../store/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RegisterReq } from "@/types";
 import { AuthLayout } from "./AuthLayout";
 import { AuthForm } from "./AuthForm";
 import { ImageSide } from "./ImageSide";
 import ForgotPassword from "./ForgotPassword";
+import { RootState } from "@/store/store";
 
 const Form: React.FC = () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -190,6 +191,7 @@ const Form: React.FC = () => {
         localStorage.setItem("access_token", accessToken);
         localStorage.setItem("refresh", refreshToken);
       }
+      console.log("Role: " + role);
 
       notification.success({
         message: "Successfully login",
@@ -208,7 +210,9 @@ const Form: React.FC = () => {
       navigate("/welcome");
       return;
     }
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=838128278169-ug2l134id0g6krlkhiklt8u606iln46u.apps.googleusercontent.com&redirect_uri=${encodeURIComponent('https://localhost:7115/api/Auth/google-response')}&response_type=code&scope=openid email profile&state=${role}`;
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=838128278169-ug2l134id0g6krlkhiklt8u606iln46u.apps.googleusercontent.com&redirect_uri=${encodeURIComponent(
+      "https://localhost:7115/api/Auth/google-response"
+    )}&response_type=code&scope=openid email profile&state=${role}`;
 
     const width = 500;
     const height = 600;

@@ -11,7 +11,6 @@ import { useSearchParams } from "react-router-dom";
 const Chat: React.FC = () => {
   const [searchParams] = useSearchParams();
   const receiver = searchParams.get("receiver");
-  console.log(receiver);
   const [showDetails, setShowDetails] = useState(false);
   const [selectedConversation, setSelectedConversation] =
     useState<Conversation | null>(null);
@@ -36,6 +35,8 @@ const Chat: React.FC = () => {
   const handleSelectConversation = (conversation: Conversation) => {
     setSelectedConversation(conversation);
   };
+
+  console.log(receiver);
 
   return (
     <div className="flex h-screen bg-slate-50">

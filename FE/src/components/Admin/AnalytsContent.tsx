@@ -133,27 +133,27 @@ const AnalyticsContent: React.FC<Props> = ({ revenueData }) => {
               <div className="flex items-center justify-between">
                 <span>Completed Projects</span>
                 <span className="font-bold">
-                  {projectStatusWithPercent[0]?.percentage}%
+                  {projectStatusWithPercent[1]?.percentage}%
                 </span>
               </div>
               <div className="w-full bg-secondary h-2 rounded-full">
                 <div
                   className="bg-green-500 h-2 rounded-full"
                   style={{
-                    width: `${projectStatusWithPercent[0]?.percentage}%`,
+                    width: `${projectStatusWithPercent[1]?.percentage}%`,
                   }}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4 pt-4">
                 <div className="border rounded p-4 text-center">
                   <div className="text-2xl font-bold text-green-500">
-                    {projectStatusWithPercent[0]?.projectCount}
+                    {projectStatusWithPercent[1]?.projectCount}
                   </div>
                   <div className="text-sm text-muted-foreground">Completed</div>
                 </div>
                 <div className="border rounded p-4 text-center">
                   <div className="text-2xl font-bold text-blue-500">
-                    {projectStatusWithPercent[1]?.projectCount}
+                    {projectStatusWithPercent[0]?.projectCount}
                   </div>
                   <div className="text-sm text-muted-foreground">
                     In Progress

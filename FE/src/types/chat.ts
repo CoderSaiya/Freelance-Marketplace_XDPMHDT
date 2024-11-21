@@ -1,7 +1,7 @@
 export interface Conversation {
     id: number;
     name: string;
-    lastMessageTime: string;
+    lastMessageTime?: string;
 }
 
 export interface ConversationListProps {

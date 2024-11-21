@@ -10,7 +10,11 @@ import ClientInfo from "./ClientInfo";
 import SimilarProjects from "./SimilarProjects";
 import Breadcrumb from "../Public/Breadcrumb";
 
-const ProjectDetailPage: React.FC<ProjectType> = (props, refech) => {
+interface ProjectDetailPageProps extends ProjectType {
+  refetch: () => void;
+}
+
+const ProjectDetailPage: React.FC<ProjectDetailPageProps> = (props) => {
   const tagsString = props.skillRequire;
   const tagsArray = tagsString.split(",").map((tag) => tag.trim());
 
@@ -44,9 +48,9 @@ const ProjectDetailPage: React.FC<ProjectType> = (props, refech) => {
         <ApplyAndBenefits
           clientId={Number(props.users?.id)}
           projectId={props.projectId}
-          refechProject={refech}
+          refechProject={props.refetch}
         />
-        <ApplierList applies={props.applies}/>
+        <ApplierList applies={props.applies} />
       </div>
 
       {/* Right Column */}
@@ -59,7 +63,7 @@ const ProjectDetailPage: React.FC<ProjectType> = (props, refech) => {
           createAt={String(props.users?.createAt)}
           rating={Number(props.users?.userProfile.rating)}
         />
-        <SimilarProjects />
+        <SimilarProjects projectId={Number(props.projectId)} />
       </div>
     </div>
   );

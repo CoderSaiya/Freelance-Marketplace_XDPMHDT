@@ -258,6 +258,7 @@ export const graphqlApi = createApi({
                   applyId
                   status
                   createAt
+                  freelancerId
                   freelancer {
                     username
                     createAt
@@ -827,6 +828,25 @@ export const graphqlApi = createApi({
         },
       })
     }),
+    getSimilorProjects: builder.query<ResponseType<{ getSimilarProjects: ProjectType[] }>, number>({
+      query: (projectId) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query getSimilarProjects($projectId : Int!) {
+              getSimilarProjects(projectId: $projectId) {
+                projectId
+                projectName
+                budget
+                createAt
+              }
+            }
+          `,
+          variables: { projectId },
+        },
+      }),
+    }),
   }),
 });
 
@@ -860,4 +880,5 @@ export const { useCreateProjectMutation,
   useGroupedProjectStatusCountsQuery,
   useForgotPasswordMutation,
   useVerifyCodeMutation,
-  useChangePasswordMutation, } = graphqlApi;
+  useChangePasswordMutation,
+  useGetSimilorProjectsQuery, } = graphqlApi;

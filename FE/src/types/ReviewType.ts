@@ -1,15 +1,16 @@
 export interface ReviewType {
-    reviewId: number;
-    fromUserId: number;
-    toUserId: number;
-    projectId: number;
+    reviewId?: number;
+    senderId: number;
+    recipientId: number;
+    contractId: number;
     rating: number;
-    comment: string;
-    createdAt: string;
+    feedback: string;
+    createdAt?: string;
 }
 
 export interface ReviewInput {
-    userId: number;
+    senderId: number;
+    recipientId: number;
     contractId: number;
     rating: number;
     feedback?: string;

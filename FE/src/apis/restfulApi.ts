@@ -178,12 +178,12 @@ export const restfulApi = createApi({
   }),
 });
 
-export const {  
-  useLoginUserMutation, 
-  useRegisterUserMutation, 
+export const {
+  useLoginUserMutation,
+  useRegisterUserMutation,
   useLoginGoogleMutation,
   useUploadImgMutation,
-  useSendMessageMutation, 
+  useSendMessageMutation,
   useSendAllMutation,
   useGetChatHistoryQuery,
   useStripePaymentMutation,

@@ -7,7 +7,9 @@ import {
   CardCvcElement,
 } from "@stripe/react-stripe-js";
 import { InfoCircleOutlined } from "@ant-design/icons";
-import { useStripePaymentMutation } from "../../apis/restfulApi";
+import {
+  useStripePaymentMutation,
+} from "../../apis/restfulApi";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { useUpdateWalletBalanceMutation } from "../../apis/graphqlApi";
@@ -62,61 +64,64 @@ const AddFundsModal: React.FC<AddFundsModalProps> = ({ onClose, refetch }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
 
-    const cardNumber = elements.getElement(CardNumberElement);
-    const cardExpiry = elements.getElement(CardExpiryElement);
-    const cardCvc = elements.getElement(CardCvcElement);
+    if (paymentMethod.toLowerCase() === "card") {
+      if (!stripe || !elements) return;
 
-    if (!cardNumber || !cardExpiry || !cardCvc) return;
+      const cardNumber = elements.getElement(CardNumberElement);
+      const cardExpiry = elements.getElement(CardExpiryElement);
+      const cardCvc = elements.getElement(CardCvcElement);
 
-    try {
-      // Step 1: Request PaymentIntent from the server with total amount
-      const response = await stripePayment({
-        amount: totalAmount,
-        userId: Number(userId),
-      }).unwrap();
+      if (!cardNumber || !cardExpiry || !cardCvc) return;
 
-      const { clientSecret } = await response;
+      try {
+        // Step 1: Request PaymentIntent from the server with total amount
+        const response = await stripePayment({
+          amount: totalAmount,
+          userId: Number(userId),
+        }).unwrap();
 
-      // Step 2: Confirm the PaymentIntent
-      const { error, paymentIntent } = await stripe.confirmCardPayment(
-        clientSecret,
-        {
-          payment_method: {
-            card: cardNumber,
-            billing_details: {
-              name: cardholderName,
+        const { clientSecret } = await response;
+
+        // Step 2: Confirm the PaymentIntent
+        const { error, paymentIntent } = await stripe.confirmCardPayment(
+          clientSecret,
+          {
+            payment_method: {
+              card: cardNumber,
+              billing_details: {
+                name: cardholderName,
+              },
             },
-          },
-        }
-      );
+          }
+        );
 
-      if (error) {
+        if (error) {
+          setErrors((prev) => ({
+            ...prev,
+            cardNumber: error.message || "An error occurred",
+          }));
+        } else if (paymentIntent && paymentIntent.status === "succeeded") {
+          console.log("Payment successful!", paymentIntent);
+          await updateWalletBalance({
+            userId: Number(userId),
+            amount: Number(amount),
+          }).unwrap();
+          refetch();
+
+          notification.success({
+            message: "Sucessfully add funds!!!",
+          });
+
+          onClose();
+        }
+      } catch (err) {
+        console.error("Payment failed:", err);
         setErrors((prev) => ({
           ...prev,
-          cardNumber: error.message || "An error occurred",
+          cardNumber: "An error occurred while processing your payment.",
         }));
-      } else if (paymentIntent && paymentIntent.status === "succeeded") {
-        console.log("Payment successful!", paymentIntent);
-        await updateWalletBalance({
-          userId: Number(userId),
-          amount: Number(amount),
-        }).unwrap();
-        refetch();
-
-        notification.success({
-          message: "Sucessfully add funds!!!",
-        });
-
-        onClose();
       }
-    } catch (err) {
-      console.error("Payment failed:", err);
-      setErrors((prev) => ({
-        ...prev,
-        cardNumber: "An error occurred while processing your payment.",
-      }));
     }
   };
 
@@ -251,107 +256,119 @@ const AddFundsModal: React.FC<AddFundsModalProps> = ({ onClose, refetch }) => {
           </div>
 
           {/* Right Column - Amount Selection */}
+
           <div>
             <h2 className="text-xl font-bold mb-6">
-              Select amount
+              {paymentMethod === "card" ? "Selected amount" : "Paypal"}
               <span className="text-gray-500 text-base float-right">(USD)</span>
             </h2>
-
-            <div className="space-y-6">
+            {paymentMethod === "paypal" && (
               <div>
-                <label className="block text-sm mb-2">Currency</label>
-                <div className="relative">
-                  <select className="w-full p-2 border rounded-md appearance-none bg-white">
-                    <option value="USD">🇺🇸 US Dollar</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                    <svg
-                      className="h-4 w-4 text-gray-400"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
+                <button
+                  onClick={handleSubmit}
+                  className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                >
+                  Confirm and go paypal
+                </button>
+              </div>
+            )}
+            {paymentMethod === "card" && (
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm mb-2">Currency</label>
+                  <div className="relative">
+                    <select className="w-full p-2 border rounded-md appearance-none bg-white">
+                      <option value="USD">🇺🇸 US Dollar</option>
+                    </select>
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                      <svg
+                        className="h-4 w-4 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-sm mb-2">Amount</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-2">$</span>
-                  <input
-                    type="text"
-                    value={amount}
-                    onChange={handleAmountChange}
-                    className="w-full p-2 pl-8 border rounded-md text-right"
+                <div>
+                  <label className="block text-sm mb-2">Amount</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-2">$</span>
+                    <input
+                      type="text"
+                      value={amount}
+                      onChange={handleAmountChange}
+                      className="w-full p-2 pl-8 border rounded-md text-right"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Total due</span>
+                    <span>${parseFloat(amount || "0").toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="flex items-center">
+                      Processing fee
+                      <InfoCircleOutlined className="ml-1 text-gray-400" />
+                    </span>
+                    <span>${processingFee.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between font-bold">
+                    <span>Payment due</span>
+                    <span>${totalAmount.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleSubmit}
+                  className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                >
+                  Confirm and pay ${totalAmount.toFixed(2)} USD
+                </button>
+
+                <p className="text-sm text-gray-600">
+                  You agree to authorize the use of your card for this deposit
+                  and future payments, and agree to be bound to the{" "}
+                  <a href="#" className="text-blue-500">
+                    Terms & Conditions
+                  </a>
+                  .
+                </p>
+
+                <div className="flex justify-between items-center mt-4 space-x-4">
+                  <img
+                    src="https://www.f-cdn.com/assets/main/en/assets/payments/secure/ssl-secure.png"
+                    alt="Secure"
+                    className="h-6"
+                  />
+                  <img
+                    src="https://www.f-cdn.com/assets/main/en/assets/payments/secure/pci-dss.png"
+                    alt="PCI DSS"
+                    className="h-6"
+                  />
+                  <img
+                    src="https://www.f-cdn.com/assets/main/en/assets/payments/secure/mastercard-securecode.svg"
+                    alt="Mastercard SecureCode"
+                    className="h-6"
+                  />
+                  <img
+                    src="https://www.f-cdn.com/assets/main/en/assets/payments/secure/visa-secure-blu.svg"
+                    alt="Verified by Visa"
+                    className="h-6"
                   />
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Total due</span>
-                  <span>${parseFloat(amount || "0").toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="flex items-center">
-                    Processing fee
-                    <InfoCircleOutlined className="ml-1 text-gray-400" />
-                  </span>
-                  <span>${processingFee.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between font-bold">
-                  <span>Payment due</span>
-                  <span>${totalAmount.toFixed(2)}</span>
-                </div>
-              </div>
-
-              <button
-                onClick={handleSubmit}
-                className="w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-              >
-                Confirm and pay ${totalAmount.toFixed(2)} USD
-              </button>
-
-              <p className="text-sm text-gray-600">
-                You agree to authorize the use of your card for this deposit and
-                future payments, and agree to be bound to the{" "}
-                <a href="#" className="text-blue-500">
-                  Terms & Conditions
-                </a>
-                .
-              </p>
-
-              <div className="flex justify-between items-center mt-4 space-x-4">
-                <img
-                  src="https://www.f-cdn.com/assets/main/en/assets/payments/secure/ssl-secure.png"
-                  alt="Secure"
-                  className="h-6"
-                />
-                <img
-                  src="https://www.f-cdn.com/assets/main/en/assets/payments/secure/pci-dss.png"
-                  alt="PCI DSS"
-                  className="h-6"
-                />
-                <img
-                  src="https://www.f-cdn.com/assets/main/en/assets/payments/secure/mastercard-securecode.svg"
-                  alt="Mastercard SecureCode"
-                  className="h-6"
-                />
-                <img
-                  src="https://www.f-cdn.com/assets/main/en/assets/payments/secure/visa-secure-blu.svg"
-                  alt="Verified by Visa"
-                  className="h-6"
-                />
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

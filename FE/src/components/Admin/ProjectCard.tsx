@@ -4,7 +4,7 @@ interface ProjectCardProps {
   title: string;
   budget: string;
   progress: number;
-  status: "Active" | "Completed" | "Processing";
+  status: "Active" | "Finished" | "Processing";
   dueDate: string;
 }
 
@@ -17,7 +17,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
 }) => {
   const statusColors = {
     Active: "bg-blue-500",
-    Completed: "bg-green-500",
+    Finished: "bg-green-500",
     Processing: "bg-yellow-500",
   };
 

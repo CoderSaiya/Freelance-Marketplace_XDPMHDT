@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import Banner from "../components/Home/Banner";
 import Propose from "../components/Home/Propose";
 import styled from "@emotion/styled";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { useNavigate } from "react-router-dom";
 
 interface Sponsor {
   id: number;
@@ -223,6 +226,14 @@ const ScrollToTopButton: React.FC = () => {
 
 const Home: React.FC = () => {
   const { scrollYProgress } = useScroll();
+
+  const navigate = useNavigate();
+
+  const role = useSelector((state: RootState) => state.auth.role);
+
+  useEffect(() => {
+    if (role.toLowerCase() === "admin") navigate("/admin");
+  }, [role]);
 
   // Smooth scroll progress animation
   const smoothProgress = useSpring(scrollYProgress, {

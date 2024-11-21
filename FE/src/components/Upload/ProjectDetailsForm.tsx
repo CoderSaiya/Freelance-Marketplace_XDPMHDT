@@ -25,7 +25,7 @@ const ProjectDetailsForm: React.FC<ProjectDetailsFormProps> = ({
   const [inputSkill, setInputSkill] = useState("");
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === " " && inputSkill.trim()) {
+    if (event.key === "," && inputSkill.trim()) {
       event.preventDefault();
       if (!skills.includes(inputSkill.trim())) {
         setSkills([...skills, inputSkill.trim()]);
@@ -82,7 +82,7 @@ const ProjectDetailsForm: React.FC<ProjectDetailsFormProps> = ({
               value={inputSkill}
               onChange={(e) => setInputSkill(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type a skill and press space"
+              placeholder="Type a skill and press ','"
             />
             <div className="flex flex-wrap gap-2 mt-2">
               {skills.map((skill, index) => (
