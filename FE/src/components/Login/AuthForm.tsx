@@ -22,6 +22,7 @@ interface AuthFormProps {
   toggleAuthMode: () => void;
   isSuccess: boolean;
   onFogot: (status: boolean) => void;
+  isSignupLoad: boolean
 }
 
 const passwordCriteria = {
@@ -59,6 +60,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
   toggleAuthMode,
   isSuccess,
   onFogot,
+  isSignupLoad,
 }) => {
   const [showPasswordStrength, setShowPasswordStrength] = useState(false);
 
@@ -283,6 +285,7 @@ export const AuthForm: React.FC<AuthFormProps> = ({
             (passwordStrength.level === "weak" ||
               passwordStrength.level === "medium")
           }
+          isSignupLoad={isSignupLoad}
         />
       </form>
 

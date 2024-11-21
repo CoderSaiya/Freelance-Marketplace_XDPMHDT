@@ -27,7 +27,7 @@ const Detail: React.FC = () => {
         users={project?.users}
         category={project?.category}
         applies={project?.applies || []}
-        refech={refetch}
+        refetch={refetch}
       />
     </div>
   );

@@ -29,7 +29,6 @@ import ProjectApplicantsDialog from "../ProjectApplicantsDialog";
 import UploadDialog from "../UploadDialog";
 import ApplicantCard from "../ApplicantCard";
 import RatingDialog from "../RatingDialog";
-import { ReviewInput } from "@/types/ReviewType";
 
 const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
   userId,
@@ -95,14 +94,15 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
       const acceptedApply = project.applies?.find(
         (apply: ApplyType) => apply.status === "Accepted"
       );
+      console.log(acceptedApply);
 
-      if (acceptedApply) {
+      if (acceptedApply?.freelancerId) {
         if (role === "Client") {
           setUserToRate({
             name: acceptedApply.freelancer.username,
             role: "Freelancer",
             projectTitle: project.projectName,
-            userId: acceptedApply.freelancer.id,
+            userId: acceptedApply.freelancerId,
           });
         } else {
           setUserToRate({
@@ -137,14 +137,9 @@ const ProjectManagementTab: React.FC<{ userId: number; role: string }> = ({
               Number(selectedApply?.projectId)
             ).unwrap();
 
-      const formData = new FormData();
-      // formData.append("userId",userId.toString());
-      // formData.append("contractId",response?.data.contractByProjectId.contractId.toString());
-      // formData.append("rating",rating.toString());
-      // formData.append("feedback",review);
-
       const rate = {
-        userId: userId,
+        recipientId: userToRate.userId,
+        senderId: userId,
         contractId: response?.data.contractByProjectId.contractId,
         rating: rating,
         feedback: review,

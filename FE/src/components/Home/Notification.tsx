@@ -21,7 +21,11 @@ import {
   stopHubConnection,
 } from "@/services/notificationService";
 
-const Notification: React.FC = () => {
+interface Props {
+  refetchWallet: () => void;
+}
+
+const Notification: React.FC<Props> = ({ refetchWallet }) => {
   const userId = useSelector((state: RootState) => state.auth.userId);
   const { data, refetch } = useNotificationsByUserQuery(Number(userId));
   const [markNotification] = useMarkNotificationAsReadMutation();
@@ -32,6 +36,7 @@ const Notification: React.FC = () => {
     const handleNotification = (notification: NotificationItem) => {
       setNotifications((prev) => [notification, ...prev]);
       setUnreadCount((prev) => prev + 1);
+      refetchWallet();
     };
 
     createHubConnection("notificationhub", handleNotification);
@@ -130,7 +135,9 @@ const Notification: React.FC = () => {
                               </span>
                             </TooltipTrigger>
                             <TooltipContent>
-                              {new Date(notification.createdAt).toLocaleString()}
+                              {new Date(
+                                notification.createdAt
+                              ).toLocaleString()}
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>

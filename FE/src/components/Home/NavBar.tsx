@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import AddFundsModal from "./AddFundsModal";
-import { useGetWalletQuery } from "../../apis/graphqlApi";
+import { useGetWalletQuery, useUserByUsernameQuery } from "../../apis/graphqlApi";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import Notification from "./Notification";
@@ -21,6 +21,8 @@ const Navbar: React.FC = () => {
 
   const userId = useSelector((state: RootState) => state.auth.userId);
   const username = useSelector((state: RootState) => state.auth.username);
+
+  const { data: userData } = useUserByUsernameQuery(String(username));
   const { data, refetch } = useGetWalletQuery(Number(userId));
 
   const handleMouseEnter = () => {
@@ -90,7 +92,7 @@ const Navbar: React.FC = () => {
           </>
         ) : (
           <>
-            <Notification />
+            <Notification refetchWallet={refetch} />
             <div
               className="relative"
               onMouseEnter={handleMouseEnter}
@@ -99,13 +101,15 @@ const Navbar: React.FC = () => {
               {/* User Avatar */}
               <button className="flex items-center mr-4">
                 <img
-                  src="/img/logo.png"
+                  src={userData?.data.userByUsername.userProfile.avatar}
                   alt="User Avatar"
                   className="w-12 h-12 rounded-full"
                 />
 
                 <div className="flex flex-col items-start">
-                  <h2 className="text-base">{data?.data.getWallet.user.username}</h2>
+                  <h2 className="text-base">
+                    {data?.data.getWallet.user.username}
+                  </h2>
                   <span className="text-sm">
                     ${data?.data.getWallet.balance} USD
                   </span>

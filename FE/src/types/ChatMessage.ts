@@ -1,7 +1,9 @@
+import { User } from "./UserType";
+
 export interface ChatMessage {
     id: number,
-    senderId: number,
-    recipientId: number,
+    sender: User,
+    recipient: User,
     message: string,
     timestamp: Date
 }

@@ -1,13 +1,14 @@
 export interface Conversation {
     id: number;
     name: string;
-    lastMessageTime: string;
+    lastMessageTime?: string;
 }
 
 export interface ConversationListProps {
     conversations: Conversation[];
     onSelectConversation: (conversation: Conversation) => void;
-    selectedConversation: Conversation | null
+    selectedConversation: Conversation | null;
+    isLoading: boolean;
 }
 
 export interface ChatWindowProps {
@@ -18,8 +19,8 @@ export interface ChatWindowProps {
 
 export interface ChatItem {
     id: number;
-    sender: string;
-    recipeient: string;
+    sender?: string;
+    recipient?: string;
     message?: string;
-    Timestamp: string;
+    timestamp: Date;
 }

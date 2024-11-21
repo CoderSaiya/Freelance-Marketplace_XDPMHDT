@@ -79,7 +79,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
               {project.price}
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground line-clamp-3">
+          <p className="text-sm text-muted-foreground line-clamp-3 h-9">
             {truncateDescription(project.description)}
           </p>
         </div>

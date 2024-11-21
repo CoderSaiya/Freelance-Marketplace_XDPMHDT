@@ -9,17 +9,18 @@ import { useNavigate } from "react-router-dom";
 import { notification } from "antd";
 import { jwtDecode } from "jwt-decode";
 import { setUser } from "../../store/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RegisterReq } from "@/types";
 import { AuthLayout } from "./AuthLayout";
 import { AuthForm } from "./AuthForm";
 import { ImageSide } from "./ImageSide";
 import ForgotPassword from "./ForgotPassword";
+import { RootState } from "@/store/store";
 
 const Form: React.FC = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const code = urlParams.get("code");
-  const role = urlParams.get("role");
+  const role = urlParams.get("state");
   const isRegister = urlParams.get("isRegister") === "true";
 
   const [isLogin, setIsLogin] = useState(!isRegister);
@@ -28,9 +29,10 @@ const Form: React.FC = () => {
   const [email, setEmail] = useState("");
   const [isShowPass, setIsShowPass] = useState(false);
   const [forgotStatus, setForgotStatus] = useState(false);
+  const [googleWindow, setGoogleWindow] = useState<Window | null>(null);
 
   const [loginUser] = useLoginUserMutation();
-  const [registerUser] = useRegisterUserMutation();
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
   const [loginGoogle, { data, error, isSuccess }] = useLoginGoogleMutation();
 
   const navigate = useNavigate();
@@ -46,22 +48,65 @@ const Form: React.FC = () => {
     }
   }, [isLogin, navigate, role]);
 
-  // const { data, error, refetch } = useGoogleCallbackQuery(code ?? '', {
-  //   skip: !code,
-  // });
+  useEffect(() => {
+    if (code) {
+      loginGoogle(String(role));
+    }
+  }, [code, loginGoogle]);
 
-  // useEffect(() => {
-  //   if (data && data.token) {
-  //     localStorage.setItem('access-token', data.token)
-  //     navigate('/');
-  //   }
-  // }, [data, dispatch, navigate]);
+  useEffect(() => {
+    if (isSuccess && data) {
+      const { accessToken, refreshToken } = data.data;
+      if (accessToken && refreshToken) {
+        const decodedToken: any = jwtDecode(accessToken);
+        const userId =
+          decodedToken[
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
+          ];
+        const userName =
+          decodedToken[
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"
+          ];
 
-  // useEffect(() => {
-  //   if (error) {
-  //     console.error('OAuth callback failed:', error);
-  //   }
-  // }, [error]);
+        const role =
+          decodedToken[
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+          ];
+
+        dispatch(setUser({ userId: userId, username: userName, role: role }));
+
+        localStorage.setItem("access_token", accessToken);
+        localStorage.setItem("refresh", refreshToken);
+      }
+      notification.success({
+        message: "Login successfully with Google!",
+      });
+
+      // Đóng pop-up nếu đang mở
+      if (googleWindow) {
+        googleWindow.close();
+        setGoogleWindow(null);
+      }
+
+      navigate("/");
+    }
+  }, [isSuccess, data, navigate, dispatch, googleWindow]);
+
+  useEffect(() => {
+    if (error) {
+      console.error("OAuth callback failed:", error);
+      notification.error({
+        message: "Google authentication failed",
+        description: error?.message || "Please try again.",
+      });
+
+      // Đóng pop-up nếu đăng nhập thất bại
+      if (googleWindow) {
+        googleWindow.close();
+        setGoogleWindow(null);
+      }
+    }
+  }, [error, googleWindow]);
 
   const slideVariants = {
     enter: (direction: number) => ({
@@ -146,6 +191,7 @@ const Form: React.FC = () => {
         localStorage.setItem("access_token", accessToken);
         localStorage.setItem("refresh", refreshToken);
       }
+      console.log("Role: " + role);
 
       notification.success({
         message: "Successfully login",
@@ -153,14 +199,20 @@ const Form: React.FC = () => {
       navigate("/");
     } catch {
       notification.error({
-        message: "Failed login" ,
+        message: "Failed login",
       });
       console.error("Login failed:", error);
     }
   };
 
   const handleLoginGoogle = () => {
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=838128278169-ug2l134id0g6krlkhiklt8u606iln46u.apps.googleusercontent.com&redirect_uri=http://localhost:5173/auth/callback&response_type=code&scope=openid email profile`;
+    if (!role) {
+      navigate("/welcome");
+      return;
+    }
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=838128278169-ug2l134id0g6krlkhiklt8u606iln46u.apps.googleusercontent.com&redirect_uri=${encodeURIComponent(
+      "https://localhost:7115/api/Auth/google-response"
+    )}&response_type=code&scope=openid email profile&state=${role}`;
 
     const width = 500;
     const height = 600;
@@ -168,45 +220,25 @@ const Form: React.FC = () => {
     const top = window.screen.height / 2 - height / 2;
 
     // Mở cửa sổ nhỏ để đăng nhập Google
-    const googleWindow = window.open(
+    const popup = window.open(
       googleAuthUrl,
       "Google Sign-In",
       `width=${width},height=${height},top=${top},left=${left}`
     );
 
+    setGoogleWindow(popup);
+
     // Theo dõi khi cửa sổ pop-up đóng
     const interval = setInterval(() => {
-      if (googleWindow && googleWindow.closed) {
+      if (popup && popup.closed) {
         clearInterval(interval);
-        // Kiểm tra nếu cửa sổ đăng nhập bị đóng
         console.log("Google window closed");
-        // Xử lý sau khi đăng nhập thành công
+        setGoogleWindow(null);
       }
     }, 1000);
   };
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get("code");
-
-    if (code) {
-      // Call your loginGoogle mutation with the Google code
-      loginGoogle(code);
-    }
-  }, [loginGoogle]);
-
-  useEffect(() => {
-    if (isSuccess && data) {
-      const { accessToken, refreshToken } = data;
-
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
-      notification.success({
-        message: "Succcesfully login",
-      });
-      navigate("/");
-    }
-  }, [isSuccess, data, navigate]);
+  console.log(role);
 
   return (
     <AuthLayout>
@@ -241,6 +273,7 @@ const Form: React.FC = () => {
                     toggleAuthMode={() => setIsLogin(!isLogin)}
                     isSuccess={isSuccess}
                     onFogot={setForgotStatus}
+                    isSignupLoad={isLoading}
                   />
                 </div>
 

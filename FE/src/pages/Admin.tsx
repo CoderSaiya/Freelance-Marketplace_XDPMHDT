@@ -37,15 +37,24 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard: React.FC = () => {
   const [currentTab, setCurrentTab] = useState("dashboard");
+
+  const navigate = useNavigate();
 
   const { data } = useGetProjectQuery();
   const { data: revenueData } = useGetRevenueQuery();
 
   const revenues = revenueData?.data.monthlyRevenue || [];
   const projects = data?.data.projects || [];
+
+  const handleLogout = () => {
+    localStorage.setItem("access_token", "");
+    localStorage.setItem("refresh", "");
+    navigate("/login");
+  };
 
   const getProgress = (status: string) => {
     let progress = 0;
@@ -106,10 +115,7 @@ const AdminDashboard: React.FC = () => {
     switch (currentTab) {
       case "dashboard":
         return (
-          <DashboardContent
-            projectData={projectData}
-            revenueData={revenues}
-          />
+          <DashboardContent projectData={projectData} revenueData={revenues} />
         );
       case "projects":
         return <ProjectsContent projectData={projectData} />;
@@ -123,10 +129,7 @@ const AdminDashboard: React.FC = () => {
         return <SettingsContent />;
       default:
         return (
-          <DashboardContent
-            projectData={projectData}
-            revenueData={revenues}
-          />
+          <DashboardContent projectData={projectData} revenueData={revenues} />
         );
     }
   };
@@ -204,7 +207,7 @@ const AdminDashboard: React.FC = () => {
                 Setting
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="text-red-600">
+              <DropdownMenuItem className="text-red-600" onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 Log out
               </DropdownMenuItem>

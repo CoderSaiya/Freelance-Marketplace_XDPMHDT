@@ -11,6 +11,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   userId,
   username,
   activeTab,
+  refetch,
 }) => {
   const me = useSelector((state: RootState) => state.auth.username);
   const [updateUserProfile] = useUpdateUserProfileMutation();
@@ -39,6 +40,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         },
       }).unwrap();
       setIsEditing(false);
+      refetch();
     } catch (error) {
       console.error("Error updating profile:", error);
     }
@@ -47,7 +49,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     <div className="flex items-center justify-between mb-6">
       <div className="flex items-center">
         <img
-          src="/img/BinhGa.jpg"
+          src={contactInfo.avatar}
           alt="Avatar"
           className="w-28 h-28 rounded-full mr-6"
         />

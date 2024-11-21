@@ -258,6 +258,7 @@ export const graphqlApi = createApi({
                   applyId
                   status
                   createAt
+                  freelancerId
                   freelancer {
                     username
                     createAt
@@ -519,6 +520,7 @@ export const graphqlApi = createApi({
                 username
                 email
                 userProfile {
+                  avatar
                   rating
                   company
                   phone
@@ -784,6 +786,67 @@ export const graphqlApi = createApi({
         },
       }),
     }),
+    verifyCode: builder.mutation<ResponseType<{ verifyCode: boolean }>, { email: string, code: string }>({
+      query: ({ email, code }) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            mutation verifyCode($email: String!, $code: String!) {
+              verifyCode(email: $email, code: $code)
+            }
+          `,
+          variables: { email, code },
+        },
+      })
+    }),
+    forgotPassword: builder.mutation<ResponseType<{ forgotPassword: boolean }>, string>({
+      query: (email) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            mutation SendCode($email: String!) {
+              forgotPassword(email: $email)
+            }
+          `,
+          variables: { email },
+        },
+      })
+    }),
+    changePassword: builder.mutation<ResponseType<{ changePassword: boolean }>, { email: string, newPass: string }>({
+      query: ({ email, newPass }) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            mutation ChangePassword($email: String!, $newPass: String!) {
+              changePassword(email: $email, newPass: $newPass)
+            }
+          `,
+          variables: { email, newPass },
+        },
+      })
+    }),
+    getSimilorProjects: builder.query<ResponseType<{ getSimilarProjects: ProjectType[] }>, number>({
+      query: (projectId) => ({
+        url: 'graphql',
+        method: 'POST',
+        body: {
+          query: `
+            query getSimilarProjects($projectId : Int!) {
+              getSimilarProjects(projectId: $projectId) {
+                projectId
+                projectName
+                budget
+                createAt
+              }
+            }
+          `,
+          variables: { projectId },
+        },
+      }),
+    }),
   }),
 });
 
@@ -814,4 +877,8 @@ export const { useCreateProjectMutation,
   useGetRevenueQuery,
   useGetStatisticsQuery,
   useGetPercentCategoryQuery,
-  useGroupedProjectStatusCountsQuery } = graphqlApi;
+  useGroupedProjectStatusCountsQuery,
+  useForgotPasswordMutation,
+  useVerifyCodeMutation,
+  useChangePasswordMutation,
+  useGetSimilorProjectsQuery, } = graphqlApi;
