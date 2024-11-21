@@ -39,6 +39,3 @@ npm run build
 - Ensure Node.js and npm are correctly installed
 - Clear npm cache if dependency issues occur: `npm cache clean --force`
 - Check console for specific error messages
-
-## Contact
-[Your Team/Project Contact Information]
