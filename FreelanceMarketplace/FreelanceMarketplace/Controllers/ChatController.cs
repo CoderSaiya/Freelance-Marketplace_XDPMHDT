@@ -38,6 +38,7 @@ public class ChatController : ControllerBase
     [HttpPost("send")]
     public async Task<IActionResult> SendMessage([FromBody] ChatMessageDto chatMessage)
     {
+        Console.WriteLine("Nguoi gui: " + chatMessage.Sender + "Nguoi nhan: " + chatMessage.Recipient);
         if (chatMessage == null) return BadRequest("Message cannot be null");
 
         var sender = await _userService.GetUserByUsername(chatMessage.Sender);
@@ -100,9 +101,8 @@ public class ChatController : ControllerBase
     [HttpGet("history")]
     public async Task<IActionResult> GetChatHistory(string user1, string user2)
     {
-        Console.WriteLine("cmm");
-        var user1Entity = await _userService.GetUserByUsernameAsync(user1);
-        var user2Entity = await _userService.GetUserByUsernameAsync(user2);
+        var user1Entity = await _context.Users.FirstOrDefaultAsync(u => u.Username == user1);
+        var user2Entity = await _context.Users.FirstOrDefaultAsync(u => u.Username == user2);
         if (user1Entity == null || user2Entity == null)
             return BadRequest("Invalid users");
 

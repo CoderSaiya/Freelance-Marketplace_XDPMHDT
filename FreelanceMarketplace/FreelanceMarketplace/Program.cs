@@ -18,11 +18,14 @@ using GraphQL.Types;
 using FreelanceMarketplace.Models.DTOs;
 using Microsoft.AspNetCore.SignalR;
 using FreelanceMarketplace.Security;
+using FreelanceMarketplace.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add SignalR service
 builder.Services.AddSignalR();
+
+//builder.Services.AddHostedService<ProjectStatusUpdater>();
 
 // Configure authentication with JWT Bearer
 builder.Services.AddAuthentication(options =>

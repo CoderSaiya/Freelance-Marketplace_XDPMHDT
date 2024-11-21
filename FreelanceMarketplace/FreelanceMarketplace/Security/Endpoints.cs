@@ -18,7 +18,8 @@
             "/chathub",
             "/notificationhub",
             "/notificationhub/negotiate",
-            "/api/chat/get-conversations"
+            "/api/chat/get-conversations",
+            "/api/paypal",
 
         };
 
@@ -33,6 +34,7 @@
             "/api/chat/history",
             "/api/stripe/create-payment-intent",
             "/api/stripe/webhook",
+            "/api/paypal/create-order",
         };
 
         public static readonly string[] ClientEndpoints =
@@ -41,6 +43,7 @@
             "/api/chat/history",
             "/api/stripe/create-payment-intent",
             "/api/stripe/webhook",
+            "/api/paypal/create-order",
         };
     }
 }

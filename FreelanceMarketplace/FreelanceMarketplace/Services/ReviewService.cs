@@ -102,7 +102,7 @@ namespace FreelanceMarketplace.Services
                 Console.WriteLine("recipient ID: " + recipient.Id);
 
                 var newRating = _context.Reviews
-                                .Where(r => r.RecipientId == recipient.Id)
+                                .Where(r => r.RecipientId == review.RecipientId)
                                 .Select(r => r.Rating)
                                 .DefaultIfEmpty(0)
                                 .Average();
