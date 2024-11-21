@@ -22,7 +22,7 @@ npm install
 
 ## Run Development Server
 ```bash
-npm start
+npm run start
 ```
 
 ## Build Production Version
