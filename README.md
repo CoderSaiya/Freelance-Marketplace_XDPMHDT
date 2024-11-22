@@ -34,5 +34,85 @@ Freelance Marketplace là một nền tảng kết nối trực tiếp giữa fr
 - Hỗ trợ quy trình tìm kiếm, quản lý dự án và thanh toán trực tuyến an toàn, tiện lợi.
 - Giúp khách hàng dễ dàng tìm kiếm và hợp tác với freelancer phù hợp với dự án của họ.
 
+# Hướng Dẫn Cài Đặt Dự Án Freelance Marketplace
+
+## Điều Kiện Tiên Quyết
+- Visual Studio 2022 (khuyến nghị phiên bản Community Edition)
+- .NET Core SDK 6.0 trở lên
+- SQL Server 2019 hoặc mới hơn
+- Git
+
+## Bước 1: Clone Mã Nguồn
+```bash
+# Mở Terminal hoặc Command Prompt
+git clone [URL_REPOSITORY]
+cd [TÊN_THƯ_MỤC_DỰ_ÁN]
+```
+
+## Bước 2: Cấu Hình Cơ Sở Dữ Liệu
+1. Mở SQL Server Management Studio
+2. Tạo Database mới:
+```sql
+CREATE DATABASE FreelanceMarketplace
+```
+3. Cập nhật connection string trong `Program.cs`:
+```cs
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        connectionString: "Data Source=DESKTOP-1FAVEMH\\SQLEXPRESS;Initial Catalog=FreelanceMarketplace;Integrated Security=True;trusted_connection=true;encrypt=false;", \\thay ở đây
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null);
+        }),
+    contextLifetime: ServiceLifetime.Scoped,
+    optionsLifetime: ServiceLifetime.Singleton
+);
+```
+
+## Bước 3: Migrations và Khởi Tạo Cơ Sở Dữ Liệu
+```bash
+# Mở Terminal tại thư mục project Backend
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+
+# Hoặc mở Tools -> NuGet Package Manager -> Package Manager Console
+Add-Migration InitialCreate
+Update-Database
+```
+
+## Bước 4: Cài Đặt Dependencies
+```bash
+# Restore packages NuGet
+dotnet restore
+```
+
+## Bước 5: Chạy Ứng Dụng
+```bash
+# Chạy Backend
+dotnet run
+
+# Nếu sử dụng Visual Studio
+# - Mở solution
+# - Nhấn F5 hoặc nút Start
+```
+
+## Khắc Phục Sự Cố
+- Kiểm tra version .NET Core
+- Đảm bảo connection string chính xác
+- Cài đầy đủ dependencies
+
+
+## Lưu Ý Bảo Mật
+- Không commit các file chứa thông tin nhạy cảm
+- Sử dụng Secret Manager của .NET Core
+- Luôn sử dụng HTTPS
+
+## Tài Liệu Tham Khảo
+- [Tài liệu .NET Core](https://docs.microsoft.com/dotnet)
+- [Entity Framework Core](https://docs.microsoft.com/ef)
+
 ## 📄 License
 Dự án được mô tả chi tiết trong file SRS - [Xem tài liệu chi tiết](./SRS.docx) để xem chi tiết.
